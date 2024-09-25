@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Scheduler } from "@aldabil/react-scheduler";
 
+const colors = ['#50b500', '#007BFF', '#FFC107', '#900000', '#28a745'];
+
 // Define a type for your form data
 interface FormData {
   num_employees: string;
@@ -15,6 +17,9 @@ interface Event {
   title: string;
   start: Date;
   end: Date;
+  color?: string;
+  admin_id: number;
+  editable: boolean;
 }
 
 export default function App() {
@@ -37,7 +42,7 @@ export default function App() {
       setFormData({
         ...formData,
         num_employees: value,
-        employee_types: new Array(numEmployees).fill("full_time"),  // Default to full_time
+        employee_types: new Array(numEmployees).fill("full_time"),  // Default to full_time?
       });
     } else {
       setFormData({
@@ -60,7 +65,6 @@ export default function App() {
   // Define the type for the form submission handler
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
     const payload = {
       num_employees: parseInt(formData.num_employees, 10),
       shifts_per_day: parseInt(formData.shifts_per_day, 10),
@@ -78,24 +82,48 @@ export default function App() {
     });
 
     const data = await response.json();
+    console.log(data);
 
     // Convert the API response to scheduler events
     const newEvents: Event[] = [];
-    const schedules = data.schedules[0];
 
-    Object.keys(schedules).forEach((day, index) => {
-      schedules[day].forEach((shift: any) => {
-        newEvents.push({
-          event_id: `${day}-${shift.shift}`,
-          title: `Employee ${shift.employee} Shift ${shift.shift}`,
-          start: new Date(new Date().setDate(new Date().getDate() + index)),
-          end: new Date(new Date().setDate(new Date().getDate() + index + 1)),
+    // Iterate over the entire schedules array
+    data.schedules.forEach((dayObj: any, outerIndex: number) => {
+      // Iterate over each "Day X" key
+      Object.keys(dayObj).forEach((dayKey, dayIndex) => {
+        const shifts = dayObj[dayKey];
+
+        // Increment the base date by the dayIndex (to correctly map Day 1, Day 2, etc.)
+        const currentDate = new Date();
+        currentDate.setDate(currentDate.getDate() + dayIndex);
+
+        // Iterate over the shifts in the day
+        shifts.forEach((item: any) => {
+          const shiftStartHour = item.shift === 0 ? 6 : 12;
+          const shiftEndHour = item.shift === 0 ? 12 : 17;
+
+          // Create the start and end time for the shift based on the current date
+          const shiftStart = new Date(currentDate);
+          shiftStart.setHours(shiftStartHour, 0, 0, 0);
+
+          const shiftEnd = new Date(currentDate);
+          shiftEnd.setHours(shiftEndHour, 0, 0, 0);
+
+          newEvents.push({
+            event_id: `day${outerIndex + 1}-shift${item.shift}-emp${item.employee}`,
+            title: `Employee ${item.employee} Shift ${item.shift}`,
+            start: shiftStart,
+            end: shiftEnd,
+            color: colors[item.employee % colors.length],
+            admin_id: item.employee,
+            editable: true,
+          });
         });
       });
     });
 
-    setEvents(newEvents); // Update the Scheduler with the new events
-  };
+    setEvents(newEvents);
+};
 
   return (
     <div style={{ display: "flex", flexDirection: "row" }}>
