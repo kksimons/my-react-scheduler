@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Scheduler } from "@aldabil/react-scheduler";
 
+//possible colors for an event to get assigned when it comes in
 const colors = ['#50b500', '#007BFF', '#FFC107', '#900000', '#28a745'];
 
-// Define a type for your form data
+// Form data types
 interface FormData {
   num_employees: string;
   shifts_per_day: string;
@@ -11,7 +12,7 @@ interface FormData {
   employee_types: string[];
 }
 
-// Define a type for the events
+// Event types
 interface Event {
   event_id: string;
   title: string;
@@ -52,7 +53,7 @@ export default function App() {
     }
   };
 
-  // Handle changes in the employee types
+  // Handle changes in the employee types so each employee gets an employee_type
   const handleEmployeeTypeChange = (index: number, value: string) => {
     const updatedEmployeeTypes = [...formData.employee_types];
     updatedEmployeeTypes[index] = value;
@@ -62,7 +63,7 @@ export default function App() {
     });
   };
 
-  // Define the type for the form submission handler
+  // Define the type for the form submission handler: the api expects num_employees, shifts_per_day, total_days, and an array of employee_types
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const payload = {
@@ -72,7 +73,7 @@ export default function App() {
       employee_types: formData.employee_types,
     };
     
-    // Make the POST request to the API
+    // Make the POST request to the API; remember to have the docker running
     const response = await fetch("http://localhost:80/api/v1/scheduler", {
       method: "POST",
       headers: {
@@ -84,7 +85,7 @@ export default function App() {
     const data = await response.json();
     console.log(data);
 
-    // Convert the API response to scheduler events
+    // Convert the API response to scheduler events in the calendar
     const newEvents: Event[] = [];
 
     // Iterate over the entire schedules array
@@ -97,7 +98,7 @@ export default function App() {
         const currentDate = new Date();
         currentDate.setDate(currentDate.getDate() + dayIndex);
 
-        // Iterate over the shifts in the day
+        // Iterate over the shifts in the day object that comes back inside of the schedule array
         shifts.forEach((item: any) => {
           const shiftStartHour = item.shift === 0 ? 6 : 12;
           const shiftEndHour = item.shift === 0 ? 12 : 17;
@@ -175,12 +176,33 @@ export default function App() {
       </form>
 
       <Scheduler
-        events={events} // We now use dynamic events from API response
+        events={events}
         disableViewer
         onEventClick={() => {
           console.log("onEventClick");
+        }}
+        week={{
+          weekDays: [0, 1, 2, 3, 4, 5, 6],
+          weekStartOn: 1,
+          startHour: 5,
+          endHour: 24,
+          step: 60,
         }}
       />
     </div>
   );
 }
+
+//for reference
+// export interface WeekProps {
+//     weekDays: WeekDays[];
+//     weekStartOn: WeekDays;
+//     startHour: DayHours;
+//     endHour: DayHours;
+//     step: number;
+//     cellRenderer?(props: CellRenderedProps): JSX.Element;
+//     headRenderer?(day: Date): JSX.Element;
+//     hourRenderer?(hour: string): JSX.Element;
+//     navigation?: boolean;
+//     disableGoToDay?: boolean;
+// }
