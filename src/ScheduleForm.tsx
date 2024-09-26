@@ -1,63 +1,89 @@
-// New Schedule form
 import React, { useState } from 'react';
 import './App.css';
+
 function ScheduleForm() {
+  const [values, setValues] = useState({
+    employeeCount: '',
+    shiftsPerDay: '',
+    totalDays: '',
+    employeeType: '',
+  });
 
-    const ScheduleForm = () => {
+  const handleChanges = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
+    setValues({
+      ...values,
+      [e.target.name]: e.target.value,
+    });
+  };
 
-        const [values, setValues] = useState({
-            employeeCount: '',
-            shiftsPerDay: '',
-            totalDays: '',
-            employeeType: '',
+  const handleSubmit = (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    console.log(values);
+  };
 
-        })
+  const resetForm = () => {
+    setValues({
+      employeeCount: '',
+      shiftsPerDay: '',
+      totalDays: '',
+      employeeType: '',
+    });
+  };
 
-        const handleChanges = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
-            setValues({
-                ...values,
-                [e.target.name]: e.target.value
-            })
-        }
+  return (
+    <div className="container">
+      <h1>Schedule Details</h1>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="employeeCount">Number of Employees*</label>
+        <input
+          type="text"
+          placeholder="Enter Number"
+          name="employeeCount"
+          onChange={handleChanges}
+          required
+          value={values.employeeCount}
+        />
 
-        const handleSubmit = (e: { preventDefault: () => void; }) => {
-            e.preventDefault();
-            console.log(values);
-        }
+        <label htmlFor="shiftsPerDay">Shifts Per Day*</label>
+        <input
+          type="text"
+          placeholder="Enter Number"
+          name="shiftsPerDay"
+          onChange={handleChanges}
+          required
+          value={values.shiftsPerDay}
+        />
 
-        const ResetFun = () => {
-            setValues({ employeeCount: '', shiftsPerDay: '', totalDays: '', employeeType: ''})
-        }
+        <label htmlFor="totalDays">Total Days*</label>
+        <input
+          type="text"
+          placeholder="Enter Total Days"
+          name="totalDays"
+          onChange={handleChanges}
+          required
+          value={values.totalDays}
+        />
 
-            return (
-                <div className ="container">
-                    <h1>Schedule Details</h1>
-                    <form onSubmit={handleSubmit} >
-                        <label htmlFor="employeeCount">Number of Employees*</label>
-                        <input type="text" placeholder="Enter Number" 
-                        onChange={(e) => handleChanges(e)} required value={values.employeeCount}/>
+        <label htmlFor="employeeType">Employee Type*</label>
+        <select
+          name="employeeType"
+          id="type"
+          onChange={handleChanges}
+          value={values.employeeType}
+        >
+          <option value="">Select Type</option>
+          <option value="Full Time">Full Time</option>
+          <option value="Part Time">Part Time</option>
+          <option value="Contract">Contract</option>
+        </select>
 
-                        <label htmlFor="shiftsPerDay">Shifts Per Day*</label>
-                        <input type="text" placeholder="Enter Number" 
-                        onChange={(e) => handleChanges(e)} required value={values.shiftsPerDay}/>
-
-                        <label htmlFor="totalDays">total Days*</label>
-                        <input type="text" placeholder="Enter Total Days" 
-                        onChange={(e) => handleChanges(e)} required value={values.totalDays}/>
-
-                        <label htmlFor="employeeType">Employee Type*</label>
-                        <select name="employeeType" id="type" onChange={(e) => handleChanges(e)}>
-                            <option value="Full Time">Full Time</option>
-                            <option value="Part Time">Part Time</option>
-                            <option value="Contract">Contract</option>
-                        </select>
-                        
-                        <button type="reset" onClick={ResetFun}>Reset</button>
-                        <button type="submit" >Submit</button>
-
-                    </form>
-                </div>
-            );        
-    }
+        <button type="reset" onClick={resetForm}>
+          Reset
+        </button>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  );
 }
+
 export default ScheduleForm;

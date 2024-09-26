@@ -1,0 +1,53 @@
+ [
+    {
+      "firstName": "John",
+      "lastName": "Doe",
+      "gender": "male",
+      "email": "john.doe@example.com",
+      "phone": "123-456-7890",
+      "employeeType": "Full Time",
+      "position": "Server",
+      "availableShift": "Opening"
+    },
+    {
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "gender": "female",
+      "email": "jane.smith@example.com",
+      "phone": "123-555-7890",
+      "employeeType": "Part Time",
+      "position": "Host",
+      "availableShift": "Evening"
+    },
+    {
+      "firstName": "Robert",
+      "lastName": "Johnson",
+      "gender": "male",
+      "email": "robert.johnson@example.com",
+      "phone": "321-456-7890",
+      "employeeType": "Full Time",
+      "position": "Busser",
+      "availableShift": "Closing"
+    },
+    {
+      "firstName": "Emily",
+      "lastName": "Davis",
+      "gender": "female",
+      "email": "emily.davis@example.com",
+      "phone": "987-654-3210",
+      "employeeType": "Contract",
+      "position": "Server",
+      "availableShift": "Opening"
+    },
+    {
+      "firstName": "Michael",
+      "lastName": "Williams",
+      "gender": "male",
+      "email": "michael.williams@example.com",
+      "phone": "555-123-4567",
+      "employeeType": "Part Time",
+      "position": "Host",
+      "availableShift": "Evening"
+    }
+  ]
+  
