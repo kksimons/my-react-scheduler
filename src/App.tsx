@@ -35,7 +35,7 @@ interface Event {
 }
 
 export default function App() {
-  const [value, setValue] = useState(0); // Keep track of tab state in the header
+  const [value, setValue] = useState(2); // Let's default this to the New Schedule section since that's all we have right now
   const [events, setEvents] = useState<Event[]>([]);
   const [formData, setFormData] = useState<FormData>({
     num_employees: "",
