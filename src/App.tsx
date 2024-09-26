@@ -115,6 +115,9 @@ export default function App() {
           const shiftEnd = new Date(currentDate);
           shiftEnd.setHours(shiftEndHour, 0, 0, 0);
 
+          // Let's make sure colors are unique so we can distinguish them on the calendar
+          const colorIndex = item.employee % colors.length;
+
           newEvents.push({
             event_id: `day${outerIndex + 1}-shift${item.shift}-emp${
               item.employee
@@ -122,7 +125,7 @@ export default function App() {
             title: `Employee ${item.employee} Shift ${item.shift}`,
             start: shiftStart,
             end: shiftEnd,
-            color: colors[item.employee % colors.length],
+            color: colors[colorIndex],
             admin_id: item.employee,
             editable: true,
           });
