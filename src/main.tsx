@@ -7,7 +7,7 @@ import SchedulerView from './SchedulerView.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <SchedulerView />
+    <App />
 
   </StrictMode>
 )

@@ -131,7 +131,7 @@ export default function App() {
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: "1fr 4fr", height: "100vh" }}>
-      <div style={{background: "black", maxWidth: "100%"}}>
+      <div style={{background: "black", maxWidth: "100"}}>
         <form onSubmit={handleSubmit} style={{ marginRight: "20px" }}>
           <h3>Schedule Settings</h3>
           <div>
@@ -179,7 +179,7 @@ export default function App() {
           <button type="submit">Generate Schedule</button>
         </form>
       </div>
-      <div style={{background: "pink"}}> 
+      <div> 
         <Scheduler
           events={events}
           disableViewer

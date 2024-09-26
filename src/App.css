@@ -1,11 +1,10 @@
-App.css
+/* App.css */
 
-#root {
+/* #root {
   width: 100%;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
-}
+} */
 
 .logo {
   height: 6em;
@@ -81,58 +80,85 @@ h1 {
   color: #4206a3;
 }
 
-label {
-  font-size: 15px;
-  display: block;
-  width: 100%;
-  margin-top: 8px;
-  margin-bottom: 5px;
-  text-align: left;
-  color: #555;
-  font-weight: bold;
-}
 
-input {
-  display: block;
-  width: 100%;
-  padding: 8px;
-  box-sizing: border-box;
-  border: 1px solid #ddd;
-  font-size: 12px;
-}
+ /* ScheduleForm.tsx */
+.schedule-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .schedule-container h1 {
+    text-align: center;
+    font-size: 24px;
+    color: #551212;
+    margin-bottom: 20px;
+  }
+  
+  .schedule-form label {
+    font-size: 15px;
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    margin-bottom: 5px;
+    text-align: left;
+    color: #555;
+    font-weight: bold;
+  }
+  
+  .schedule-form input,
+  .schedule-form select {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    border-radius: 5px;
+  }
+  
+  .schedule-form select {
+    background-color: white;
+  }
+  
+  .schedule-form button {
+    padding: 10px 20px;
+    border-radius: 6px;
+    margin: 10px 0;
+    border: none;
+    color: white;
+    cursor: pointer;
+    background-color: #4206a3;
+    width: 45%;
+    font-size: 16px;
+  }
+  
+  .schedule-form button[type="reset"] {
+    background-color: #d9534f;
+  }
+  
+  .schedule-form button:hover {
+    background-color: #5e2f8e;
+  }
+  
+  .schedule-form button[type="reset"]:hover {
+    background-color: #c9302c;
+  }
+  
+  .schedule-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
 
-select {
-  display: block;
-  width: 100%;
-  margin-bottom: 15px;
-  padding: 10px;
-  box-sizing: border-box;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-}
 
-textarea {
-  resize: none;
-  width: 98%;
-  min-height: 100px;
-  max-height: 150px;;
-}
-
-button {
-  padding: 10px 15px;
-  border-radius: 6px;
-  margin: 15px;
-  border: none;
-  color: white;
-  cursor: pointer;
-  background-color: #4206a3;
-  width: 40%;
-  font-size: 16px;
-}
-
-button:hover {
-  background-color: #5e2f8e;
-}
+  /* EmployeeManagement.tsx FORM  */
+  
 
 /* Navbar css */
 
@@ -162,5 +188,12 @@ button:hover {
 .topnav a.active {
   background-color: #0449aa;
   color: white;
+}
+
+
+/* schedule  */
+
+.schedule-container.label { 
+
 }
 
