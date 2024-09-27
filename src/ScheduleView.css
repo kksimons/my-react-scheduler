@@ -13,60 +13,65 @@
   /* Sidebar with form */
   .employee-setting-sidebar {
     background-color: rgb(255, 255, 255);
-    max-width: 20%;
+    width: 100%;
     color: rgb(0, 0, 0);
   }
   
-   /* Form styling 
-  .schedule-form {
-    margin-right: 20px;
+ /* Form styling  */
+.schedule-form {
+    /* margin-right: 20px; */
+    margin-top: 5rem;
   }
   
-  .schedule-form h3 {
-    margin-bottom: 15px;
-    color: white;
+.schedule-form h3 {
+    /* margin-top: 5rem; */
+    text-align: center;
+    color: #4206a3;
   }
   
-  .schedule-form label {
+.schedule-form label {
     display: block;
-    margin-bottom: 5px;
     font-weight: bold;
+    color: black;
+    text-align: center;
   }
   
-  .schedule-form input,
-  .schedule-form select {
+.schedule-form input, select {
     display: block;
     width: 100%;
     padding: 8px;
-    margin-bottom: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    text-align: center;
+
   }
   
-  .schedule-form h4 {
+.schedule-form h4 {
     margin-top: 20px;
     color: white;
   } */
   
   /* Button styling */
-  .schedule-form button {
-    width: 30%;
-    margin: auto 0;
+.generate-button button {
+    width: 50%;
+    margin: auto;
     background-color: 4206a3 ;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
+    align-items: center;
   }
   
-  .schedule-form button:hover {
+.generate-button button:hover {
     background-color: #550ccb;
   }
   
 
   /* SCHEDULER VIEW ONLY STYLING */
-  .scheduler-view-only {
-    width: 80%;
+.scheduler-view-only {
+    width: 100%;
+
   }
 

@@ -245,7 +245,9 @@ export default function App() {
                 </div>
               ))}
             </div>
-            <button type="submit">Generate Schedule</button>
+            <div className="generate-button">
+              <button type="submit">Generate Schedule</button>
+            </div>
           </form>
         </div>
         <div className="scheduler-view-only"> 
