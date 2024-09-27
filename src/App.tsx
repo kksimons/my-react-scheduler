@@ -50,7 +50,7 @@ function App() {
         <Route path="/ScheduleForm" element={<ScheduleForm />} />
         <Route path="/EmployeeManagement" element={<EmployeeManagement />} />
         <Route path="/SchedulerView" element={<SchedulerView />} />
-        <Route path="/DisplayEmployeeList" element={<DisplayEmployeeList />} /> {/* Add the EmployeeList route */}
+        <Route path="/DisplayEmployeeList" element={<DisplayEmployeeList />} /> 
       </Routes>
     </Router>
   );

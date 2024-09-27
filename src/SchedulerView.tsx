@@ -230,8 +230,8 @@ export default function App() {
                 onChange={handleInputChange}
               />
             </div>
-            <div>
-              <h4>Assign Employee Types</h4>
+            <div className="assign-employee-type">
+              <h3>Assign Employee Types</h3>
               {formData.employee_types.map((type, index) => (
                 <div key={index}>
                   <label>Employee {index + 1}:</label>
@@ -262,7 +262,7 @@ export default function App() {
                 weekStartOn: 1,
                 startHour: 5,
                 endHour: 24,
-                step: 60,
+                step: 100,
               }}
             />
         </div>
