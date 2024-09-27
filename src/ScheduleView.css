@@ -1,0 +1,72 @@
+/* Main grid container */
+
+.schedule-container {
+
+  }
+
+.scheduler-sidebar-and-view {
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    height: 100vh;
+}
+  
+  /* Sidebar with form */
+  .employee-setting-sidebar {
+    background-color: rgb(255, 255, 255);
+    max-width: 20%;
+    color: rgb(0, 0, 0);
+  }
+  
+   /* Form styling 
+  .schedule-form {
+    margin-right: 20px;
+  }
+  
+  .schedule-form h3 {
+    margin-bottom: 15px;
+    color: white;
+  }
+  
+  .schedule-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  .schedule-form input,
+  .schedule-form select {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .schedule-form h4 {
+    margin-top: 20px;
+    color: white;
+  } */
+  
+  /* Button styling */
+  .schedule-form button {
+    width: 30%;
+    margin: auto 0;
+    background-color: 4206a3 ;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .schedule-form button:hover {
+    background-color: #550ccb;
+  }
+  
+
+  /* SCHEDULER VIEW ONLY STYLING */
+  .scheduler-view-only {
+    width: 80%;
+  }
+

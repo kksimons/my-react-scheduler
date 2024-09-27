@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Scheduler } from "@aldabil/react-scheduler";
+import './ScheduleView.css';
 
 //possible colors for an event to get assigned when it comes in
 const colors = ['#50b500', '#007BFF', '#FFC107', '#900000', '#28a745'];
@@ -130,70 +131,139 @@ export default function App() {
 };
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 4fr", height: "100vh" }}>
-      <div style={{background: "black", maxWidth: "100"}}>
-        <form onSubmit={handleSubmit} style={{ marginRight: "20px" }}>
-          <h3>Schedule Settings</h3>
-          <div>
-            <label>Number of Employees:</label>
-            <input
-              type="number"
-              name="num_employees"
-              value={formData.num_employees}
-              onChange={handleInputChange}
+    // <div style={{ display: "grid", gridTemplateColumns: "1fr 4fr", height: "100vh" }}>
+    //   <div style={{background: "black", maxWidth: "100"}}>
+    //     <form onSubmit={handleSubmit} style={{ marginRight: "20px" }}>
+    //       <h3>Schedule Settings</h3>
+    //       <div>
+    //         <label>Number of Employees:</label>
+    //         <input
+    //           type="number"
+    //           name="num_employees"
+    //           value={formData.num_employees}
+    //           onChange={handleInputChange}
+    //         />
+    //       </div>
+    //       <div>
+    //         <label>Shifts per Day:</label>
+    //         <input
+    //           type="number"
+    //           name="shifts_per_day"
+    //           value={formData.shifts_per_day}
+    //           onChange={handleInputChange}
+    //         />
+    //       </div>
+    //       <div>
+    //         <label>Total Days:</label>
+    //         <input
+    //           type="number"
+    //           name="total_days"
+    //           value={formData.total_days}
+    //           onChange={handleInputChange}
+    //         />
+    //       </div>
+    //       <div>
+    //         <h4>Assign Employee Types</h4>
+    //         {formData.employee_types.map((type, index) => (
+    //           <div key={index}>
+    //             <label>Employee {index + 1}:</label>
+    //             <select
+    //               value={type}
+    //               onChange={(e) => handleEmployeeTypeChange(index, e.target.value)}
+    //             >
+    //               <option value="full_time">Full Time</option>
+    //               <option value="part_time">Part Time</option>
+    //             </select>
+    //           </div>
+    //         ))}
+    //       </div>
+    //       <button type="submit">Generate Schedule</button>
+    //     </form>
+    //   </div>
+    //   <div> 
+    //     <Scheduler
+    //       events={events}
+    //       disableViewer
+    //       onEventClick={() => {
+    //         console.log("onEventClick");
+    //       }}
+    //       week={{
+    //         weekDays: [0, 1, 2, 3, 4, 5, 6],
+    //         weekStartOn: 1,
+    //         startHour: 5,
+    //         endHour: 24,
+    //         step: 60,
+    //       }}
+    //     />
+    //   </div>
+    // </div>
+
+    <div className="scheduler-view-container">
+      <div className="scheduler-sidebar-and-view"> 
+        <div className="employee-setting-sidebar">
+          <form onSubmit={handleSubmit} className="schedule-form">
+            <h3>Schedule Settings</h3>
+            <div>
+              <label>Number of Employees:</label>
+              <input
+                type="number"
+                name="num_employees"
+                value={formData.num_employees}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label>Shifts per Day:</label>
+              <input
+                type="number"
+                name="shifts_per_day"
+                value={formData.shifts_per_day}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label>Total Days:</label>
+              <input
+                type="number"
+                name="total_days"
+                value={formData.total_days}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <h4>Assign Employee Types</h4>
+              {formData.employee_types.map((type, index) => (
+                <div key={index}>
+                  <label>Employee {index + 1}:</label>
+                  <select
+                    value={type}
+                    onChange={(e) => handleEmployeeTypeChange(index, e.target.value)}
+                  >
+                    <option value="full_time">Full Time</option>
+                    <option value="part_time">Part Time</option>
+                  </select>
+                </div>
+              ))}
+            </div>
+            <button type="submit">Generate Schedule</button>
+          </form>
+        </div>
+        <div className="scheduler-view-only"> 
+            <Scheduler
+              events={events}
+              disableViewer
+              onEventClick={() => {
+                console.log("onEventClick");
+              }}
+              week={{
+                weekDays: [0, 1, 2, 3, 4, 5, 6],
+                weekStartOn: 1,
+                startHour: 5,
+                endHour: 24,
+                step: 60,
+              }}
             />
-          </div>
-          <div>
-            <label>Shifts per Day:</label>
-            <input
-              type="number"
-              name="shifts_per_day"
-              value={formData.shifts_per_day}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <label>Total Days:</label>
-            <input
-              type="number"
-              name="total_days"
-              value={formData.total_days}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <h4>Assign Employee Types</h4>
-            {formData.employee_types.map((type, index) => (
-              <div key={index}>
-                <label>Employee {index + 1}:</label>
-                <select
-                  value={type}
-                  onChange={(e) => handleEmployeeTypeChange(index, e.target.value)}
-                >
-                  <option value="full_time">Full Time</option>
-                  <option value="part_time">Part Time</option>
-                </select>
-              </div>
-            ))}
-          </div>
-          <button type="submit">Generate Schedule</button>
-        </form>
-      </div>
-      <div> 
-        <Scheduler
-          events={events}
-          disableViewer
-          onEventClick={() => {
-            console.log("onEventClick");
-          }}
-          week={{
-            weekDays: [0, 1, 2, 3, 4, 5, 6],
-            weekStartOn: 1,
-            startHour: 5,
-            endHour: 24,
-            step: 60,
-          }}
-        />
+        </div>
       </div>
     </div>
   );

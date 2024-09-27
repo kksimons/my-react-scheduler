@@ -1,0 +1,140 @@
+
+/* STYLE ADD EMPLOYEE FORM */
+/* Container for the form and employee list */
+
+/* TODO 
+1. fix margin h2 employee list 
+2. form background color to white 
+
+*/
+
+
+.employee-manager-container {
+    /* background-color: white;  */
+    background-color: white; /* Change from gray to white */
+    padding: 20px; /* Add some padding to give space between the form and the edges */
+    min-height: 100vh; /* Ensure the page covers the full height */
+}
+.add-employee-container {
+    max-width: 40%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Heading styles */
+  .add-employee-container h1{
+    text-align: center;
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  /* Form styling */
+  .add-employee-form-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  /* Labels */
+  .add-employee-form-container label {
+    font-size: 16px;
+    display: block;
+    width: 100%;
+    /* margin-top: 0.1rem; */
+    margin-bottom: 5px;
+    text-align: left;
+    color: #000000;
+    font-weight: bold;
+  }
+  
+  /* Inputs and Selects */
+  .add-employee-form-container input, select{
+    display: block;
+    width: 100%;
+    padding: 10px;
+    /* margin-bottom: 5px; */
+    /* margin: auto 0; */
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    border-radius: 5px;
+  }
+  
+  .add-employee-form-container select {
+    background-color: white;
+  }
+
+  .add-employee-form-container option:hover {
+    background-color:#4206a3;
+  }
+  
+  /*BUTTON STYLES */
+  .add-employee-button-container button{
+    padding: 16px 0;
+    border-radius: 6px;
+    margin: 1.5rem 0;
+
+    border: none;
+    color: white;
+    cursor: pointer;
+    background-color: #4206a3;
+    width: 40%;
+    font-size: 16px;
+  }
+  
+  .add-employee-form-container button:hover {
+    background-color: #550ccb;
+  }
+  
+  
+  
+  
+  
+  /* STYLE EMPLOYEE TABLE */
+  /* Employee table container */
+  .employee-table-container {
+    margin-top: 10px;
+    background-color:#4206a3;
+  }
+
+  .employee-table-container {
+    color: white;
+  }
+  /* Table styling */
+  .employee-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+  }
+  
+  /* Table header */
+  .employee-table th {
+    background-color: #4206a3;
+    color: white;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  /* Table rows */
+  .employee-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+    color: #000000;
+  }
+  
+  /* Hover effect for rows */
+  .employee-table tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
+import './ScheduleForm.css';
 
 function ScheduleForm() {
   const [values, setValues] = useState({
