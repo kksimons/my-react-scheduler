@@ -3,14 +3,12 @@ import { Scheduler } from "@aldabil/react-scheduler";
 import {
   Box,
   Button,
-  MenuItem,
-  Select,
   TextField,
   Typography,
+  Avatar,
+  Paper,
 } from "@mui/material";
-
-// Possible colors for events
-const colors = ["#50b500", "#007BFF", "#FFC107", "#900000", "#28a745"];
+import employeesData from "../data/employees.json"; // Importing the employees data
 
 // Form data types
 interface FormData {
@@ -40,28 +38,49 @@ export default function CooksSchedule() {
     total_days: "",
     employee_types: [],
   });
+  const [employeeColors, setEmployeeColors] = useState<{ [key: number]: string }>({}); // Store employee colors dynamically
+
+  const [idMapping, setIdMapping] = useState<{ [key: number]: number }>({}); // Store the API index -> employee ID mapping
 
   // Track shift times in the state
   const [shiftTimes, setShiftTimes] = useState({
-    shift1: { start: "09:00", end: "13:00" }, // Default times for 3 shifts
+    shift1: { start: "09:00", end: "13:00" },
     shift2: { start: "13:00", end: "17:00" },
     shift3: { start: "17:00", end: "21:00" },
   });
 
   const { shift1, shift2, shift3 } = shiftTimes;
 
+  // Fetch cook data and set the number of employees based on employee type
+  useEffect(() => {
+    const cooks = employeesData.filter(
+      (employee) => employee.employee_type === "cook"
+    );
+
+    // Create a mapping of API index -> actual employee ID
+    const cookIdMapping: { [key: number]: number } = {};
+    cooks.forEach((cook, index) => {
+      cookIdMapping[index] = cook.id;
+    });
+    setIdMapping(cookIdMapping);
+
+    setFormData((prev) => ({
+      ...prev,
+      num_employees: cooks.length.toString(),
+      employee_types: cooks.map(() => "full_time"), // Defaulting cooks to full-time
+    }));
+  }, []);
+
   // Adjust step and default shift times based on shifts_per_day
   useEffect(() => {
     if (formData.shifts_per_day === "2") {
-      // If 2 shifts, set step to 360 minutes and default shift times
       setStep(360);
       setShiftTimes({
         shift1: { start: "09:00", end: "15:00" },
         shift2: { start: "15:00", end: "21:00" },
-        shift3: { start: "", end: "" }, // Empty for shift3 since it's not used
+        shift3: { start: "", end: "" }, // Shift 3 not used
       });
     } else if (formData.shifts_per_day === "3") {
-      // If 3 shifts, set step to 240 minutes and default shift times
       setStep(240);
       setShiftTimes({
         shift1: { start: "09:00", end: "13:00" },
@@ -80,7 +99,7 @@ export default function CooksSchedule() {
       setFormData({
         ...formData,
         num_employees: value,
-        employee_types: new Array(numEmployees).fill("full_time"), // Default to full_time
+        employee_types: new Array(numEmployees).fill("full_time"), // Defaulting all employees to full-time
       });
     } else {
       setFormData({
@@ -90,41 +109,17 @@ export default function CooksSchedule() {
     }
   };
 
-  // Handle changes in the employee types so each employee gets an employee_type
-  const handleEmployeeTypeChange = (index: number, value: string) => {
-    const updatedEmployeeTypes = [...formData.employee_types];
-    updatedEmployeeTypes[index] = value;
-    setFormData({
-      ...formData,
-      employee_types: updatedEmployeeTypes,
-    });
-  };
-
-  // Update shift times in the state
-  type ShiftKey = "shift1" | "shift2" | "shift3";
-  const handleShiftTimeChange = (
-    shift: ShiftKey,
-    timeType: string,
-    value: string
-  ) => {
-    setShiftTimes((prevShiftTimes) => ({
-      ...prevShiftTimes,
-      [shift]: {
-        ...prevShiftTimes[shift],
-        [timeType]: value,
-      },
-    }));
-  };
-
   // Define the form submission handler
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const cooks = employeesData.filter(employee => employee.employee_type === "cook");
+
     const payload = {
-      num_employees: parseInt(formData.num_employees, 10),
+      num_employees: cooks.length,  // Number of cooks
       shifts_per_day: parseInt(formData.shifts_per_day, 10),
       total_days: parseInt(formData.total_days, 10),
-      employee_types: formData.employee_types,
+      employee_types: cooks.map(employee => employee.work_type),  // Pass work types
     };
 
     const response = await fetch("http://localhost:80/api/v1/scheduler", {
@@ -138,6 +133,7 @@ export default function CooksSchedule() {
     const data = await response.json();
 
     const newEvents: Event[] = [];
+    const newEmployeeColors: { [key: number]: string } = {}; // Temporary object to store colors
 
     // Generate events with shift times included
     data.schedules.forEach((dayObj: any, outerIndex: number) => {
@@ -170,30 +166,80 @@ export default function CooksSchedule() {
           const [endHour, endMinute] = shiftEndHour.split(":");
           shiftEnd.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
 
-          const colorIndex = item.employee % colors.length;
+          // Map the API index to the actual employee ID
+          const employeeId = idMapping[item.employee];
+
+          // Assign a color to the employee if not already assigned
+          if (!newEmployeeColors[employeeId]) {
+            newEmployeeColors[employeeId] = generateRandomColor(); // Use a random color generator
+          }
 
           newEvents.push({
-            event_id: `day${outerIndex + 1}-shift${item.shift}-emp${
-              item.employee
-            }`,
-            title: `Employee ${item.employee} Shift ${item.shift}`,
+            event_id: `day${outerIndex + 1}-shift${item.shift}-emp${employeeId}`,
+            title: `Employee ${employeeId} Shift ${item.shift}`,
             start: shiftStart,
             end: shiftEnd,
-            color: colors[colorIndex],
-            admin_id: item.employee,
+            color: newEmployeeColors[employeeId],  // Use dynamic color
+            admin_id: employeeId,
             editable: true,
           });
         });
       });
     });
 
+    // Set events and colors after the schedule is generated
     setEvents(newEvents);
+    setEmployeeColors(newEmployeeColors); // Update employee colors dynamically after schedule generation
+  };
+
+  // Function to generate random colors for employees
+  const generateRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
   };
 
   return (
     <div>
+      {/* Render Cook Cards */}
+      <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+        {employeesData
+          .filter((employee) => employee.employee_type === "cook")
+          .map((employee) => (
+            <Paper
+              key={employee.id}
+              elevation={3}
+              sx={{
+                padding: 2,
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+                width: "300px",
+                backgroundColor: employeeColors[employee.id] || "#FFFFFF", // Use white by default, color after schedule generation
+              }}
+            >
+              <Avatar
+                src={employee.profilePic}
+                alt={employee.name}
+                sx={{ width: 56, height: 56 }}
+              />
+              <Box>
+                <Typography variant="h6">{employee.name}</Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {employee.employee_type.charAt(0).toUpperCase() +
+                    employee.employee_type.slice(1)}
+                </Typography>
+              </Box>
+            </Paper>
+          ))}
+      </Box>
+
+      {/* Form for scheduling */}
       <form onSubmit={handleSubmit}>
-        <Box sx={{ display: "flex", gap: "24px" }}>
+        <Box sx={{ display: "flex", gap: "24px", marginTop: "20px" }}>
           {/* Schedule Settings (Left) */}
           <Box sx={{ flex: 1 }}>
             <Typography variant="h6" gutterBottom>
@@ -229,110 +275,6 @@ export default function CooksSchedule() {
               margin="normal"
               variant="outlined"
             />
-          </Box>
-
-          {/* Assign Employee Types (Middle) */}
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="h6" gutterBottom>
-              Assign Employee Types
-            </Typography>
-            {formData.num_employees &&
-              parseInt(formData.num_employees) > 0 && (
-                <>
-                  {formData.employee_types.map((type, index) => (
-                    <Select
-                      key={index}
-                      label={`Employee ${index + 1}`}
-                      value={type}
-                      onChange={(e) =>
-                        handleEmployeeTypeChange(
-                          index,
-                          e.target.value as string
-                        )
-                      }
-                      fullWidth
-                      variant="outlined"
-                      sx={{ marginBottom: "8px" }}
-                    >
-                      <MenuItem value="full_time">Full Time</MenuItem>
-                      <MenuItem value="part_time">Part Time</MenuItem>
-                    </Select>
-                  ))}
-                </>
-              )}
-          </Box>
-
-          {/* Define Shift Times (Right) */}
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="h6" gutterBottom>
-              Define Shift Times
-            </Typography>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <Box sx={{ display: "flex", gap: "16px" }}>
-                <TextField
-                  label="Shift 1 Start Time"
-                  type="time"
-                  value={shift1.start}
-                  onChange={(e) =>
-                    handleShiftTimeChange("shift1", "start", e.target.value)
-                  }
-                  fullWidth
-                />
-                <TextField
-                  label="Shift 1 End Time"
-                  type="time"
-                  value={shift1.end}
-                  onChange={(e) =>
-                    handleShiftTimeChange("shift1", "end", e.target.value)
-                  }
-                  fullWidth
-                />
-              </Box>
-
-              <Box sx={{ display: "flex", gap: "16px" }}>
-                <TextField
-                  label="Shift 2 Start Time"
-                  type="time"
-                  value={shift2.start}
-                  onChange={(e) =>
-                    handleShiftTimeChange("shift2", "start", e.target.value)
-                  }
-                  fullWidth
-                />
-                <TextField
-                  label="Shift 2 End Time"
-                  type="time"
-                  value={shift2.end}
-                  onChange={(e) =>
-                    handleShiftTimeChange("shift2", "end", e.target.value)
-                  }
-                  fullWidth
-                />
-              </Box>
-
-              {formData.shifts_per_day === "3" && (
-                <Box sx={{ display: "flex", gap: "16px" }}>
-                  <TextField
-                    label="Shift 3 Start Time"
-                    type="time"
-                    value={shift3.start}
-                    onChange={(e) =>
-                      handleShiftTimeChange("shift3", "start", e.target.value)
-                    }
-                    fullWidth
-                  />
-                  <TextField
-                    label="Shift 3 End Time"
-                    type="time"
-                    value={shift3.end}
-                    onChange={(e) =>
-                      handleShiftTimeChange("shift3", "end", e.target.value)
-                    }
-                    fullWidth
-                  />
-                </Box>
-              )}
-            </Box>
           </Box>
         </Box>
 
