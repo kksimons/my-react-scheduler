@@ -3,12 +3,13 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyCey0QGSAn2QsMyKrHJQ5nojR92KOXMiE8",
+  authDomain: "powershift-29522.firebaseapp.com",
+  projectId: "powershift-29522",
+  storageBucket: "powershift-29522.appspot.com",
+  messagingSenderId: "880153414164",
+  appId: "1:880153414164:web:402906cbf5ba9fde673501",
+  measurementId: "G-KV9E3CL7BF"
 };
 
 const app = initializeApp(firebaseConfig);
