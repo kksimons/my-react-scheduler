@@ -38,6 +38,7 @@ import DisplayEmployeeList from './DisplayEmployeeList';
 function App() {
   return (
     <Router>
+      <h1 className='menu-title'>PowerShift</h1>
       <div className="topnav">
         <Link to="/">Home</Link>
         <Link to="/SchedulerView">Scheduler View</Link>
