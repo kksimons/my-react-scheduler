@@ -1,7 +1,14 @@
 import { useState, useEffect } from "react";
 import { Scheduler } from "@aldabil/react-scheduler";
-import { Box, Button, TextField, Typography, Avatar, Paper } from "@mui/material";
-import employeesData from "../data/employees.json"; // Importing the employees data
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Avatar,
+  Paper,
+} from "@mui/material";
+import employeesData from "../data/employees.json"; // Importing the employees data for now, we can move off to firebase when it's ready and pull from there
 
 // Form data types
 interface FormData {
@@ -31,7 +38,9 @@ export default function ServersSchedule() {
     total_days: "",
     employee_types: [],
   });
-  const [employeeColors, setEmployeeColors] = useState<{ [key: number]: string }>({}); // Store employee colors dynamically
+  const [employeeColors, setEmployeeColors] = useState<{
+    [key: number]: string;
+  }>({}); // Store employee colors dynamically
 
   // Track shift times in the state
   const [shiftTimes, setShiftTimes] = useState({
@@ -162,7 +171,9 @@ export default function ServersSchedule() {
           }
 
           newEvents.push({
-            event_id: `day${outerIndex + 1}-shift${item.shift}-emp${item.employee}`,
+            event_id: `day${outerIndex + 1}-shift${item.shift}-emp${
+              item.employee
+            }`,
             title: `Employee ${item.employee} Shift ${item.shift}`,
             start: shiftStart,
             end: shiftEnd,

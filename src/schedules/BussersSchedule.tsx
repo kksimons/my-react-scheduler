@@ -8,7 +8,7 @@ import {
   Avatar,
   Paper,
 } from "@mui/material";
-import employeesData from "../data/employees.json"; // Importing the employees data
+import employeesData from "../data/employees.json"; // Importing the employees data for now, we can move off to firebase when it's ready and pull from there
 
 // Form data types
 interface FormData {
@@ -193,7 +193,7 @@ export default function BussersSchedule() {
     setEmployeeColors(newEmployeeColors); // Update employee colors dynamically after schedule generation
   };
 
-  // Function to generate random colors for employees
+  // Function to generate random colors for employees, maybe we can find a better one that doesn't make ugly ones sometime
   const generateRandomColor = () => {
     const letters = "0123456789ABCDEF";
     let color = "#";

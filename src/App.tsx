@@ -5,7 +5,7 @@ import BussersSchedule from "./schedules/BussersSchedule";
 import CooksSchedule from "./schedules/CooksSchedule";
 
 export default function App() {
-  const [value, setValue] = useState(2); // Default to Servers Schedule
+  const [value, setValue] = useState(0); // Default to Servers Schedule, now 0
 
   return (
     <div>

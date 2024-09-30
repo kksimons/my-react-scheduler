@@ -8,7 +8,7 @@ import {
   Avatar,
   Paper,
 } from "@mui/material";
-import employeesData from "../data/employees.json"; // Importing the employees data
+import employeesData from "../data/employees.json"; // Importing the employees data for now, we can move off to firebase when it's ready and pull from there
 
 // Form data types
 interface FormData {
