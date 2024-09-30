@@ -1,0 +1,167 @@
+[
+  {
+    "id": 0,
+    "name": "John Doe",
+    "employee_type": "server",
+    "profilePic": "./pexels-italo-melo-881954-2379004.jpg",
+    "color": "#50b500",
+    "work_type": "full_time",
+    "availability": {
+      "mon": ["morning", "afternoon"],
+      "tue": ["afternoon", "evening"],
+      "wed": [],
+      "thu": ["morning"],
+      "fri": ["morning", "afternoon", "evening"]
+    }
+  },
+  {
+    "id": 1,
+    "name": "Jane Smith",
+    "employee_type": "server",
+    "profilePic": "./pexels-pixabay-415829.jpg",
+    "color": "#007BFF",
+    "work_type": "part_time",
+    "availability": {
+      "mon": ["morning", "evening"],
+      "tue": [],
+      "wed": ["afternoon", "evening"],
+      "thu": ["morning"],
+      "fri": ["afternoon", "evening"]
+    }
+  },
+  {
+    "id": 2,
+    "name": "Sam Johnson",
+    "employee_type": "server",
+    "profilePic": "./pexels-stefanstefancik-91227.jpg",
+    "color": "#FFC107",
+    "work_type": "full_time",
+    "availability": {
+      "mon": ["morning"],
+      "tue": ["morning", "afternoon"],
+      "wed": ["afternoon", "evening"],
+      "thu": ["morning", "afternoon"],
+      "fri": ["morning", "afternoon"]
+    }
+  },
+  {
+    "id": 3,
+    "name": "Alex Turner",
+    "employee_type": "server",
+    "profilePic": "./pexels-blitzboy-1040880.jpg",
+    "color": "#00FF99",
+    "work_type": "part_time",
+    "availability": {
+      "mon": ["afternoon"],
+      "tue": ["morning", "evening"],
+      "wed": ["morning"],
+      "thu": ["afternoon", "evening"],
+      "fri": ["morning", "afternoon"]
+    }
+  },
+  {
+    "id": 4,
+    "name": "Paul Brown",
+    "employee_type": "busser",
+    "profilePic": "./pexels-cottonbro-6626903.jpg",
+    "color": "#900000",
+    "work_type": "part_time",
+    "availability": {
+      "mon": ["morning"],
+      "tue": ["morning"],
+      "wed": ["afternoon"],
+      "thu": ["morning", "afternoon"],
+      "fri": ["afternoon"]
+    }
+  },
+  {
+    "id": 5,
+    "name": "Lily White",
+    "employee_type": "busser",
+    "profilePic": "./pexels-danxavier-1239288.jpg",
+    "color": "#28a745",
+    "work_type": "full_time",
+    "availability": {
+      "mon": ["afternoon", "evening"],
+      "tue": ["morning", "afternoon"],
+      "wed": ["morning"],
+      "thu": ["evening"],
+      "fri": ["morning", "evening"]
+    }
+  },
+  {
+    "id": 6,
+    "name": "Emily Davis",
+    "employee_type": "busser",
+    "profilePic": "./pexels-bertellifotografia-573299.jpg",
+    "color": "#FF33FF",
+    "work_type": "full_time",
+    "availability": {
+      "mon": ["morning", "afternoon"],
+      "tue": ["evening"],
+      "wed": ["morning", "afternoon"],
+      "thu": ["morning"],
+      "fri": ["afternoon", "evening"]
+    }
+  },
+  {
+    "id": 7,
+    "name": "Mark Green",
+    "employee_type": "cook",
+    "profilePic": "./pexels-linkedin-2182970.jpg",
+    "color": "#FF5733",
+    "work_type": "full_time",
+    "availability": {
+      "mon": ["morning"],
+      "tue": ["morning", "afternoon"],
+      "wed": ["afternoon"],
+      "thu": ["morning", "evening"],
+      "fri": ["evening"]
+    }
+  },
+  {
+    "id": 8,
+    "name": "Anna Black",
+    "employee_type": "cook",
+    "profilePic": "./pexels-vinicius-wiesehofer-289347-1130626.jpg",
+    "color": "#C70039",
+    "work_type": "part_time",
+    "availability": {
+      "mon": ["afternoon"],
+      "tue": ["morning", "evening"],
+      "wed": ["evening"],
+      "thu": ["afternoon"],
+      "fri": ["morning", "evening"]
+    }
+  },
+  {
+    "id": 9,
+    "name": "Grace Blue",
+    "employee_type": "cook",
+    "profilePic": "./pexels-olly-762020.jpg",
+    "color": "#900C3F",
+    "work_type": "full_time",
+    "availability": {
+      "mon": ["morning", "evening"],
+      "tue": ["afternoon"],
+      "wed": ["morning"],
+      "thu": ["morning"],
+      "fri": ["afternoon", "evening"]
+    }
+  },
+  {
+    "id": 10,
+    "name": "Oliver Stone",
+    "employee_type": "cook",
+    "profilePic": "./pexels-rb-audiovisual-1819483.jpg",
+    "color": "#800080",
+    "work_type": "part_time",
+    "availability": {
+      "mon": ["afternoon"],
+      "tue": ["morning", "evening"],
+      "wed": ["morning"],
+      "thu": ["morning", "afternoon"],
+      "fri": ["evening"]
+    }
+  }
+]
