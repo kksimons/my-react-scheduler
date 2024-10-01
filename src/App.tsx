@@ -3,6 +3,7 @@ import { Box, Tab, Tabs, Typography } from "@mui/material";
 import ServersSchedule from "./schedules/ServersSchedule";
 import BussersSchedule from "./schedules/BussersSchedule";
 import CooksSchedule from "./schedules/CooksSchedule";
+import HomePage from "./schedules/HomePage";
 
 export default function App() {
   const [value, setValue] = useState(0); // Default to Servers Schedule, now 0
@@ -12,6 +13,7 @@ export default function App() {
       {/* Header */}
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={value} onChange={(e, newValue) => setValue(newValue)} aria-label="schedule tabs">
+          <Tab label="Home" />
           <Tab label="Servers Schedule" />
           <Tab label="Bussers Schedule" />
           <Tab label="Cooks Schedule" />
@@ -21,17 +23,23 @@ export default function App() {
       {/* Tabs Content */}
       {value === 0 && (
         <Box p={3}>
+          <Typography variant="h5">Home</Typography>
+          <HomePage />
+        </Box>
+      )}
+      {value === 1 && (
+        <Box p={3}>
           <Typography variant="h5">Servers Schedule</Typography>
           <ServersSchedule />
         </Box>
       )}
-      {value === 1 && (
+      {value === 2 && (
         <Box p={3}>
           <Typography variant="h5">Bussers Schedule</Typography>
           <BussersSchedule />
         </Box>
       )}
-      {value === 2 && (
+      {value === 3 && (
         <Box p={3}>
           <Typography variant="h5">Cooks Schedule</Typography>
           <CooksSchedule />
