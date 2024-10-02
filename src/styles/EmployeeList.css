@@ -1,0 +1,43 @@
+/* STYLE EMPLOYEE TABLE */
+  /* Employee table container */
+  .employee-list-container {
+    margin-top: 10px;
+    background-color:#4206a3;
+  }
+
+  .employee-table-container {
+    color: white;
+  }
+  /* Table styling */
+  .employee-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+  }
+  
+  /* Table header */
+  .employee-table th {
+    background-color: #4206a3;
+    color: white;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  /* Table rows */
+  .employee-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+    color: #000000;
+  }
+  
+  /* Hover effect for rows */
+  .employee-table tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  

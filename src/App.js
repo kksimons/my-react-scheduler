@@ -1,16 +1,14 @@
-// src/Home.tsx
+// src/App.js
 import React, { useEffect, useState } from "react";
-import { auth } from "./userAuth/firebase"; // Update path if necessary
-import { onAuthStateChanged, User } from "firebase/auth";
-import SignUp from "./userAuth/SignUp";
-import SignIn from "./userAuth/SignIn";
-import GitHubSignIn from "./userAuth/GitHubSignIn";
-import SignOut from "./userAuth/SignOut";
+import { auth } from "./userAuth/firebase"; // Update this path
+import { onAuthStateChanged } from "firebase/auth";
+import SignUp from "./userAuth/SignUp"; // Update this path
+import SignIn from "./userAuth/SignIn"; // Update this path
+import GitHubSignIn from "./userAuth/GitHubSignIn"; // Import GitHubSignIn component
+import SignOut from "./userAuth/SignOut"; // Import SignOut component
 
-import SchedulerView from "./SchedulerView";
-
-const Home: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
+const App = () => {
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,7 +27,6 @@ const Home: React.FC = () => {
     return () => unsubscribe();
   }, []);
 
-  // Display loading indicator while checking authentication state
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -40,12 +37,9 @@ const Home: React.FC = () => {
         <div>
           <div>Welcome, {user.email}!</div>
           <SignOut />
-          {/* Here you can add other components that should be displayed after logging in */}
-          <SchedulerView />
         </div>
       ) : (
         <div>
-          {/* Show authentication components when user is not logged in */}
           <SignUp />
           <SignIn />
           <GitHubSignIn />
@@ -55,4 +49,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default App;
