@@ -1,4 +1,3 @@
-// src/Home.tsx
 import React, { useEffect, useState } from "react";
 import { auth } from "./userAuth/firebase"; // Update path if necessary
 import { onAuthStateChanged, User } from "firebase/auth";
@@ -40,7 +39,6 @@ const Home: React.FC = () => {
         <div>
           <div>Welcome, {user.email}!</div>
           <SignOut />
-          {/* Here you can add other components that should be displayed after logging in */}
           <SchedulerView />
         </div>
       ) : (

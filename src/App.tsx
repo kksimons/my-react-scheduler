@@ -35,6 +35,7 @@ import EmployeeManagement from './EmployeeManagement';
 //import EmployeeList from './EmployeeList'; // Import EmployeeList
 import DisplayEmployeeList from './DisplayEmployeeList';
 
+
 function App() {
   return (
     <Router>
@@ -53,6 +54,7 @@ function App() {
         <Route path="/DisplayEmployeeList" element={<DisplayEmployeeList />} /> 
       </Routes>
     </Router>
+
   );
 }
 
