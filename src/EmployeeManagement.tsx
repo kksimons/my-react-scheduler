@@ -98,7 +98,7 @@ const EmployeeManagement: React.FC = () => {
     { value: "morning", label: "Morning" },
     { value: "evening", label: "Evening" },
     { value: "closing", label: "Closing" },
-    { value: "Anytime", label: "Anytime" },
+    { value: "anytime", label: "Anytime" },
   ];
 
   return (
