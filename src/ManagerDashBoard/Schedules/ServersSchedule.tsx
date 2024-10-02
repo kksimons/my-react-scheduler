@@ -8,7 +8,7 @@ import {
   Avatar,
   Paper,
 } from "@mui/material";
-import employeesData from "../data/employees.json"; // Importing the employees data for now, we can move off to firebase when it's ready and pull from there
+import employeesData from "../../data/employees.json"; // Importing the employees data for now, we can move off to firebase when it's ready and pull from there
 
 // Form data types
 interface FormData {
@@ -29,7 +29,7 @@ interface Event {
   editable: boolean;
 }
 
-export default function CooksSchedule() {
+export default function ServersSchedule() {
   const [events, setEvents] = useState<Event[]>([]);
   const [step, setStep] = useState(240); // Default step for 3 shifts
   const [formData, setFormData] = useState<FormData>({
@@ -38,9 +38,9 @@ export default function CooksSchedule() {
     total_days: "",
     employee_types: [],
   });
-  const [employeeColors, setEmployeeColors] = useState<{ [key: number]: string }>({}); // Store employee colors dynamically
-
-  const [idMapping, setIdMapping] = useState<{ [key: number]: number }>({}); // Store the API index -> employee ID mapping
+  const [employeeColors, setEmployeeColors] = useState<{
+    [key: number]: string;
+  }>({}); // Store employee colors dynamically
 
   // Track shift times in the state
   const [shiftTimes, setShiftTimes] = useState({
@@ -51,23 +51,15 @@ export default function CooksSchedule() {
 
   const { shift1, shift2, shift3 } = shiftTimes;
 
-  // Fetch cook data and set the number of employees based on employee type
+  // Fetch employee data and set the number of employees based on employee type
   useEffect(() => {
-    const cooks = employeesData.filter(
-      (employee) => employee.employee_type === "cook"
+    const servers = employeesData.filter(
+      (employee) => employee.employee_type === "server"
     );
-
-    // Create a mapping of API index -> actual employee ID
-    const cookIdMapping: { [key: number]: number } = {};
-    cooks.forEach((cook, index) => {
-      cookIdMapping[index] = cook.id;
-    });
-    setIdMapping(cookIdMapping);
-
     setFormData((prev) => ({
       ...prev,
-      num_employees: cooks.length.toString(),
-      employee_types: cooks.map(() => "full_time"), // Defaulting cooks to full-time
+      num_employees: servers.length.toString(),
+      employee_types: servers.map(() => "full_time"),
     }));
   }, []);
 
@@ -99,7 +91,7 @@ export default function CooksSchedule() {
       setFormData({
         ...formData,
         num_employees: value,
-        employee_types: new Array(numEmployees).fill("full_time"), // Defaulting all employees to full-time
+        employee_types: new Array(numEmployees).fill("full_time"),
       });
     } else {
       setFormData({
@@ -109,17 +101,25 @@ export default function CooksSchedule() {
     }
   };
 
+  // Function to generate random colors for employees
+  const generateRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
   // Define the form submission handler
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const cooks = employeesData.filter(employee => employee.employee_type === "cook");
-
     const payload = {
-      num_employees: cooks.length,  // Number of cooks
+      num_employees: parseInt(formData.num_employees, 10),
       shifts_per_day: parseInt(formData.shifts_per_day, 10),
       total_days: parseInt(formData.total_days, 10),
-      employee_types: cooks.map(employee => employee.work_type),  // Pass work types
+      employee_types: formData.employee_types,
     };
 
     const response = await fetch("http://localhost:80/api/v1/scheduler", {
@@ -131,9 +131,8 @@ export default function CooksSchedule() {
     });
 
     const data = await response.json();
-
     const newEvents: Event[] = [];
-    const newEmployeeColors: { [key: number]: string } = {}; // Temporary object to store colors
+    const newEmployeeColors: { [key: number]: string } = {};
 
     // Generate events with shift times included
     data.schedules.forEach((dayObj: any, outerIndex: number) => {
@@ -166,48 +165,36 @@ export default function CooksSchedule() {
           const [endHour, endMinute] = shiftEndHour.split(":");
           shiftEnd.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
 
-          // Map the API index to the actual employee ID
-          const employeeId = idMapping[item.employee];
-
           // Assign a color to the employee if not already assigned
-          if (!newEmployeeColors[employeeId]) {
-            newEmployeeColors[employeeId] = generateRandomColor(); // Use a random color generator
+          if (!newEmployeeColors[item.employee]) {
+            newEmployeeColors[item.employee] = generateRandomColor();
           }
 
           newEvents.push({
-            event_id: `day${outerIndex + 1}-shift${item.shift}-emp${employeeId}`,
-            title: `Employee ${employeeId} Shift ${item.shift}`,
+            event_id: `day${outerIndex + 1}-shift${item.shift}-emp${
+              item.employee
+            }`,
+            title: `Employee ${item.employee} Shift ${item.shift}`,
             start: shiftStart,
             end: shiftEnd,
-            color: newEmployeeColors[employeeId],  // Use dynamic color
-            admin_id: employeeId,
+            color: newEmployeeColors[item.employee], // Assign employee's color
+            admin_id: item.employee,
             editable: true,
           });
         });
       });
     });
 
-    // Set events and colors after the schedule is generated
     setEvents(newEvents);
-    setEmployeeColors(newEmployeeColors); // Update employee colors dynamically after schedule generation
-  };
-
-  // Function to generate random colors for employees
-  const generateRandomColor = () => {
-    const letters = "0123456789ABCDEF";
-    let color = "#";
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
+    setEmployeeColors(newEmployeeColors); // Assign employee colors dynamically
   };
 
   return (
     <div>
-      {/* Render Cook Cards */}
+      {/* Render Employee Cards */}
       <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
         {employeesData
-          .filter((employee) => employee.employee_type === "cook")
+          .filter((employee) => employee.employee_type === "server")
           .map((employee) => (
             <Paper
               key={employee.id}
@@ -218,7 +205,7 @@ export default function CooksSchedule() {
                 alignItems: "center",
                 gap: 2,
                 width: "300px",
-                backgroundColor: employeeColors[employee.id] || "#FFFFFF", // Use white by default, color after schedule generation
+                backgroundColor: employeeColors[employee.id] || "#FFFFFF", // Color applied after schedule generation
               }}
             >
               <Avatar
