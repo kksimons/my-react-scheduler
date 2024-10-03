@@ -1,9 +1,16 @@
+// THIS PAGE WILL DO: 
+// 1. This page will display employee lists (All, Dining, Kitchen, Add Employee). Each tab will display employees base on their employee_system (kitchen or dining) 
+// 2. It will auto update new employee 
+// 3. 
+
+
+
 import React, { useState, useEffect } from "react";
 import { Box, Tab, Tabs } from "@mui/material";
 import { db } from "../userAuth/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import AddEmployee from "./AddEmployee";
-import "./EmployeeManagement.css";
+// import "./EmployeeManagement.css";
 import DiningEmployeeList from "./DiningEmployeeList";
 import KitchenEmployeeList from "./KitchenEmployeeList";
 
@@ -25,6 +32,7 @@ const EmployeeList: React.FC<{ employees: any[] }> = ({ employees }) => {
           </tr>
         </thead>
         <tbody>
+          {/* Display employee by employee */}
           {employees.map((employee, index) => (
             <tr key={index}>
               <td>{employee.employee_fname}</td>
@@ -43,17 +51,17 @@ const EmployeeList: React.FC<{ employees: any[] }> = ({ employees }) => {
 };
 
 // DiningEmployeeList and KitchenEmployeeList defined as above...
-
 const EmployeeManagement: React.FC = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const [employees, setEmployees] = useState<any[]>([]);
 
-  // Fetch employees from Firestore
+  // Fetch employees from Firestore and display it in the table when we call the function 
   const fetchEmployees = async () => {
     try {
-      const employeeCollection = collection(db, "employee-info");
-      const employeeSnapshot = await getDocs(employeeCollection);
-      const employeeList = employeeSnapshot.docs.map((doc) => doc.data());
+
+      const employeeCollection = collection(db, "employee-info"); //employee-info = our database name
+      const employeeSnapshot = await getDocs(employeeCollection); //get doc of our emp database 
+      const employeeList = employeeSnapshot.docs.map((doc) => doc.data()); //get each emp info 
       setEmployees(employeeList);
     } catch (error) {
       console.error("Error fetching employee data:", error);
@@ -62,7 +70,13 @@ const EmployeeManagement: React.FC = () => {
 
   useEffect(() => {
     fetchEmployees();
-  }, []);
+  }, []); //fetch employees data in our employee-info db 
+
+  //Function to handle to add new employees into state employee 
+  const handleEmployeeAdded = (newEmployee: any) => {
+    setEmployees((prevEmployees) => [...prevEmployees, newEmployee]);
+  };
+
 
   // Handle tab change
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -80,19 +94,21 @@ const EmployeeManagement: React.FC = () => {
       </Tabs>
 
       {/* Tab content */}
-      {tabIndex === 0 && <EmployeeList employees={employees} />}
+      {/* The first one has only {employees because it's fetch emp without any filter, so it will show all emp we have} */}
+      {tabIndex === 0 && <EmployeeList employees={employees} />} 
 
-      {/* Dining employee tab */}
-      {tabIndex === 1 && <DiningEmployeeList employees={employees} />}
+      
+      {/* Dining employee tab, add filter */}
+      {tabIndex === 1 && <DiningEmployeeList employees={employees.filter(emp => emp.employee_system === "Dining Side")} />}
 
-      {/* Kitchen employee tab */}
-      {tabIndex === 2 && <KitchenEmployeeList employees={employees} />}
+      {/* Kitchen employee tab, add filter */}
+      {tabIndex === 2 && <KitchenEmployeeList employees={employees.filter(emp => emp.employee_system === "Kitchen Side")} />}
 
       {/* Add employee tab */}
       {tabIndex === 3 && (
         <AddEmployee
           onEmployeeAdded={() => {
-            fetchEmployees(); // Refresh the employee list after adding a new employee
+            fetchEmployees(); 
           }}
         />
       )}
@@ -101,3 +117,5 @@ const EmployeeManagement: React.FC = () => {
 };
 
 export default EmployeeManagement;
+
+

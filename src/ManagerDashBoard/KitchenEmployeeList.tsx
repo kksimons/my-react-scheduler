@@ -3,7 +3,7 @@
 
 const KitchenEmployeeList: React.FC<{ employees: any[] }> = ({ employees }) => {
     const diningEmployees = employees.filter(
-      (employee) => employee.employee_system === "kitchen"
+      (employee) => employee.employee_system === "Kitchen Side"
     );
   
     return (

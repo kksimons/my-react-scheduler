@@ -1,3 +1,7 @@
+// THIS PAGE WILL DO: 
+// 1. Add new employees to table list 
+// 2. It will auto fetching data from firebase database and auto update and display on our table (w/o manually reload the page by using CALL BACK )
+
 
 import React, { useState } from "react";
 import { db } from "../userAuth/firebase";
@@ -7,7 +11,11 @@ import Select from "react-select"; //react select for multi select
 
 
 //set value form 
-const AddEmployee: React.FC = () => {
+interface AddEmployeeProps {
+  onEmployeeAdded: () => void;
+}
+
+const AddEmployee: React.FC<AddEmployeeProps> = ({ onEmployeeAdded }) => {
   const [values, setValues] = useState({
     firstName: "",
     lastName: "",
@@ -34,7 +42,7 @@ const AddEmployee: React.FC = () => {
     }));
   };
 
-  // function to handle changes for the multi-select component
+  // function to handle changes for the multi-select component (availability section) 
   const handleMultiSelectChange = (selectedOptions: any) => {
     setValues((prevValues) => ({
       ...prevValues,
@@ -44,35 +52,44 @@ const AddEmployee: React.FC = () => {
     }));
   };
 
-  // Function to capitalize the first letter of each word
-const capitalize = (str: string) => {
-  return str
-    .toLowerCase() // First, convert the entire string to lowercase to handle cases where the input is in uppercase.
-    .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize the first letter of each word.
-};
+    // Function to capitalize the first letter of each word
+  const capitalize = (str: string) => {
+    return str
+      .toLowerCase() // First, convert the entire string to lowercase to handle cases where the input is in uppercase.
+      .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize the first letter of each word.
+  };   //Since i have found a way to capitalize which is to capitalize the value. idk if this funct is still nessessary but seems like a good practice ig 
 
-// Handle form submission to add a new employee
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
 
-  // Employee data object to be saved in Firestore with capitalized fields
-  const employeeData = {
+
+  // Handle form submission to add a new employee
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+
+
+  // Employee data object to be saved in Firestore with capitalized fields (anything with text be cap)
+  const employeeData  = {
     employee_fname: capitalize(values.firstName),
     employee_lname: capitalize(values.lastName),
-    employee_dob: values.dob, // Keeping date as is since it does not need capitalization
-    employee_phone_number: values.phone, // Phone numbers do not need capitalization
+    employee_dob: values.dob, 
+    employee_phone_number: values.phone, 
     employee_position: capitalize(values.position),
     employee_type: capitalize(values.employeeType),
-    employee_system: values.position === "cook" ? "kitchen" : "dining Side", // Automatically derive and capitalize based on position
-    employee_availability: capitalize(values.availableShift), // Capitalize shift availability if needed
+    employee_system: values.position === "Cook" ? "Kitchen Side" : "Dining Side", // Automatically derive
+    employee_availability: capitalize(values.availableShift), 
   };
 
   try {
     // Add new employee data to Firestore
-    await addDoc(employeesCollectionRef, employeeData);
+    const docRef = await addDoc(employeesCollectionRef, employeeData);
+    const newEmployee = { id: docRef.id, ...employeeData };
 
     // Alert when a new employee is added
     window.alert(`New employee ${capitalize(values.firstName)} ${capitalize(values.lastName)} has been added.`);
+
+    // Callback. The reason why it's here is because new added employee will not be auto display on the list, and we have to reload manually. Callback from EmployeeManagement down to AddEmployee
+    onEmployeeAdded(newEmployee);
+
 
     // Reset form values after submission
     setValues({
@@ -86,6 +103,8 @@ const handleSubmit = async (e: React.FormEvent) => {
       position: "",
       availableShift: "",
     });
+
+    fetchEmployeeList();
   } catch (error) {
     console.error("Error adding employee:", error);
   }
@@ -94,10 +113,10 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   // Shift options for availability
   const shiftOptions = [
-    { value: "morning", label: "Morning" },
-    { value: "evening", label: "Evening" },
-    { value: "closing", label: "Closing" },
-    { value: "anytime", label: "Anytime" },
+    { value: "Morning", label: "Morning" },
+    { value: "Evening", label: "Evening" },
+    { value: "Closing", label: "Closing" },
+    { value: "Anytime", label: "Anytime" },
   ];
 
   return (
@@ -181,10 +200,10 @@ const handleSubmit = async (e: React.FormEvent) => {
               required
             >
               <option value="">Select Position*</option>
-              <option value="cook">Cook</option>
-              <option value="busser">Busser</option>
-              <option value="server">Server</option>
-              <option value="host">Host</option>
+              <option value="Cook">Cook</option>
+              <option value="Busser">Busser</option>
+              <option value="Server">Server</option>
+              <option value="Host">Host</option>
             </select>
           </div>
 
@@ -216,3 +235,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 };
 
 export default AddEmployee;
+function fetchEmployeeList() {
+  throw new Error("Function not implemented.");
+}
+
