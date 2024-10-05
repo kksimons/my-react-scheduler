@@ -150,19 +150,16 @@ export default function App() {
       )}
       {currentTab === 1 && (role === "server" || role === "employer") && (
         <Box p={3}>
-          <Typography variant="h5">Servers Schedule</Typography>
           <ServersSchedule />
         </Box>
       )}
       {currentTab === 2 && (role === "busser" || role === "employer") && (
         <Box p={3}>
-          <Typography variant="h5">Bussers Schedule</Typography>
           <BussersSchedule />
         </Box>
       )}
       {currentTab === 3 && (role === "cook" || role === "employer") && (
         <Box p={3}>
-          <Typography variant="h5">Cooks Schedule</Typography>
           <CooksSchedule />
         </Box>
       )}
