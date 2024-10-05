@@ -1,7 +1,22 @@
 import { useState, useEffect } from "react";
 import { Scheduler } from "@aldabil/react-scheduler";
-import { Box, Button, TextField, Typography, Avatar, Paper } from "@mui/material";
-import { collection, query, where, getDocs, addDoc, orderBy, limit } from "firebase/firestore";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Avatar,
+  Paper,
+} from "@mui/material";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  orderBy,
+  limit,
+} from "firebase/firestore";
 import { db } from "../userAuth/firebase"; // Import Firebase Firestore instance
 import { useUserStore } from "../stores/useUserStore"; // Zustand store to access user role
 import { Timestamp } from "firebase/firestore";
@@ -34,7 +49,9 @@ export default function CooksSchedule() {
     total_days: "",
     employee_types: [],
   });
-  const [employeeColors, setEmployeeColors] = useState<{ [key: string]: string }>({});
+  const [employeeColors, setEmployeeColors] = useState<{
+    [key: string]: string;
+  }>({});
   const [cooks, setCooks] = useState<any[]>([]); // State to hold cook employees
 
   const [shiftTimes, setShiftTimes] = useState({
@@ -130,7 +147,10 @@ export default function CooksSchedule() {
   };
 
   // Save schedule to Firestore under 'cookSchedule' collection
-  const saveScheduleToFirestore = async (scheduleData: { events: Event[]; employeeColors: { [key: string]: string } }) => {
+  const saveScheduleToFirestore = async (scheduleData: {
+    events: Event[];
+    employeeColors: { [key: string]: string };
+  }) => {
     try {
       // Check if events exist
       if (!scheduleData.events || !Array.isArray(scheduleData.events)) {
@@ -162,7 +182,11 @@ export default function CooksSchedule() {
   // Fetch the last generated schedule for cooks from Firestore
   const fetchLastScheduleFromFirestore = async () => {
     try {
-      const scheduleQuery = query(collection(db, "cookSchedules"), orderBy("timestamp", "desc"), limit(1));
+      const scheduleQuery = query(
+        collection(db, "cookSchedules"),
+        orderBy("timestamp", "desc"),
+        limit(1)
+      );
 
       const querySnapshot = await getDocs(scheduleQuery);
 
@@ -232,7 +256,7 @@ export default function CooksSchedule() {
         const currentDate = new Date();
         currentDate.setDate(currentDate.getDate() + dayIndex);
 
-        shifts.forEach((item: any) => {
+        shifts.forEach((item: any, shiftIndex: number) => {
           let shiftStartHour, shiftEndHour;
 
           if (item.shift === 0) {
@@ -256,8 +280,11 @@ export default function CooksSchedule() {
           const [endHour, endMinute] = shiftEndHour.split(":");
           shiftEnd.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
 
-          // Map the employee index from API to the Firestore `userId`
+          // Ensure the event ID is unique by including a combination of day, shift, employee, and a unique shiftIndex or timestamp
           const employeeId = employeeIdMapping[item.employee];
+          const uniqueEventId = `day${outerIndex + 1}-shift${
+            item.shift
+          }-emp${employeeId}-${shiftStart.getTime()}-${shiftIndex}`;
 
           // Assign a color to the employee if not already assigned
           if (!newEmployeeColors[employeeId]) {
@@ -265,7 +292,7 @@ export default function CooksSchedule() {
           }
 
           newEvents.push({
-            event_id: `day${outerIndex + 1}-shift${item.shift}-emp${employeeId}`,
+            event_id: uniqueEventId, // Ensure event_id is unique
             title: `Employee ${employeeId} Shift ${item.shift}`,
             start: shiftStart,
             end: shiftEnd,
@@ -313,7 +340,8 @@ export default function CooksSchedule() {
             <Box>
               <Typography variant="h6">{employee.name}</Typography>
               <Typography variant="body2" color="textSecondary">
-                {employee.employeeType.charAt(0).toUpperCase() + employee.employeeType.slice(1)}
+                {employee.employeeType.charAt(0).toUpperCase() +
+                  employee.employeeType.slice(1)}
               </Typography>
             </Box>
           </Paper>

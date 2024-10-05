@@ -262,7 +262,7 @@ export default function ServersSchedule() {
           const currentDate = new Date();
           currentDate.setDate(currentDate.getDate() + dayIndex);
 
-          shifts.forEach((item: any) => {
+          shifts.forEach((item: any, shiftIndex: number) => {
             let shiftStartHour, shiftEndHour;
 
             if (item.shift === 0) {
@@ -291,8 +291,11 @@ export default function ServersSchedule() {
             const [endHour, endMinute] = shiftEndHour.split(":");
             shiftEnd.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
 
-            // Map the employee index from API to the Firestore `userId`
+            // Ensure the event ID is unique by including a combination of day, shift, employee, and a unique shiftIndex or timestamp
             const employeeId = employeeIdMapping[item.employee];
+            const uniqueEventId = `day${outerIndex + 1}-shift${
+              item.shift
+            }-emp${employeeId}-${shiftStart.getTime()}-${shiftIndex}`;
 
             // Assign a color to the employee if not already assigned
             if (!newEmployeeColors[employeeId]) {
@@ -300,9 +303,7 @@ export default function ServersSchedule() {
             }
 
             newEvents.push({
-              event_id: `day${outerIndex + 1}-shift${
-                item.shift
-              }-emp${employeeId}`,
+              event_id: uniqueEventId, // Ensure event_id is unique
               title: `Employee ${employeeId} Shift ${item.shift}`,
               start: shiftStart,
               end: shiftEnd,
