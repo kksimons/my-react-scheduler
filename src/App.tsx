@@ -130,7 +130,6 @@ export default function App() {
       {/* Tabs Content */}
       {value === 0 && (
         <Box p={3}>
-          <Typography variant="h5">Home</Typography>
           <HomePage setValue={setValue} />
         </Box>
       )}

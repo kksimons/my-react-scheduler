@@ -135,7 +135,7 @@ export default function HomePage({ setValue }) {
       let employeeQuerySnapshot = await getDocs(
         query(employeesQuery, where("userId", "==", userId))
       );
-  
+
       // Check if a matching employee document was found
       if (!employeeQuerySnapshot.empty) {
         const employeeDoc = employeeQuerySnapshot.docs[0].data();
@@ -145,13 +145,13 @@ export default function HomePage({ setValue }) {
           profilePic: employeeDoc.profilePic || null,
         };
       }
-  
+
       // If not found in 'employees', check 'employers' in the same way
       let employersQuery = collection(db, "employers");
       let employerQuerySnapshot = await getDocs(
         query(employersQuery, where("userId", "==", userId))
       );
-  
+
       if (!employerQuerySnapshot.empty) {
         const employerDoc = employerQuerySnapshot.docs[0].data();
         console.log("Employer document found: ", employerDoc); // Log for debugging
@@ -160,14 +160,14 @@ export default function HomePage({ setValue }) {
           profilePic: employerDoc.profilePic || null,
         };
       }
-  
+
       console.log("No user document found for this user");
       return null;
     } catch (error) {
       console.error("Error fetching user role and profile picture:", error);
       return null;
     }
-  };  
+  };
 
   const handleSignUpOrSignIn = async () => {
     try {
@@ -182,16 +182,16 @@ export default function HomePage({ setValue }) {
           employeeType,
           excludedDays,
         } = userInfo;
-  
+
         const userCredential = await createUserWithEmailAndPassword(
           auth,
           email,
           password
         );
         const userId = userCredential.user.uid;
-  
+
         const profilePicUrl = await uploadProfilePicToStorage(userId);
-  
+
         // Add user to Firestore based on their role
         if (role === "employee") {
           await addDoc(collection(db, "employees"), {
@@ -216,13 +216,13 @@ export default function HomePage({ setValue }) {
             profilePic: profilePicUrl || null,
           });
         }
-  
+
         // Immediately update the state without waiting for page reload
         setRole(role);
         setStoreProfilePic(profilePicUrl);
         setIsLoggedIn(true);
         setSuccessMessage("Sign-up successful!");
-  
+
         // Trigger schedule update after successful sign up
         handleScheduleUpdate(role);
       } else {
@@ -232,15 +232,15 @@ export default function HomePage({ setValue }) {
           email,
           password
         );
-  
+
         const userDoc = await fetchUserRoleAndProfile(userCredential.user.uid);
-  
+
         if (userDoc) {
           setRole(userDoc.role);
           setStoreProfilePic(userDoc.profilePic);
           setIsLoggedIn(true);
           setSuccessMessage("Login successful!");
-  
+
           // Trigger schedule update after successful login
           handleScheduleUpdate(userDoc.role);
         } else {
@@ -254,7 +254,7 @@ export default function HomePage({ setValue }) {
       setOpenSnackbar(true);
     }
   };
-  
+
   // Added handleScheduleUpdate to dynamically switch tabs based on role
   const handleScheduleUpdate = (userRole) => {
     if (userRole === "server") {
@@ -266,7 +266,7 @@ export default function HomePage({ setValue }) {
     } else if (userRole === "manager") {
       setValue(1); // Switch to 'Manager Schedule'
     }
-  };  
+  };
 
   const handleProfilePicUpload = (e) => {
     const file = e.target.files[0];
@@ -344,7 +344,14 @@ export default function HomePage({ setValue }) {
           elevation={3}
           sx={{ padding: 3, width: "500px", marginBottom: 4 }}
         >
-          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              mb: 2,
+              gap: 1,
+            }}
+          >
             <Button
               variant={isNewUser ? "contained" : "outlined"}
               onClick={() => setIsNewUser(true)}
@@ -365,8 +372,8 @@ export default function HomePage({ setValue }) {
             <Box>
               {step === 0 && (
                 <Box>
-                  <Typography variant="h6" gutterBottom>
-                    Step 1: Enter Email & Password
+                  <Typography variant="h6" gutterBottom sx={{ mb: 4, mt: 2 }}>
+                    Create an Account
                   </Typography>
                   <TextField
                     name="email"
@@ -661,7 +668,12 @@ export default function HomePage({ setValue }) {
 
               {/* Stepper Controls */}
               <Box
-                sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mt: 3,
+                  mb: 7,
+                }}
               >
                 <Button disabled={step === 0} onClick={handleBack}>
                   Back
@@ -691,7 +703,7 @@ export default function HomePage({ setValue }) {
             <Box>
               {/* Login Form */}
               <Typography variant="h6" gutterBottom>
-                Login
+                Sign In
               </Typography>
               <TextField
                 name="email"
