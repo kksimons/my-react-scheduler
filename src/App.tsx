@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Box, Tab, Tabs, Typography, Avatar, Button } from "@mui/material";
 import ServersSchedule from "./schedules/ServersSchedule";
 import BussersSchedule from "./schedules/BussersSchedule";
@@ -10,17 +10,21 @@ import { signOut } from "firebase/auth";
 import { useUserStore } from "./stores/useUserStore";
 
 export default function App() {
-  const [value, setValue] = useState(0);
-
   const db = getFirestore();
   const {
+    currentTab,
     isLoggedIn,
     role,
     profilePic,
     setRole,
     setProfilePic,
     setIsLoggedIn,
+    setCurrentTab,
   } = useUserStore();
+
+  const handleTabChange = (event, newValue) => {
+    setCurrentTab(newValue); // Persist the tab in Zustand store
+  };
 
   useEffect(() => {
     // Listen for changes to the user's authentication state
@@ -30,27 +34,38 @@ export default function App() {
         if (userDoc) {
           setRole(userDoc.role);
           setProfilePic(userDoc.profilePic);
+
+          // Automatically set currentTab based on role
+          if (userDoc.role === "server") {
+            setCurrentTab(1); // Set to Servers schedule
+          } else if (userDoc.role === "busser") {
+            setCurrentTab(2); // Set to Bussers schedule
+          } else if (userDoc.role === "cook") {
+            setCurrentTab(3); // Set to Cooks schedule
+          } else if (userDoc.role === "employer") {
+            setCurrentTab(1); // Employers default to Servers schedule
+          }
         }
         setIsLoggedIn(true);
       } else {
+        // Reset everything on logout
         setRole(null);
         setProfilePic(null);
         setIsLoggedIn(false);
+        setCurrentTab(0); // Reset to Home tab on logout
       }
     });
 
     return () => unsubscribe();
-  }, [setRole, setProfilePic, setIsLoggedIn]);
+  }, [setRole, setProfilePic, setIsLoggedIn, setCurrentTab]);
 
   // Fetch role and profile picture from either 'employees' or 'employers' collection
-  const fetchUserRoleAndProfile = async (userId: string) => {
+  const fetchUserRoleAndProfile = async (userId) => {
     try {
-      // Check 'employees' collection first
       let docRef = doc(db, "employees", userId);
       let docSnap = await getDoc(docRef);
 
       if (!docSnap.exists()) {
-        // If not found in 'employees', check 'employers'
         docRef = doc(db, "employers", userId);
         docSnap = await getDoc(docRef);
       }
@@ -73,10 +88,11 @@ export default function App() {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth); // Sign out the user from Firebase
-      setIsLoggedIn(false); // Reset Zustand store states
+      await signOut(auth);
+      setIsLoggedIn(false);
       setRole(null);
       setProfilePic(null);
+      setCurrentTab(0); // Reset to Home tab after logout
     } catch (error) {
       console.error("Error during logout:", error);
     }
@@ -98,12 +114,11 @@ export default function App() {
           <>
             {/* Tabs */}
             <Tabs
-              value={value}
-              onChange={(e, newValue) => setValue(newValue)}
+              value={currentTab} // Directly use currentTab from Zustand store
+              onChange={handleTabChange}
               aria-label="schedule tabs"
             >
               <Tab label="Home" />
-              {/* Employers (Managers) should see all schedules */}
               {role === "employer" && <Tab label="Servers Schedule" />}
               {role === "employer" && <Tab label="Bussers Schedule" />}
               {role === "employer" && <Tab label="Cooks Schedule" />}
@@ -128,24 +143,24 @@ export default function App() {
       </Box>
 
       {/* Tabs Content */}
-      {value === 0 && (
+      {currentTab === 0 && (
         <Box p={3}>
-          <HomePage setValue={setValue} />
+          <HomePage setValue={setCurrentTab} />
         </Box>
       )}
-      {value === 1 && (role === "server" || role === "employer") && (
+      {currentTab === 1 && (role === "server" || role === "employer") && (
         <Box p={3}>
           <Typography variant="h5">Servers Schedule</Typography>
           <ServersSchedule />
         </Box>
       )}
-      {value === 2 && (role === "busser" || role === "employer") && (
+      {currentTab === 2 && (role === "busser" || role === "employer") && (
         <Box p={3}>
           <Typography variant="h5">Bussers Schedule</Typography>
           <BussersSchedule />
         </Box>
       )}
-      {value === 3 && (role === "cook" || role === "employer") && (
+      {currentTab === 3 && (role === "cook" || role === "employer") && (
         <Box p={3}>
           <Typography variant="h5">Cooks Schedule</Typography>
           <CooksSchedule />

@@ -1,14 +1,8 @@
 import { useState, useEffect } from "react";
 import { Scheduler } from "@aldabil/react-scheduler";
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Avatar,
-  Paper,
-} from "@mui/material";
-import employeesData from "../data/employees.json"; // Importing the employees data for now, we can move off to firebase when it's ready and pull from there
+import { Box, Button, TextField, Typography, Avatar, Paper } from "@mui/material";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../userAuth/firebase"; // Import Firebase Firestore instance
 
 // Form data types
 interface FormData {
@@ -25,7 +19,7 @@ interface Event {
   start: Date;
   end: Date;
   color?: string;
-  admin_id: number;
+  admin_id: string; // Use `userId` which is a string in Firestore
   editable: boolean;
 }
 
@@ -38,14 +32,9 @@ export default function BussersSchedule() {
     total_days: "",
     employee_types: [],
   });
-  const [employeeColors, setEmployeeColors] = useState<{ [key: number]: string }>({}); // Store employee colors dynamically
-  const [idMapping, setIdMapping] = useState<{ [key: number]: number }>({}); // Store the API index -> employee ID mapping
+  const [employeeColors, setEmployeeColors] = useState<{ [key: string]: string }>({}); // Store employee colors dynamically
+  const [bussers, setBussers] = useState<any[]>([]); // State to hold busser employees
 
-  useEffect(() => {
-    console.log("BussersSchedule mounted");
-  }, []);
-
-  // Track shift times in the state
   const [shiftTimes, setShiftTimes] = useState({
     shift1: { start: "09:00", end: "13:00" },
     shift2: { start: "13:00", end: "17:00" },
@@ -54,24 +43,35 @@ export default function BussersSchedule() {
 
   const { shift1, shift2, shift3 } = shiftTimes;
 
-  // Fetch busser data and set the number of employees based on employee type
+  // Fetch busser data from Firestore
   useEffect(() => {
-    const bussers = employeesData.filter(
-      (employee) => employee.employee_type === "busser"
-    );
+    const fetchBussers = async () => {
+      try {
+        const bussersQuery = query(
+          collection(db, "employees"),
+          where("employeeType", "==", "busser") // Ensure it matches the Firestore field
+        );
+        const querySnapshot = await getDocs(bussersQuery);
 
-    // Create a mapping of API index -> actual employee ID
-    const busserIdMapping: { [key: number]: number } = {};
-    bussers.forEach((busser, index) => {
-      busserIdMapping[index] = busser.id;
-    });
-    setIdMapping(busserIdMapping);
+        const fetchedBussers = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
 
-    setFormData((prev) => ({
-      ...prev,
-      num_employees: bussers.length.toString(),
-      employee_types: bussers.map(() => "full_time"), // Defaulting bussers to full-time
-    }));
+        console.log("Fetched Bussers:", fetchedBussers); // Log for debugging
+        setBussers(fetchedBussers);
+
+        setFormData((prev) => ({
+          ...prev,
+          num_employees: fetchedBussers.length.toString(),
+          employee_types: fetchedBussers.map(() => "full_time"),
+        }));
+      } catch (error) {
+        console.error("Error fetching bussers from Firestore:", error);
+      }
+    };
+
+    fetchBussers(); // Call the function to fetch bussers from Firestore
   }, []);
 
   // Adjust step and default shift times based on shifts_per_day
@@ -112,19 +112,25 @@ export default function BussersSchedule() {
     }
   };
 
+  // Function to generate random colors for employees
+  const generateRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
   // Define the form submission handler
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const bussers = employeesData.filter(
-      (employee) => employee.employee_type === "busser"
-    );
-
     const payload = {
-      num_employees: bussers.length, // Number of bussers
+      num_employees: bussers.length, // Number of bussers from state
       shifts_per_day: parseInt(formData.shifts_per_day, 10),
       total_days: parseInt(formData.total_days, 10),
-      employee_types: bussers.map((employee) => employee.work_type), // Pass work types
+      employee_types: bussers.map((employee) => employee.workType), // Pass work types
     };
 
     const response = await fetch("http://localhost:80/api/v1/scheduler", {
@@ -138,7 +144,13 @@ export default function BussersSchedule() {
     const data = await response.json();
 
     const newEvents: Event[] = [];
-    const newEmployeeColors: { [key: number]: string } = {}; // Temporary object to store colors
+    const newEmployeeColors: { [key: string]: string } = {}; // Temporary object to store colors
+
+    // Map the employee index from the API to the actual userId from Firestore
+    const employeeIdMapping = bussers.reduce(
+      (acc, busser, index) => ({ ...acc, [index]: busser.id }),
+      {}
+    );
 
     // Generate events with shift times included
     data.schedules.forEach((dayObj: any, outerIndex: number) => {
@@ -171,8 +183,8 @@ export default function BussersSchedule() {
           const [endHour, endMinute] = shiftEndHour.split(":");
           shiftEnd.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
 
-          // Map the API index to the actual employee ID
-          const employeeId = item.employee; // Skip mapping for now and use the raw employee ID
+          // Map the employee index from API to the Firestore `userId`
+          const employeeId = employeeIdMapping[item.employee];
 
           // Assign a color to the employee if not already assigned
           if (!newEmployeeColors[employeeId]) {
@@ -197,49 +209,36 @@ export default function BussersSchedule() {
     setEmployeeColors(newEmployeeColors); // Update employee colors dynamically after schedule generation
   };
 
-  // Function to generate random colors for employees, maybe we can find a better one that doesn't make ugly ones sometime
-  const generateRandomColor = () => {
-    const letters = "0123456789ABCDEF";
-    let color = "#";
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  };
-
   return (
     <div>
       {/* Render Busser Cards */}
       <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-        {employeesData
-          .filter((employee) => employee.employee_type === "busser")
-          .map((employee) => (
-            <Paper
-              key={employee.id}
-              elevation={3}
-              sx={{
-                padding: 2,
-                display: "flex",
-                alignItems: "center",
-                gap: 2,
-                width: "300px",
-                backgroundColor: employeeColors[employee.id] || "#FFFFFF", // Use white by default, color after schedule generation
-              }}
-            >
-              <Avatar
-                src={employee.profilePic}
-                alt={employee.name}
-                sx={{ width: 56, height: 56 }}
-              />
-              <Box>
-                <Typography variant="h6">{employee.name}</Typography>
-                <Typography variant="body2" color="textSecondary">
-                  {employee.employee_type.charAt(0).toUpperCase() +
-                    employee.employee_type.slice(1)}
-                </Typography>
-              </Box>
-            </Paper>
-          ))}
+        {bussers.map((employee) => (
+          <Paper
+            key={employee.id}
+            elevation={3}
+            sx={{
+              padding: 2,
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              width: "300px",
+              backgroundColor: employeeColors[employee.id] || "#FFFFFF", // Use white by default, color after schedule generation
+            }}
+          >
+            <Avatar
+              src={employee.profilePic}
+              alt={employee.name}
+              sx={{ width: 56, height: 56 }}
+            />
+            <Box>
+              <Typography variant="h6">{employee.name}</Typography>
+              <Typography variant="body2" color="textSecondary">
+                {employee.employeeType.charAt(0).toUpperCase() + employee.employeeType.slice(1)}
+              </Typography>
+            </Box>
+          </Paper>
+        ))}
       </Box>
 
       {/* Form for scheduling */}

@@ -46,6 +46,7 @@ export default function HomePage({ setValue }) {
   const [shiftTimings, setShiftTimings] = useState([{ start: "", end: "" }]);
   const [uploadProgress, setUploadProgress] = useState(0);
   const {
+    setCurrentTab,
     isLoggedIn,
     setIsLoggedIn,
     setRole,
@@ -131,43 +132,46 @@ export default function HomePage({ setValue }) {
   const fetchUserRoleAndProfile = async (userId) => {
     try {
       // Query the 'employees' collection where the 'userId' field matches the authenticated user's UID
-      let employeesQuery = collection(db, "employees");
-      let employeeQuerySnapshot = await getDocs(
+      const employeesQuery = collection(db, "employees");
+      const employeeQuerySnapshot = await getDocs(
         query(employeesQuery, where("userId", "==", userId))
       );
-
+  
       // Check if a matching employee document was found
       if (!employeeQuerySnapshot.empty) {
         const employeeDoc = employeeQuerySnapshot.docs[0].data();
         console.log("Employee document found: ", employeeDoc); // Log for debugging
+  
+        // Use employeeType as the role instead of just 'employee'
+        const role = employeeDoc.employeeType || "employee";
         return {
-          role: employeeDoc.employeeType || employeeDoc.role || null,
+          role: role, // Set role based on employeeType
           profilePic: employeeDoc.profilePic || null,
         };
       }
-
+  
       // If not found in 'employees', check 'employers' in the same way
-      let employersQuery = collection(db, "employers");
-      let employerQuerySnapshot = await getDocs(
+      const employersQuery = collection(db, "employers");
+      const employerQuerySnapshot = await getDocs(
         query(employersQuery, where("userId", "==", userId))
       );
-
+  
       if (!employerQuerySnapshot.empty) {
         const employerDoc = employerQuerySnapshot.docs[0].data();
         console.log("Employer document found: ", employerDoc); // Log for debugging
         return {
-          role: employerDoc.role || "employer", // Ensure that 'role' is returned as 'employer'
+          role: "employer", // Ensure that 'role' is returned as 'employer'
           profilePic: employerDoc.profilePic || null,
         };
       }
-
+  
       console.log("No user document found for this user");
       return null;
     } catch (error) {
       console.error("Error fetching user role and profile picture:", error);
       return null;
     }
-  };
+  };  
 
   const handleSignUpOrSignIn = async () => {
     try {
@@ -259,12 +263,16 @@ export default function HomePage({ setValue }) {
   const handleScheduleUpdate = (userRole) => {
     if (userRole === "server") {
       setValue(1); // Switch to 'Servers Schedule'
+      setCurrentTab(1); // Persist in store
     } else if (userRole === "busser") {
       setValue(2); // Switch to 'Bussers Schedule'
+      setCurrentTab(2); // Persist in store
     } else if (userRole === "cook") {
       setValue(3); // Switch to 'Cooks Schedule'
+      setCurrentTab(3); // Persist in store
     } else if (userRole === "manager") {
-      setValue(1); // Switch to 'Manager Schedule'
+      setValue(1); // Managers default to 'Servers Schedule'
+      setCurrentTab(1); // Persist in store
     }
   };
 

@@ -1,14 +1,8 @@
 import { useState, useEffect } from "react";
 import { Scheduler } from "@aldabil/react-scheduler";
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Avatar,
-  Paper,
-} from "@mui/material";
-import employeesData from "../data/employees.json"; // Importing the employees data for now, we can move off to firebase when it's ready and pull from there
+import { Box, Button, TextField, Typography, Avatar, Paper } from "@mui/material";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../userAuth/firebase"; // Import Firebase Firestore instance
 
 // Form data types
 interface FormData {
@@ -25,7 +19,7 @@ interface Event {
   start: Date;
   end: Date;
   color?: string;
-  admin_id: number;
+  admin_id: string; // Use `userId` which is a string in Firestore
   editable: boolean;
 }
 
@@ -38,11 +32,9 @@ export default function ServersSchedule() {
     total_days: "",
     employee_types: [],
   });
-  const [employeeColors, setEmployeeColors] = useState<{
-    [key: number]: string;
-  }>({}); // Store employee colors dynamically
+  const [employeeColors, setEmployeeColors] = useState<{ [key: string]: string }>({});
+  const [servers, setServers] = useState<any[]>([]); // State to hold server employees
 
-  // Track shift times in the state
   const [shiftTimes, setShiftTimes] = useState({
     shift1: { start: "09:00", end: "13:00" },
     shift2: { start: "13:00", end: "17:00" },
@@ -51,16 +43,35 @@ export default function ServersSchedule() {
 
   const { shift1, shift2, shift3 } = shiftTimes;
 
-  // Fetch employee data and set the number of employees based on employee type
+  // Fetch server data from Firestore
   useEffect(() => {
-    const servers = employeesData.filter(
-      (employee) => employee.employee_type === "server"
-    );
-    setFormData((prev) => ({
-      ...prev,
-      num_employees: servers.length.toString(),
-      employee_types: servers.map(() => "full_time"),
-    }));
+    const fetchServers = async () => {
+      try {
+        const serversQuery = query(
+          collection(db, "employees"),
+          where("employeeType", "==", "server") // Ensure it matches the Firestore field
+        );
+        const querySnapshot = await getDocs(serversQuery);
+
+        const fetchedServers = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        console.log("Fetched Servers:", fetchedServers); // Log for debugging
+        setServers(fetchedServers);
+
+        setFormData((prev) => ({
+          ...prev,
+          num_employees: fetchedServers.length.toString(),
+          employee_types: fetchedServers.map(() => "full_time"),
+        }));
+      } catch (error) {
+        console.error("Error fetching servers from Firestore:", error);
+      }
+    };
+
+    fetchServers(); // Call the function to fetch servers from Firestore
   }, []);
 
   // Adjust step and default shift times based on shifts_per_day
@@ -91,7 +102,7 @@ export default function ServersSchedule() {
       setFormData({
         ...formData,
         num_employees: value,
-        employee_types: new Array(numEmployees).fill("full_time"),
+        employee_types: new Array(numEmployees).fill("full_time"), // Defaulting all employees to full-time
       });
     } else {
       setFormData({
@@ -116,10 +127,10 @@ export default function ServersSchedule() {
     e.preventDefault();
 
     const payload = {
-      num_employees: parseInt(formData.num_employees, 10),
+      num_employees: servers.length, // Number of servers from state
       shifts_per_day: parseInt(formData.shifts_per_day, 10),
       total_days: parseInt(formData.total_days, 10),
-      employee_types: formData.employee_types,
+      employee_types: servers.map((employee) => employee.workType), // Pass work types
     };
 
     const response = await fetch("http://localhost:80/api/v1/scheduler", {
@@ -131,8 +142,15 @@ export default function ServersSchedule() {
     });
 
     const data = await response.json();
+
     const newEvents: Event[] = [];
-    const newEmployeeColors: { [key: number]: string } = {};
+    const newEmployeeColors: { [key: string]: string } = {}; // Temporary object to store colors
+
+    // Map the employee index from the API to the actual userId from Firestore
+    const employeeIdMapping = servers.reduce(
+      (acc, server, index) => ({ ...acc, [index]: server.id }),
+      {}
+    );
 
     // Generate events with shift times included
     data.schedules.forEach((dayObj: any, outerIndex: number) => {
@@ -165,63 +183,62 @@ export default function ServersSchedule() {
           const [endHour, endMinute] = shiftEndHour.split(":");
           shiftEnd.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
 
+          // Map the employee index from API to the Firestore `userId`
+          const employeeId = employeeIdMapping[item.employee];
+
           // Assign a color to the employee if not already assigned
-          if (!newEmployeeColors[item.employee]) {
-            newEmployeeColors[item.employee] = generateRandomColor();
+          if (!newEmployeeColors[employeeId]) {
+            newEmployeeColors[employeeId] = generateRandomColor(); // Use a random color generator
           }
 
           newEvents.push({
-            event_id: `day${outerIndex + 1}-shift${item.shift}-emp${
-              item.employee
-            }`,
-            title: `Employee ${item.employee} Shift ${item.shift}`,
+            event_id: `day${outerIndex + 1}-shift${item.shift}-emp${employeeId}`,
+            title: `Employee ${employeeId} Shift ${item.shift}`,
             start: shiftStart,
             end: shiftEnd,
-            color: newEmployeeColors[item.employee], // Assign employee's color
-            admin_id: item.employee,
+            color: newEmployeeColors[employeeId], // Use dynamic color
+            admin_id: employeeId,
             editable: true,
           });
         });
       });
     });
 
+    // Set events and colors after the schedule is generated
     setEvents(newEvents);
-    setEmployeeColors(newEmployeeColors); // Assign employee colors dynamically
+    setEmployeeColors(newEmployeeColors); // Update employee colors dynamically after schedule generation
   };
 
   return (
     <div>
-      {/* Render Employee Cards */}
+      {/* Render Server Cards */}
       <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-        {employeesData
-          .filter((employee) => employee.employee_type === "server")
-          .map((employee) => (
-            <Paper
-              key={employee.id}
-              elevation={3}
-              sx={{
-                padding: 2,
-                display: "flex",
-                alignItems: "center",
-                gap: 2,
-                width: "300px",
-                backgroundColor: employeeColors[employee.id] || "#FFFFFF", // Color applied after schedule generation
-              }}
-            >
-              <Avatar
-                src={employee.profilePic}
-                alt={employee.name}
-                sx={{ width: 56, height: 56 }}
-              />
-              <Box>
-                <Typography variant="h6">{employee.name}</Typography>
-                <Typography variant="body2" color="textSecondary">
-                  {employee.employee_type.charAt(0).toUpperCase() +
-                    employee.employee_type.slice(1)}
-                </Typography>
-              </Box>
-            </Paper>
-          ))}
+        {servers.map((employee) => (
+          <Paper
+            key={employee.id}
+            elevation={3}
+            sx={{
+              padding: 2,
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              width: "300px",
+              backgroundColor: employeeColors[employee.id] || "#FFFFFF", // Use white by default, color after schedule generation
+            }}
+          >
+            <Avatar
+              src={employee.profilePic}
+              alt={employee.name}
+              sx={{ width: 56, height: 56 }}
+            />
+            <Box>
+              <Typography variant="h6">{employee.name}</Typography>
+              <Typography variant="body2" color="textSecondary">
+                {employee.employeeType.charAt(0).toUpperCase() + employee.employeeType.slice(1)}
+              </Typography>
+            </Box>
+          </Paper>
+        ))}
       </Box>
 
       {/* Form for scheduling */}
