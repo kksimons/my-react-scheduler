@@ -124,14 +124,17 @@ export default function HomePage({ setValue }: HomePageProps) {
     setUserInfo((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAvailabilityChange = (day: string) => {
+  const handleAvailabilityChange = (day: string, shift: string) => {
     setUserInfo((prev) => ({
       ...prev,
-      excludedDays: userInfo.excludedDays.includes(day)
-        ? userInfo.excludedDays.filter((d) => d !== day)
-        : [...userInfo.excludedDays, day],
+      availability: {
+        ...prev.availability,
+        [day]: prev.availability[day].includes(shift)
+          ? prev.availability[day].filter((s) => s !== shift) // Deselect shift
+          : [...prev.availability[day], shift], // Select shift
+      },
     }));
-  };
+  };  
 
   const handleShiftCountChange = (e: SelectChangeEvent<number>) => {
     const count = parseInt(e.target.value as string);
@@ -406,6 +409,8 @@ export default function HomePage({ setValue }: HomePageProps) {
                     display: "flex",
                     justifyContent: "space-between",
                     gap: 2,
+                    mb: 10,
+                    mt: 10
                   }}
                 >
                   <Paper
@@ -428,9 +433,9 @@ export default function HomePage({ setValue }: HomePageProps) {
                   >
                     <Avatar
                       alt="Employee Avatar"
-                      src={previewUrl || "./placeholder-avatar.jpg"}
-                      sx={{ margin: "auto", width: 56, height: 56 }}
-                    />
+                      src={previewUrl || "./employee.jpg"}
+                      sx={{ margin: "auto", width: 100, height: 100 }}
+                      />
                     <Typography>Employee</Typography>
                   </Paper>
 
@@ -454,9 +459,9 @@ export default function HomePage({ setValue }: HomePageProps) {
                   >
                     <Avatar
                       alt="Employer Avatar"
-                      src="/path-to-employer-avatar.jpg"
-                      sx={{ margin: "auto", width: 56, height: 56 }}
-                    />
+                      src="/employer.jpg"
+                      sx={{ margin: "auto", width: 100, height: 100 }} 
+                      />
                     <Typography>Employer</Typography>
                   </Paper>
                 </Box>
@@ -556,7 +561,7 @@ export default function HomePage({ setValue }: HomePageProps) {
                               ? "contained"
                               : "outlined"
                           }
-                          onClick={() => handleAvailabilityChange(day)}
+                          onClick={() => handleAvailabilityChange(day, shift)}
                           sx={{ mr: 1, mb: 1 }}
                         >
                           {shift}
