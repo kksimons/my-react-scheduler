@@ -41,6 +41,10 @@ export default function BussersSchedule() {
   const [employeeColors, setEmployeeColors] = useState<{ [key: number]: string }>({}); // Store employee colors dynamically
   const [idMapping, setIdMapping] = useState<{ [key: number]: number }>({}); // Store the API index -> employee ID mapping
 
+  useEffect(() => {
+    console.log("BussersSchedule mounted");
+  }, []);
+
   // Track shift times in the state
   const [shiftTimes, setShiftTimes] = useState({
     shift1: { start: "09:00", end: "13:00" },
@@ -168,7 +172,7 @@ export default function BussersSchedule() {
           shiftEnd.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
 
           // Map the API index to the actual employee ID
-          const employeeId = idMapping[item.employee];
+          const employeeId = item.employee; // Skip mapping for now and use the raw employee ID
 
           // Assign a color to the employee if not already assigned
           if (!newEmployeeColors[employeeId]) {

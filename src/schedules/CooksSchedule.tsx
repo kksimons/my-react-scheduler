@@ -167,7 +167,7 @@ export default function CooksSchedule() {
           shiftEnd.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
 
           // Map the API index to the actual employee ID
-          const employeeId = idMapping[item.employee];
+          const employeeId = item.employee; // Skip mapping for now and use the raw employee ID
 
           // Assign a color to the employee if not already assigned
           if (!newEmployeeColors[employeeId]) {

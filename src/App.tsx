@@ -13,7 +13,14 @@ export default function App() {
   const [value, setValue] = useState(0);
 
   const db = getFirestore();
-  const { isLoggedIn, role, profilePic, setRole, setProfilePic, setIsLoggedIn } = useUserStore();
+  const {
+    isLoggedIn,
+    role,
+    profilePic,
+    setRole,
+    setProfilePic,
+    setIsLoggedIn,
+  } = useUserStore();
 
   useEffect(() => {
     // Listen for changes to the user's authentication state
@@ -96,9 +103,12 @@ export default function App() {
               aria-label="schedule tabs"
             >
               <Tab label="Home" />
-              {role === "manager" && <Tab label="Servers Schedule" />}
-              {role === "manager" && <Tab label="Bussers Schedule" />}
-              {role === "manager" && <Tab label="Cooks Schedule" />}
+              {/* Employers (Managers) should see all schedules */}
+              {role === "employer" && <Tab label="Servers Schedule" />}
+              {role === "employer" && <Tab label="Bussers Schedule" />}
+              {role === "employer" && <Tab label="Cooks Schedule" />}
+
+              {/* Employees see only their own schedules */}
               {role === "server" && <Tab label="Servers Schedule" />}
               {role === "busser" && <Tab label="Bussers Schedule" />}
               {role === "cook" && <Tab label="Cooks Schedule" />}
@@ -116,47 +126,45 @@ export default function App() {
           </>
         )}
       </Box>
-
       {/* Tabs Content */}
       {value === 0 && (
         <Box p={3}>
           <Typography variant="h5">Home</Typography>
-          <HomePage />
+          <HomePage setValue={setValue} />
         </Box>
       )}
-      {value === 1 && role === "server" && (
+      {value === 1 && (role === "server" || role === "employer") && (
         <Box p={3}>
           <Typography variant="h5">Servers Schedule</Typography>
           <ServersSchedule />
         </Box>
       )}
-      {value === 2 && role === "busser" && (
+      {value === 2 && (role === "busser" || role === "employer") && (
         <Box p={3}>
           <Typography variant="h5">Bussers Schedule</Typography>
           <BussersSchedule />
         </Box>
       )}
-      {value === 3 && role === "cook" && (
+      {value === 3 && (role === "cook" || role === "employer") && (
         <Box p={3}>
           <Typography variant="h5">Cooks Schedule</Typography>
           <CooksSchedule />
         </Box>
       )}
-
-      {/* Manager's View */}
-      {role === "manager" && value === 1 && (
+      {/* Employer's View */}
+      {role === "employer" && value === 1 && (
         <Box p={3}>
           <Typography variant="h5">Servers Schedule</Typography>
           <ServersSchedule />
         </Box>
       )}
-      {role === "manager" && value === 2 && (
+      {role === "employer" && value === 2 && (
         <Box p={3}>
           <Typography variant="h5">Bussers Schedule</Typography>
           <BussersSchedule />
         </Box>
       )}
-      {role === "manager" && value === 3 && (
+      {role === "employer" && value === 3 && (
         <Box p={3}>
           <Typography variant="h5">Cooks Schedule</Typography>
           <CooksSchedule />

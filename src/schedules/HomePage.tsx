@@ -36,7 +36,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../userAuth/firebase";
 import { useUserStore } from "../stores/useUserStore";
 
-export default function HomePage() {
+export default function HomePage({ setValue }) {
   const db = getFirestore();
   const [isNewUser, setIsNewUser] = useState(true);
   const [step, setStep] = useState(0);
@@ -135,48 +135,63 @@ export default function HomePage() {
       let employeeQuerySnapshot = await getDocs(
         query(employeesQuery, where("userId", "==", userId))
       );
-
+  
       // Check if a matching employee document was found
       if (!employeeQuerySnapshot.empty) {
         const employeeDoc = employeeQuerySnapshot.docs[0].data();
+        console.log("Employee document found: ", employeeDoc); // Log for debugging
         return {
           role: employeeDoc.employeeType || employeeDoc.role || null,
           profilePic: employeeDoc.profilePic || null,
         };
       }
-
+  
       // If not found in 'employees', check 'employers' in the same way
       let employersQuery = collection(db, "employers");
       let employerQuerySnapshot = await getDocs(
         query(employersQuery, where("userId", "==", userId))
       );
-
+  
       if (!employerQuerySnapshot.empty) {
         const employerDoc = employerQuerySnapshot.docs[0].data();
+        console.log("Employer document found: ", employerDoc); // Log for debugging
         return {
-          role: employerDoc.role || null,
+          role: employerDoc.role || "employer", // Ensure that 'role' is returned as 'employer'
           profilePic: employerDoc.profilePic || null,
         };
       }
-
+  
       console.log("No user document found for this user");
       return null;
     } catch (error) {
       console.error("Error fetching user role and profile picture:", error);
       return null;
     }
-  };
+  };  
 
   const handleSignUpOrSignIn = async () => {
     try {
       if (isNewUser) {
-        const { email, password, role, availability, workType, name, employeeType, excludedDays } = userInfo;
-
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const {
+          email,
+          password,
+          role,
+          availability,
+          workType,
+          name,
+          employeeType,
+          excludedDays,
+        } = userInfo;
+  
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
         const userId = userCredential.user.uid;
-
+  
         const profilePicUrl = await uploadProfilePicToStorage(userId);
-
+  
         // Add user to Firestore based on their role
         if (role === "employee") {
           await addDoc(collection(db, "employees"), {
@@ -201,22 +216,33 @@ export default function HomePage() {
             profilePic: profilePicUrl || null,
           });
         }
-
+  
+        // Immediately update the state without waiting for page reload
         setRole(role);
         setStoreProfilePic(profilePicUrl);
         setIsLoggedIn(true);
         setSuccessMessage("Sign-up successful!");
+  
+        // Trigger schedule update after successful sign up
+        handleScheduleUpdate(role);
       } else {
         const { email, password } = userInfo;
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+  
         const userDoc = await fetchUserRoleAndProfile(userCredential.user.uid);
-
+  
         if (userDoc) {
           setRole(userDoc.role);
           setStoreProfilePic(userDoc.profilePic);
           setIsLoggedIn(true);
           setSuccessMessage("Login successful!");
+  
+          // Trigger schedule update after successful login
+          handleScheduleUpdate(userDoc.role);
         } else {
           setErrorMessage("No user document found for this user ID.");
         }
@@ -228,6 +254,19 @@ export default function HomePage() {
       setOpenSnackbar(true);
     }
   };
+  
+  // Added handleScheduleUpdate to dynamically switch tabs based on role
+  const handleScheduleUpdate = (userRole) => {
+    if (userRole === "server") {
+      setValue(1); // Switch to 'Servers Schedule'
+    } else if (userRole === "busser") {
+      setValue(2); // Switch to 'Bussers Schedule'
+    } else if (userRole === "cook") {
+      setValue(3); // Switch to 'Cooks Schedule'
+    } else if (userRole === "manager") {
+      setValue(1); // Switch to 'Manager Schedule'
+    }
+  };  
 
   const handleProfilePicUpload = (e) => {
     const file = e.target.files[0];
@@ -249,7 +288,8 @@ export default function HomePage() {
           uploadTask.on(
             "state_changed",
             (snapshot) => {
-              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              const progress =
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
               setUploadProgress(progress);
               console.log(`Upload is ${progress}% done`);
             },
@@ -274,21 +314,6 @@ export default function HomePage() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      setIsLoggedIn(false);
-      setRole("");
-      setStoreProfilePic(null);
-      setSuccessMessage("Logged out successfully.");
-      setOpenSnackbar(true);
-    } catch (error) {
-      console.error("Error during logout:", error);
-      setErrorMessage("Failed to log out.");
-      setOpenSnackbar(true);
-    }
-  };
-
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
     setErrorMessage("");
@@ -310,7 +335,8 @@ export default function HomePage() {
           sx={{ padding: 3, width: "500px", marginBottom: 4 }}
         >
           <Typography variant="h6" gutterBottom>
-            You are logged in, your profile will eventually be shown here to edit.
+            You are logged in, your profile will eventually be shown here to
+            edit.
           </Typography>
         </Paper>
       ) : (
@@ -371,13 +397,19 @@ export default function HomePage() {
                     elevation={3}
                     sx={{
                       padding: 2,
-                      backgroundColor: userInfo.role === "employee" ? "lightblue" : "white",
+                      backgroundColor:
+                        userInfo.role === "employee" ? "lightblue" : "white",
                       cursor: "pointer",
                       width: "45%",
                       textAlign: "center",
-                      border: userInfo.role === "employee" ? "2px solid blue" : "1px solid gray",
+                      border:
+                        userInfo.role === "employee"
+                          ? "2px solid blue"
+                          : "1px solid gray",
                     }}
-                    onClick={() => setUserInfo({ ...userInfo, role: "employee" })}
+                    onClick={() =>
+                      setUserInfo({ ...userInfo, role: "employee" })
+                    }
                   >
                     <Avatar
                       alt="Employee Avatar"
@@ -391,13 +423,19 @@ export default function HomePage() {
                     elevation={3}
                     sx={{
                       padding: 2,
-                      backgroundColor: userInfo.role === "employer" ? "lightblue" : "white",
+                      backgroundColor:
+                        userInfo.role === "employer" ? "lightblue" : "white",
                       cursor: "pointer",
                       width: "45%",
                       textAlign: "center",
-                      border: userInfo.role === "employer" ? "2px solid blue" : "1px solid gray",
+                      border:
+                        userInfo.role === "employer"
+                          ? "2px solid blue"
+                          : "1px solid gray",
                     }}
-                    onClick={() => setUserInfo({ ...userInfo, role: "employer" })}
+                    onClick={() =>
+                      setUserInfo({ ...userInfo, role: "employer" })
+                    }
                   >
                     <Avatar
                       alt="Employer Avatar"
@@ -422,7 +460,9 @@ export default function HomePage() {
                     sx={{ mb: 2 }}
                   />
                   <FormControl fullWidth sx={{ mb: 2 }}>
-                    <InputLabel id="employee-type-label">Employee Type</InputLabel>
+                    <InputLabel id="employee-type-label">
+                      Employee Type
+                    </InputLabel>
                     <Select
                       labelId="employee-type-label"
                       name="employeeType"
@@ -451,7 +491,9 @@ export default function HomePage() {
                       alt="Click to Upload"
                       src={previewUrl || "/path-to-placeholder-avatar.jpg"}
                       sx={{ width: 100, height: 100 }}
-                      onClick={() => document.getElementById("profilePicInput").click()}
+                      onClick={() =>
+                        document.getElementById("profilePicInput").click()
+                      }
                     />
                     <input
                       accept="image/*"
@@ -463,7 +505,11 @@ export default function HomePage() {
                   </Box>
 
                   {uploadProgress > 0 && uploadProgress < 100 && (
-                    <LinearProgress variant="determinate" value={uploadProgress} sx={{ mb: 2 }} />
+                    <LinearProgress
+                      variant="determinate"
+                      value={uploadProgress}
+                      sx={{ mb: 2 }}
+                    />
                   )}
 
                   <FormControl fullWidth sx={{ mb: 2 }}>
@@ -485,7 +531,9 @@ export default function HomePage() {
                   </Typography>
                   {["mon", "tue", "wed", "thu", "fri"].map((day) => (
                     <Box key={day}>
-                      <Typography variant="subtitle1">{day.toUpperCase()}</Typography>
+                      <Typography variant="subtitle1">
+                        {day.toUpperCase()}
+                      </Typography>
                       {["morning", "afternoon", "evening"].map((shift) => (
                         <Button
                           key={shift}
@@ -523,7 +571,9 @@ export default function HomePage() {
                       alt="Click to Upload"
                       src={previewUrl || "/path-to-placeholder-avatar.jpg"}
                       sx={{ width: 100, height: 100 }}
-                      onClick={() => document.getElementById("profilePicInput").click()}
+                      onClick={() =>
+                        document.getElementById("profilePicInput").click()
+                      }
                     />
                     <input
                       accept="image/*"
@@ -535,7 +585,11 @@ export default function HomePage() {
                   </Box>
 
                   {uploadProgress > 0 && uploadProgress < 100 && (
-                    <LinearProgress variant="determinate" value={uploadProgress} sx={{ mb: 2 }} />
+                    <LinearProgress
+                      variant="determinate"
+                      value={uploadProgress}
+                      sx={{ mb: 2 }}
+                    />
                   )}
                   <Typography variant="h6" gutterBottom>
                     Days of Operation
@@ -543,7 +597,11 @@ export default function HomePage() {
                   {["mon", "tue", "wed", "thu", "fri"].map((day) => (
                     <Button
                       key={day}
-                      variant={userInfo.excludedDays.includes(day) ? "outlined" : "contained"}
+                      variant={
+                        userInfo.excludedDays.includes(day)
+                          ? "outlined"
+                          : "contained"
+                      }
                       onClick={() => handleAvailabilityChange(day)}
                       sx={{ mr: 1, mb: 1 }}
                     >
@@ -555,7 +613,9 @@ export default function HomePage() {
                     Shifts Per Day
                   </Typography>
                   <FormControl fullWidth sx={{ mb: 2 }}>
-                    <InputLabel id="shifts-per-day-label">Shifts per Day</InputLabel>
+                    <InputLabel id="shifts-per-day-label">
+                      Shifts per Day
+                    </InputLabel>
                     <Select
                       labelId="shifts-per-day-label"
                       value={shiftsPerDay}
@@ -576,14 +636,22 @@ export default function HomePage() {
                         label={`Shift ${index + 1} Start Time`}
                         type="time"
                         value={shift.start}
-                        onChange={(e) => handleShiftTimingChange(index, "start", e.target.value)}
+                        onChange={(e) =>
+                          handleShiftTimingChange(
+                            index,
+                            "start",
+                            e.target.value
+                          )
+                        }
                         fullWidth
                       />
                       <TextField
                         label={`Shift ${index + 1} End Time`}
                         type="time"
                         value={shift.end}
-                        onChange={(e) => handleShiftTimingChange(index, "end", e.target.value)}
+                        onChange={(e) =>
+                          handleShiftTimingChange(index, "end", e.target.value)
+                        }
                         fullWidth
                       />
                     </Box>
@@ -592,11 +660,20 @@ export default function HomePage() {
               )}
 
               {/* Stepper Controls */}
-              <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}
+              >
                 <Button disabled={step === 0} onClick={handleBack}>
                   Back
                 </Button>
-                <Button variant="contained" onClick={step === steps.length - 1 ? handleSignUpOrSignIn : handleNext}>
+                <Button
+                  variant="contained"
+                  onClick={
+                    step === steps.length - 1
+                      ? handleSignUpOrSignIn
+                      : handleNext
+                  }
+                >
                   {step === steps.length - 1 ? "Finish" : "Next"}
                 </Button>
               </Box>
@@ -616,7 +693,13 @@ export default function HomePage() {
               <Typography variant="h6" gutterBottom>
                 Login
               </Typography>
-              <TextField name="email" label="Email" onChange={handleInputChange} fullWidth sx={{ mb: 2 }} />
+              <TextField
+                name="email"
+                label="Email"
+                onChange={handleInputChange}
+                fullWidth
+                sx={{ mb: 2 }}
+              />
               <TextField
                 name="password"
                 label="Password"
@@ -625,7 +708,11 @@ export default function HomePage() {
                 fullWidth
                 sx={{ mb: 2 }}
               />
-              <Button variant="contained" onClick={handleSignUpOrSignIn} fullWidth>
+              <Button
+                variant="contained"
+                onClick={handleSignUpOrSignIn}
+                fullWidth
+              >
                 Sign In
               </Button>
             </Box>
@@ -634,7 +721,11 @@ export default function HomePage() {
       )}
 
       {/* Snackbar for success or error messages */}
-      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
         {errorMessage ? (
           <Alert severity="error" onClose={handleCloseSnackbar}>
             {errorMessage}
