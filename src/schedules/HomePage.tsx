@@ -328,6 +328,51 @@ export default function HomePage({ setValue }) {
     setSuccessMessage("");
   };
 
+  const handleGenerateSchedule = async (role, schedulePayload) => {
+    try {
+      const response = await fetch("http://localhost:80/api/v1/scheduler", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(schedulePayload),
+      });
+  
+      const scheduleData = await response.json();
+      console.log("Generated schedule data:", scheduleData);
+  
+      // Save generated schedule to Firestore
+      await saveScheduleToFirestore(role, {
+        events: scheduleData.events, // Assuming API returns events for the schedule
+        employeeColors: scheduleData.employeeColors, // Assuming each employee has a color
+      });
+  
+      setSuccessMessage("Schedule generated and saved successfully!");
+      setOpenSnackbar(true);
+    } catch (error) {
+      console.error("Error generating schedule:", error);
+      setErrorMessage("Failed to generate schedule. Please try again.");
+      setOpenSnackbar(true);
+    }
+  };  
+
+  const saveScheduleToFirestore = async (role, scheduleData) => {
+    try {
+      const collectionName = `${role}Schedule`; // Collection name like 'serverSchedule', 'busserSchedule', 'cookSchedule'
+      const scheduleCollectionRef = collection(db, collectionName);
+  
+      // Add schedule to Firestore
+      const docRef = await addDoc(scheduleCollectionRef, {
+        ...scheduleData,
+        timestamp: new Date(), // Add timestamp to identify the latest schedule
+      });
+  
+      console.log(`Schedule saved for ${role}:`, docRef.id);
+    } catch (error) {
+      console.error("Error saving schedule to Firestore:", error);
+    }
+  };
+
   return (
     <Box
       sx={{

@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { Scheduler } from "@aldabil/react-scheduler";
 import { Box, Button, TextField, Typography, Avatar, Paper } from "@mui/material";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, addDoc, orderBy, limit } from "firebase/firestore";
 import { db } from "../userAuth/firebase"; // Import Firebase Firestore instance
 import { useUserStore } from "../stores/useUserStore"; // Zustand store to access user role
+import { Timestamp } from "firebase/firestore";
 
 // Form data types
 interface FormData {
@@ -69,6 +70,9 @@ export default function BussersSchedule() {
           num_employees: fetchedBussers.length.toString(),
           employee_types: fetchedBussers.map(() => "full_time"),
         }));
+
+        // Fetch the last saved schedule for bussers when the page loads
+        await fetchLastScheduleFromFirestore();
       } catch (error) {
         console.error("Error fetching bussers from Firestore:", error);
       }
@@ -123,6 +127,72 @@ export default function BussersSchedule() {
       color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
+  };
+
+  // Save schedule to Firestore under 'busserSchedules' collection
+  const saveScheduleToFirestore = async (scheduleData: { events: Event[]; employeeColors: { [key: string]: string } }) => {
+    try {
+      // Check if events exist
+      if (!scheduleData.events || !Array.isArray(scheduleData.events)) {
+        throw new Error("Invalid event data. No events to save.");
+      }
+
+      const scheduleCollectionRef = collection(db, "busserSchedules"); // Use 'busserSchedules' collection
+
+      // Convert event start and end to Firestore Timestamps
+      const eventsWithTimestamp = scheduleData.events.map((event) => ({
+        ...event,
+        start: Timestamp.fromDate(new Date(event.start)),
+        end: Timestamp.fromDate(new Date(event.end)),
+      }));
+
+      // Save schedule to Firestore
+      await addDoc(scheduleCollectionRef, {
+        events: eventsWithTimestamp,
+        employeeColors: scheduleData.employeeColors,
+        timestamp: Timestamp.now(),
+      });
+
+      console.log("Schedule saved for bussers.");
+    } catch (error) {
+      console.error("Error saving schedule to Firestore:", error);
+    }
+  };
+
+  // Fetch the last generated schedule for bussers from Firestore
+  const fetchLastScheduleFromFirestore = async () => {
+    try {
+      const scheduleQuery = query(collection(db, "busserSchedules"), orderBy("timestamp", "desc"), limit(1));
+
+      const querySnapshot = await getDocs(scheduleQuery);
+
+      if (!querySnapshot.empty) {
+        const lastSchedule = querySnapshot.docs[0].data();
+
+        // Ensure the fetched events are in the right format
+        const fetchedEvents = lastSchedule.events.map((event: any) => {
+          // Convert Firestore Timestamp to Date object
+          const startDate = event.start.toDate();
+          const endDate = event.end.toDate();
+
+          return {
+            ...event,
+            start: startDate,
+            end: endDate,
+          };
+        });
+
+        // Update state with fetched events and employeeColors
+        setEvents(fetchedEvents);
+        setEmployeeColors(lastSchedule.employeeColors || {}); // Default to empty object if undefined
+
+        console.log("Fetched last schedule from Firestore:", lastSchedule);
+      } else {
+        console.log("No previous schedule found.");
+      }
+    } catch (error) {
+      console.error("Error fetching last schedule from Firestore:", error);
+    }
   };
 
   // Define the form submission handler
@@ -210,6 +280,12 @@ export default function BussersSchedule() {
     // Set events and colors after the schedule is generated
     setEvents(newEvents);
     setEmployeeColors(newEmployeeColors); // Update employee colors dynamically after schedule generation
+
+    // Save the generated schedule to Firestore
+    await saveScheduleToFirestore({
+      events: newEvents,
+      employeeColors: newEmployeeColors,
+    });
   };
 
   return (

@@ -1,9 +1,25 @@
 import { useState, useEffect } from "react";
 import { Scheduler } from "@aldabil/react-scheduler";
-import { Box, Button, TextField, Typography, Avatar, Paper } from "@mui/material";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "../userAuth/firebase"; // Import Firebase Firestore instance
-import { useUserStore } from "../stores/useUserStore"; // Zustand store to access user role
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Avatar,
+  Paper,
+} from "@mui/material";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  orderBy,
+  limit,
+} from "firebase/firestore";
+import { db } from "../userAuth/firebase";
+import { useUserStore } from "../stores/useUserStore";
+import { Timestamp } from "firebase/firestore";
 
 // Form data types
 interface FormData {
@@ -20,7 +36,7 @@ interface Event {
   start: Date;
   end: Date;
   color?: string;
-  admin_id: string; // Use `userId` which is a string in Firestore
+  admin_id: string;
   editable: boolean;
 }
 
@@ -33,8 +49,11 @@ export default function ServersSchedule() {
     total_days: "",
     employee_types: [],
   });
-  const [employeeColors, setEmployeeColors] = useState<{ [key: string]: string }>({});
+  const [employeeColors, setEmployeeColors] = useState<{
+    [key: string]: string;
+  }>({});
   const [servers, setServers] = useState<any[]>([]); // State to hold server employees
+  const { role } = useUserStore(); // Zustand store to get user role
 
   const [shiftTimes, setShiftTimes] = useState({
     shift1: { start: "09:00", end: "13:00" },
@@ -43,8 +62,6 @@ export default function ServersSchedule() {
   });
 
   const { shift1, shift2, shift3 } = shiftTimes;
-
-  const { role } = useUserStore(); // Zustand store to get user role
 
   // Fetch server data from Firestore
   useEffect(() => {
@@ -61,7 +78,6 @@ export default function ServersSchedule() {
           ...doc.data(),
         }));
 
-        console.log("Fetched Servers:", fetchedServers); // Log for debugging
         setServers(fetchedServers);
 
         setFormData((prev) => ({
@@ -69,6 +85,9 @@ export default function ServersSchedule() {
           num_employees: fetchedServers.length.toString(),
           employee_types: fetchedServers.map(() => "full_time"),
         }));
+
+        // Fetch the last saved schedule when the page loads
+        await fetchLastScheduleFromFirestore();
       } catch (error) {
         console.error("Error fetching servers from Firestore:", error);
       }
@@ -125,91 +144,192 @@ export default function ServersSchedule() {
     return color;
   };
 
+  // Save schedule to "serverSchedules" instead of "employerSchedule"
+  const saveScheduleToFirestore = async (scheduleData) => {
+    try {
+      // Check if events exist
+      if (!scheduleData.events || !Array.isArray(scheduleData.events)) {
+        throw new Error("Invalid event data. No events to save.");
+      }
+
+      const scheduleCollectionRef = collection(db, "serverSchedules");
+
+      // Convert event start and end to Firestore Timestamps
+      const eventsWithTimestamp = scheduleData.events.map((event) => ({
+        ...event,
+        start: Timestamp.fromDate(new Date(event.start)),
+        end: Timestamp.fromDate(new Date(event.end)),
+      }));
+
+      // Save schedule to Firestore
+      const docRef = await addDoc(scheduleCollectionRef, {
+        events: eventsWithTimestamp,
+        employeeColors: scheduleData.employeeColors,
+        timestamp: Timestamp.now(),
+      });
+
+      console.log(`Schedule saved for servers:`, docRef.id);
+    } catch (error) {
+      console.error("Error saving schedule to Firestore:", error);
+    }
+  };
+
+  // Fetch the last generated schedule from "serverSchedules"
+  const fetchLastScheduleFromFirestore = async () => {
+    try {
+      const scheduleQuery = query(
+        collection(db, "serverSchedules"),
+        orderBy("timestamp", "desc"),
+        limit(1) // Fetch only the latest schedule
+      );
+
+      const querySnapshot = await getDocs(scheduleQuery);
+
+      if (!querySnapshot.empty) {
+        const lastSchedule = querySnapshot.docs[0].data();
+
+        // Ensure the fetched events are in the right format
+        const fetchedEvents = lastSchedule.events.map((event: any) => {
+          // Convert Firestore Timestamp to Date object
+          const startDate = event.start.toDate();
+          const endDate = event.end.toDate();
+
+          return {
+            ...event,
+            start: startDate,
+            end: endDate,
+          };
+        });
+
+        // Update state with fetched events and employeeColors
+        setEvents(fetchedEvents);
+        setEmployeeColors(lastSchedule.employeeColors || {}); // Default to empty object if undefined
+
+        console.log("Fetched last schedule from Firestore:", lastSchedule);
+      } else {
+        console.log("No previous schedule found.");
+      }
+    } catch (error) {
+      console.error("Error fetching last schedule from Firestore:", error);
+    }
+  };
+
+  useEffect(() => {
+    // Log to check if events and employeeColors are updated correctly
+    console.log("Events state updated:", events);
+    console.log("Employee Colors state updated:", employeeColors);
+  }, [events, employeeColors]);
+
   // Define the form submission handler
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const payload = {
-      num_employees: servers.length, // Number of servers from state
+      num_employees: servers.length, // Number of servers
       shifts_per_day: parseInt(formData.shifts_per_day, 10),
       total_days: parseInt(formData.total_days, 10),
-      employee_types: servers.map((employee) => employee.workType), // Pass work types
+      employee_types: servers.map((employee) => employee.workType), // Employee types
     };
 
-    const response = await fetch("http://localhost:80/api/v1/scheduler", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    try {
+      const response = await fetch("http://localhost:80/api/v1/scheduler", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    const newEvents: Event[] = [];
-    const newEmployeeColors: { [key: string]: string } = {}; // Temporary object to store colors
+      if (!data.schedules || !Array.isArray(data.schedules)) {
+        throw new Error("No schedules found in API response.");
+      }
 
-    // Map the employee index from the API to the actual userId from Firestore
-    const employeeIdMapping = servers.reduce(
-      (acc, server, index) => ({ ...acc, [index]: server.id }),
-      {}
-    );
+      const newEvents: Event[] = [];
+      const newEmployeeColors: { [key: string]: string } = {}; // Temporary object to store colors
 
-    // Generate events with shift times included
-    data.schedules.forEach((dayObj: any, outerIndex: number) => {
-      Object.keys(dayObj).forEach((dayKey, dayIndex) => {
-        const shifts = dayObj[dayKey];
-        const currentDate = new Date();
-        currentDate.setDate(currentDate.getDate() + dayIndex);
+      // Map the employee index from the API to the actual userId from Firestore
+      const employeeIdMapping = servers.reduce(
+        (acc, server, index) => ({ ...acc, [index]: server.id }),
+        {}
+      );
 
-        shifts.forEach((item: any) => {
-          let shiftStartHour, shiftEndHour;
+      // Generate events with shift times included
+      data.schedules.forEach((dayObj: any, outerIndex: number) => {
+        Object.keys(dayObj).forEach((dayKey, dayIndex) => {
+          const shifts = dayObj[dayKey];
+          const currentDate = new Date();
+          currentDate.setDate(currentDate.getDate() + dayIndex);
 
-          if (item.shift === 0) {
-            shiftStartHour = shift1.start;
-            shiftEndHour = shift1.end;
-          } else if (item.shift === 1) {
-            shiftStartHour = shift2.start;
-            shiftEndHour = shift2.end;
-          } else if (item.shift === 2 && formData.shifts_per_day === "3") {
-            shiftStartHour = shift3.start;
-            shiftEndHour = shift3.end;
-          } else {
-            return;
-          }
+          shifts.forEach((item: any) => {
+            let shiftStartHour, shiftEndHour;
 
-          const shiftStart = new Date(currentDate);
-          const [startHour, startMinute] = shiftStartHour.split(":");
-          shiftStart.setHours(parseInt(startHour), parseInt(startMinute), 0, 0);
+            if (item.shift === 0) {
+              shiftStartHour = shift1.start;
+              shiftEndHour = shift1.end;
+            } else if (item.shift === 1) {
+              shiftStartHour = shift2.start;
+              shiftEndHour = shift2.end;
+            } else if (item.shift === 2 && formData.shifts_per_day === "3") {
+              shiftStartHour = shift3.start;
+              shiftEndHour = shift3.end;
+            } else {
+              return;
+            }
 
-          const shiftEnd = new Date(currentDate);
-          const [endHour, endMinute] = shiftEndHour.split(":");
-          shiftEnd.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
+            const shiftStart = new Date(currentDate);
+            const [startHour, startMinute] = shiftStartHour.split(":");
+            shiftStart.setHours(
+              parseInt(startHour),
+              parseInt(startMinute),
+              0,
+              0
+            );
 
-          // Map the employee index from API to the Firestore `userId`
-          const employeeId = employeeIdMapping[item.employee];
+            const shiftEnd = new Date(currentDate);
+            const [endHour, endMinute] = shiftEndHour.split(":");
+            shiftEnd.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
 
-          // Assign a color to the employee if not already assigned
-          if (!newEmployeeColors[employeeId]) {
-            newEmployeeColors[employeeId] = generateRandomColor(); // Use a random color generator
-          }
+            // Map the employee index from API to the Firestore `userId`
+            const employeeId = employeeIdMapping[item.employee];
 
-          newEvents.push({
-            event_id: `day${outerIndex + 1}-shift${item.shift}-emp${employeeId}`,
-            title: `Employee ${employeeId} Shift ${item.shift}`,
-            start: shiftStart,
-            end: shiftEnd,
-            color: newEmployeeColors[employeeId], // Use dynamic color
-            admin_id: employeeId,
-            editable: true,
+            // Assign a color to the employee if not already assigned
+            if (!newEmployeeColors[employeeId]) {
+              newEmployeeColors[employeeId] = generateRandomColor(); // Use a random color generator
+            }
+
+            newEvents.push({
+              event_id: `day${outerIndex + 1}-shift${
+                item.shift
+              }-emp${employeeId}`,
+              title: `Employee ${employeeId} Shift ${item.shift}`,
+              start: shiftStart,
+              end: shiftEnd,
+              color: newEmployeeColors[employeeId], // Use dynamic color
+              admin_id: employeeId,
+              editable: true,
+            });
           });
         });
       });
-    });
 
-    // Set events and colors after the schedule is generated
-    setEvents(newEvents);
-    setEmployeeColors(newEmployeeColors); // Update employee colors dynamically after schedule generation
+      // Set events and colors after the schedule is generated
+      setEvents(newEvents);
+      setEmployeeColors(newEmployeeColors);
+
+      // Save the generated schedule to Firestore
+      await saveScheduleToFirestore({
+        events: newEvents,
+        employeeColors: newEmployeeColors,
+      });
+
+      // Update UI with new events
+      setEvents(newEvents);
+      setEmployeeColors(newEmployeeColors);
+    } catch (error) {
+      console.error("Error generating or saving schedule:", error);
+    }
   };
 
   return (
@@ -237,7 +357,8 @@ export default function ServersSchedule() {
             <Box>
               <Typography variant="h6">{employee.name}</Typography>
               <Typography variant="body2" color="textSecondary">
-                {employee.employeeType.charAt(0).toUpperCase() + employee.employeeType.slice(1)}
+                {employee.employeeType.charAt(0).toUpperCase() +
+                  employee.employeeType.slice(1)}
               </Typography>
             </Box>
           </Paper>
