@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -16,13 +16,13 @@ import {
   LinearProgress,
   Snackbar,
   Alert,
+  SelectChangeEvent,
 } from "@mui/material";
 import { auth } from "../userAuth/firebase";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
-  signOut,
 } from "firebase/auth";
 import {
   getFirestore,
@@ -36,12 +36,17 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../userAuth/firebase";
 import { useUserStore } from "../stores/useUserStore";
 
-export default function HomePage({ setValue }) {
+// I hate you typescript
+interface HomePageProps {
+  setValue: (value: number) => void;
+}
+
+export default function HomePage({ setValue }: HomePageProps) {
   const db = getFirestore();
   const [isNewUser, setIsNewUser] = useState(true);
   const [step, setStep] = useState(0);
-  const [profilePic, setProfilePic] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
+  const [profilePic, setProfilePic] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [shiftsPerDay, setShiftsPerDay] = useState(1);
   const [shiftTimings, setShiftTimings] = useState([{ start: "", end: "" }]);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -53,7 +58,19 @@ export default function HomePage({ setValue }) {
     setProfilePic: setStoreProfilePic,
   } = useUserStore();
 
-  const [userInfo, setUserInfo] = useState({
+  interface UserInfo {
+    email: string;
+    password: string;
+    role: string;
+    name: string;
+    employeeType: string;
+    workType: string;
+    availability: { [key: string]: string[] };
+    excludedDays: string[];
+    shiftDetails: any[];
+  }
+
+  const [userInfo, setUserInfo] = useState<UserInfo>({
     email: "",
     password: "",
     role: "",
@@ -81,32 +98,33 @@ export default function HomePage({ setValue }) {
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
   useEffect(() => {
-    // Listen to Firebase Auth state changes to persist the login state
+    // Listen to Firebase Auth state, grab the role, and persist with zustand
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const userDoc = await fetchUserRoleAndProfile(user.uid);
-        console.log("Fetched userDoc:", userDoc); // Check what's returned
         if (userDoc) {
-          console.log("Setting role to:", userDoc.role);
           setRole(userDoc.role);
           setStoreProfilePic(userDoc.profilePic);
-          setIsLoggedIn(true); // Mark user as logged in
+          setIsLoggedIn(true);
         }
       } else {
-        setIsLoggedIn(false); // User is logged out
+        setIsLoggedIn(false);
       }
     });
-  
-    // Cleanup listener when the component unmounts
     return () => unsubscribe();
-  }, [setIsLoggedIn, setRole, setStoreProfilePic]);  
+  }, [setIsLoggedIn, setRole, setStoreProfilePic]);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUserInfo((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAvailabilityChange = (day) => {
+  const handleSelectChange = (e: SelectChangeEvent<string>) => {
+    const { name, value } = e.target;
+    setUserInfo((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAvailabilityChange = (day: string) => {
     setUserInfo((prev) => ({
       ...prev,
       excludedDays: userInfo.excludedDays.includes(day)
@@ -115,8 +133,8 @@ export default function HomePage({ setValue }) {
     }));
   };
 
-  const handleShiftCountChange = (e) => {
-    const count = parseInt(e.target.value);
+  const handleShiftCountChange = (e: SelectChangeEvent<number>) => {
+    const count = parseInt(e.target.value as string);
     setShiftsPerDay(count);
     const updatedTimings = Array.from({ length: count }, (_, i) => ({
       start: shiftTimings[i]?.start || "",
@@ -125,38 +143,42 @@ export default function HomePage({ setValue }) {
     setShiftTimings(updatedTimings);
   };
 
-  const handleShiftTimingChange = (index, type, value) => {
+  const handleShiftTimingChange = (
+    index: number,
+    type: "start" | "end",
+    value: string
+  ) => {
     const updatedTimings = [...shiftTimings];
     updatedTimings[index][type] = value;
     setShiftTimings(updatedTimings);
   };
 
-  const fetchUserRoleAndProfile = async (userId) => {
+  const fetchUserRoleAndProfile = async (userId: string) => {
     try {
       // Query the 'employees' collection where the 'userId' field matches the authenticated user's UID
       const employeesQuery = collection(db, "employees");
       const employeeQuerySnapshot = await getDocs(
         query(employeesQuery, where("userId", "==", userId))
       );
-  
+
       // Check if a matching employee document was found
       if (!employeeQuerySnapshot.empty) {
         const employeeDoc = employeeQuerySnapshot.docs[0].data();
         console.log("Employee document found: ", employeeDoc); // Log for debugging
-  
+
         // Use the employeeType from Firestore instead of hardcoding the role
         return {
           role: employeeDoc.employeeType, // Get the actual employee type (server, busser, cook, etc.)
           profilePic: employeeDoc.profilePic || null,
         };
       }
-  
+
       // If not found in 'employees', check 'employers' in the same way
       const employersQuery = collection(db, "employers");
       const employerQuerySnapshot = await getDocs(
         query(employersQuery, where("userId", "==", userId))
       );
-  
+
       if (!employerQuerySnapshot.empty) {
         const employerDoc = employerQuerySnapshot.docs[0].data();
         console.log("Employer document found: ", employerDoc); // Log for debugging
@@ -165,39 +187,25 @@ export default function HomePage({ setValue }) {
           profilePic: employerDoc.profilePic || null,
         };
       }
-  
+
       console.log("No user document found for this user");
       return null;
     } catch (error) {
       console.error("Error fetching user role and profile picture:", error);
       return null;
     }
-  };  
+  };
 
   const handleSignUpOrSignIn = async () => {
     try {
       if (isNewUser) {
-        const {
-          email,
-          password,
-          role,
-          availability,
-          workType,
-          name,
-          employeeType,
-          excludedDays,
-        } = userInfo;
+        const { email, password, role, availability, workType, name, employeeType, excludedDays } = userInfo;
 
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const userId = userCredential.user.uid;
 
         const profilePicUrl = await uploadProfilePicToStorage(userId);
 
-        // Add user to Firestore based on their role
         if (role === "employee") {
           await addDoc(collection(db, "employees"), {
             userId,
@@ -222,21 +230,14 @@ export default function HomePage({ setValue }) {
           });
         }
 
-        // Immediately update the state without waiting for page reload
         setRole(role);
         setStoreProfilePic(profilePicUrl);
         setIsLoggedIn(true);
         setSuccessMessage("Sign-up successful!");
-
-        // Trigger schedule update after successful sign up
         handleScheduleUpdate(role);
       } else {
         const { email, password } = userInfo;
-        const userCredential = await signInWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
         const userDoc = await fetchUserRoleAndProfile(userCredential.user.uid);
 
@@ -245,8 +246,6 @@ export default function HomePage({ setValue }) {
           setStoreProfilePic(userDoc.profilePic);
           setIsLoggedIn(true);
           setSuccessMessage("Login successful!");
-
-          // Trigger schedule update after successful login
           handleScheduleUpdate(userDoc.role);
         } else {
           setErrorMessage("No user document found for this user ID.");
@@ -260,12 +259,12 @@ export default function HomePage({ setValue }) {
     }
   };
 
-  const handleScheduleUpdate = (userRole) => {
+  const handleScheduleUpdate = (userRole: string) => {
     if (userRole === "server") {
       setValue(1); // Switch to 'Servers Schedule'
       setCurrentTab(1); // Persist in store
     } else if (userRole === "busser") {
-      setValue(2); // Switch to 'Bussers Schedule'
+      setValue(2); // Switch to 'Bussers Schedule'handleInputChange 
       setCurrentTab(2); // Persist in store
     } else if (userRole === "cook") {
       setValue(3); // Switch to 'Cooks Schedule'
@@ -274,21 +273,23 @@ export default function HomePage({ setValue }) {
       setValue(1); // Employers default to 'Servers Schedule'
       setCurrentTab(1); // Persist in store
     }
-  };  
-
-  const handleProfilePicUpload = (e) => {
-    const file = e.target.files[0];
-    setProfilePic(file);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreviewUrl(reader.result);
-    };
-    reader.readAsDataURL(file);
   };
 
-  const uploadProfilePicToStorage = async (userId) => {
+  const handleProfilePicUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfilePic(file); // This stores the file locally in the component
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string); // This stores the preview URL for immediate feedback
+      };
+      reader.readAsDataURL(file); // Convert the image to a base64 URL for preview
+    }
+  };
+
+  const uploadProfilePicToStorage = async (userId: string): Promise<string | null> => {
     try {
-      if (profilePic) {
+      if (profilePic) { // Check if profilePic is set and is a File
         const storageRef = ref(storage, `profilePics/${userId}`);
         const uploadTask = uploadBytesResumable(storageRef, profilePic);
 
@@ -296,8 +297,7 @@ export default function HomePage({ setValue }) {
           uploadTask.on(
             "state_changed",
             (snapshot) => {
-              const progress =
-                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
               setUploadProgress(progress);
               console.log(`Upload is ${progress}% done`);
             },
@@ -308,7 +308,7 @@ export default function HomePage({ setValue }) {
             async () => {
               const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
               console.log("Profile picture uploaded, URL:", downloadUrl);
-              resolve(downloadUrl);
+              resolve(downloadUrl); // Return the URL for the uploaded profile picture
             }
           );
         });
@@ -326,51 +326,6 @@ export default function HomePage({ setValue }) {
     setOpenSnackbar(false);
     setErrorMessage("");
     setSuccessMessage("");
-  };
-
-  const handleGenerateSchedule = async (role, schedulePayload) => {
-    try {
-      const response = await fetch("http://localhost:80/api/v1/scheduler", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(schedulePayload),
-      });
-  
-      const scheduleData = await response.json();
-      console.log("Generated schedule data:", scheduleData);
-  
-      // Save generated schedule to Firestore
-      await saveScheduleToFirestore(role, {
-        events: scheduleData.events, // Assuming API returns events for the schedule
-        employeeColors: scheduleData.employeeColors, // Assuming each employee has a color
-      });
-  
-      setSuccessMessage("Schedule generated and saved successfully!");
-      setOpenSnackbar(true);
-    } catch (error) {
-      console.error("Error generating schedule:", error);
-      setErrorMessage("Failed to generate schedule. Please try again.");
-      setOpenSnackbar(true);
-    }
-  };  
-
-  const saveScheduleToFirestore = async (role, scheduleData) => {
-    try {
-      const collectionName = `${role}Schedule`; // Collection name like 'serverSchedule', 'busserSchedule', 'cookSchedule'
-      const scheduleCollectionRef = collection(db, collectionName);
-  
-      // Add schedule to Firestore
-      const docRef = await addDoc(scheduleCollectionRef, {
-        ...scheduleData,
-        timestamp: new Date(), // Add timestamp to identify the latest schedule
-      });
-  
-      console.log(`Schedule saved for ${role}:`, docRef.id);
-    } catch (error) {
-      console.error("Error saving schedule to Firestore:", error);
-    }
   };
 
   return (
@@ -473,7 +428,7 @@ export default function HomePage({ setValue }) {
                   >
                     <Avatar
                       alt="Employee Avatar"
-                      src={previewUrl || "/path-to-placeholder-avatar.jpg"}
+                      src={previewUrl || "./placeholder-avatar.jpg"}
                       sx={{ margin: "auto", width: 56, height: 56 }}
                     />
                     <Typography>Employee</Typography>
@@ -527,7 +482,7 @@ export default function HomePage({ setValue }) {
                       labelId="employee-type-label"
                       name="employeeType"
                       value={userInfo.employeeType}
-                      onChange={handleInputChange}
+                      onChange={handleSelectChange}
                       label="Employee Type"
                     >
                       <MenuItem value="server">Server</MenuItem>
@@ -535,7 +490,6 @@ export default function HomePage({ setValue }) {
                       <MenuItem value="cook">Cook</MenuItem>
                     </Select>
                   </FormControl>
-
                   <Typography variant="h6" gutterBottom sx={{ mt: 4, mb: 4 }}>
                     Profile Picture
                   </Typography>
@@ -549,10 +503,10 @@ export default function HomePage({ setValue }) {
                   >
                     <Avatar
                       alt="Click to Upload"
-                      src={previewUrl || "/path-to-placeholder-avatar.jpg"}
+                      src={previewUrl || "./placeholder-avatar.jpg"}
                       sx={{ width: 100, height: 100 }}
                       onClick={() =>
-                        document.getElementById("profilePicInput").click()
+                        document.getElementById("profilePicInput")?.click()
                       }
                     />
                     <input
@@ -578,7 +532,7 @@ export default function HomePage({ setValue }) {
                       labelId="work-type-label"
                       name="workType"
                       value={userInfo.workType}
-                      onChange={handleInputChange}
+                      onChange={handleSelectChange}
                       label="Work Type"
                     >
                       <MenuItem value="full_time">Full-time</MenuItem>
@@ -602,7 +556,7 @@ export default function HomePage({ setValue }) {
                               ? "contained"
                               : "outlined"
                           }
-                          onClick={() => handleAvailabilityChange(day, shift)}
+                          onClick={() => handleAvailabilityChange(day)}
                           sx={{ mr: 1, mb: 1 }}
                         >
                           {shift}
@@ -629,10 +583,10 @@ export default function HomePage({ setValue }) {
                   >
                     <Avatar
                       alt="Click to Upload"
-                      src={previewUrl || "/path-to-placeholder-avatar.jpg"}
+                      src={previewUrl || "./placeholder-avatar.jpg"}
                       sx={{ width: 100, height: 100 }}
                       onClick={() =>
-                        document.getElementById("profilePicInput").click()
+                        document.getElementById("profilePicInput")?.click()
                       }
                     />
                     <input
@@ -673,11 +627,9 @@ export default function HomePage({ setValue }) {
                     Shifts Per Day
                   </Typography>
                   <FormControl fullWidth sx={{ mb: 2 }}>
-                    <InputLabel id="shifts-per-day-label">
-                      Shifts per Day
-                    </InputLabel>
+                    <InputLabel id="shifts-per-day">Shifts per Day</InputLabel>
                     <Select
-                      labelId="shifts-per-day-label"
+                      labelId="shifts-per-day"
                       value={shiftsPerDay}
                       onChange={handleShiftCountChange}
                       label="Shifts per Day"

@@ -40,6 +40,12 @@ interface Event {
   editable: boolean;
 }
 
+// for saveScheduleToFirestore
+interface ScheduleData {
+  events: Event[];
+  employeeColors: { [key: string]: string };
+}
+
 export default function ServersSchedule() {
   const [events, setEvents] = useState<Event[]>([]);
   const [step, setStep] = useState(240); // Default step for 3 shifts
@@ -145,7 +151,7 @@ export default function ServersSchedule() {
   };
 
   // Save schedule to "serverSchedules" instead of "employerSchedule"
-  const saveScheduleToFirestore = async (scheduleData) => {
+  const saveScheduleToFirestore = async (scheduleData: ScheduleData) => {
     try {
       // Check if events exist
       if (!scheduleData.events || !Array.isArray(scheduleData.events)) {

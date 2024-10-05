@@ -22,16 +22,16 @@ export default function App() {
     setCurrentTab,
   } = useUserStore();
 
-  // Remap currentTab to ensure it's always valid for the role
+  // Remap currentTab to ensure it's always valid for the role (certain roles hides tabs and it causes issues)
   const mapCurrentTab = () => {
     if (role === "server" && currentTab > 1) return 1;
-    if (role === "busser" && currentTab > 1) return 1; // Remap for busser
-    if (role === "cook" && currentTab > 1) return 1; // Remap for cook
-    return currentTab; // Keep the currentTab if it's valid
+    if (role === "busser" && currentTab > 1) return 1;
+    if (role === "cook" && currentTab > 1) return 1;
+    return currentTab;
   };
 
-  const handleTabChange = (event, newValue) => {
-    setCurrentTab(newValue); // Persist the tab in Zustand store
+  const handleTabChange = (newValue: number) => {
+    setCurrentTab(newValue); // Trying to get this to stay in zustand but not sure it's needed
   };
 
   useEffect(() => {
@@ -76,7 +76,7 @@ export default function App() {
   }, [setRole, setProfilePic, setIsLoggedIn, setCurrentTab]);
 
   // Fetch role and profile picture from Firestore
-  const fetchUserRoleAndProfile = async (userId) => {
+  const fetchUserRoleAndProfile = async (userId: string) => {
     try {
       let docRef = doc(db, "employees", userId);
       let docSnap = await getDoc(docRef);
@@ -117,12 +117,16 @@ export default function App() {
   // Define the tabs based on role
   const renderTabs = () => {
     return (
-      <Tabs value={mapCurrentTab()} onChange={handleTabChange} aria-label="schedule tabs">
+      <Tabs
+        value={mapCurrentTab()}
+        onChange={(_, newValue) => handleTabChange(newValue)}
+        aria-label="schedule tabs"
+      >
         <Tab label="Home" />
         {role === "employer" && [
           <Tab label="Servers Schedule" key="servers-tab" />,
           <Tab label="Bussers Schedule" key="bussers-tab" />,
-          <Tab label="Cooks Schedule" key="cooks-tab" />
+          <Tab label="Cooks Schedule" key="cooks-tab" />,
         ]}
         {role === "server" && <Tab label="Servers Schedule" />}
         {role === "busser" && <Tab label="Bussers Schedule" />}
@@ -160,7 +164,7 @@ export default function App() {
         return null;
     }
   };
-  
+
   return (
     <div>
       {/* Header - Only show tabs if the user is logged in */}
@@ -180,8 +184,12 @@ export default function App() {
 
             {/* Profile Avatar and Logout Button */}
             <Box sx={{ display: "flex", alignItems: "center", ml: 2 }}>
-              {profilePic && (
+              {profilePic ? (
                 <Avatar alt="Profile Picture" src={profilePic} sx={{ mr: 2 }} />
+              ) : (
+                <Avatar alt="No Profile Picture" sx={{ mr: 2 }}>
+                  N/A
+                </Avatar>
               )}
               <Button variant="outlined" onClick={handleLogout}>
                 Logout

@@ -15,8 +15,9 @@ type UserActions = {
 };
 
 export const useUserStore = create<UserState & UserActions>((set) => ({
-  role: null,
-  profilePic: null,
+  // initialize these to avoid errors
+  role: "",
+  profilePic: "",
   isLoggedIn: false,
   currentTab: 0,
 

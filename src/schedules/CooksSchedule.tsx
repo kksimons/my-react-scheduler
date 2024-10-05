@@ -157,7 +157,7 @@ export default function CooksSchedule() {
         throw new Error("Invalid event data. No events to save.");
       }
 
-      const scheduleCollectionRef = collection(db, "cookSchedules"); // Use 'cookSchedule' collection
+      const scheduleCollectionRef = collection(db, "cookSchedules");
 
       // Convert event start and end to Firestore Timestamps
       const eventsWithTimestamp = scheduleData.events.map((event) => ({
