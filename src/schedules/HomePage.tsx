@@ -134,7 +134,7 @@ export default function HomePage({ setValue }: HomePageProps) {
           : [...prev.availability[day], shift], // Select shift
       },
     }));
-  };  
+  };
 
   const handleShiftCountChange = (e: SelectChangeEvent<number>) => {
     const count = parseInt(e.target.value as string);
@@ -202,9 +202,22 @@ export default function HomePage({ setValue }: HomePageProps) {
   const handleSignUpOrSignIn = async () => {
     try {
       if (isNewUser) {
-        const { email, password, role, availability, workType, name, employeeType, excludedDays } = userInfo;
+        const {
+          email,
+          password,
+          role,
+          availability,
+          workType,
+          name,
+          employeeType,
+          excludedDays,
+        } = userInfo;
 
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
         const userId = userCredential.user.uid;
 
         const profilePicUrl = await uploadProfilePicToStorage(userId);
@@ -240,7 +253,11 @@ export default function HomePage({ setValue }: HomePageProps) {
         handleScheduleUpdate(role);
       } else {
         const { email, password } = userInfo;
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
 
         const userDoc = await fetchUserRoleAndProfile(userCredential.user.uid);
 
@@ -267,7 +284,7 @@ export default function HomePage({ setValue }: HomePageProps) {
       setValue(1); // Switch to 'Servers Schedule'
       setCurrentTab(1); // Persist in store
     } else if (userRole === "busser") {
-      setValue(2); // Switch to 'Bussers Schedule'handleInputChange 
+      setValue(2); // Switch to 'Bussers Schedule'handleInputChange
       setCurrentTab(2); // Persist in store
     } else if (userRole === "cook") {
       setValue(3); // Switch to 'Cooks Schedule'
@@ -290,9 +307,12 @@ export default function HomePage({ setValue }: HomePageProps) {
     }
   };
 
-  const uploadProfilePicToStorage = async (userId: string): Promise<string | null> => {
+  const uploadProfilePicToStorage = async (
+    userId: string
+  ): Promise<string | null> => {
     try {
-      if (profilePic) { // Check if profilePic is set and is a File
+      if (profilePic) {
+        // Check if profilePic is set and is a File
         const storageRef = ref(storage, `profilePics/${userId}`);
         const uploadTask = uploadBytesResumable(storageRef, profilePic);
 
@@ -300,7 +320,8 @@ export default function HomePage({ setValue }: HomePageProps) {
           uploadTask.on(
             "state_changed",
             (snapshot) => {
-              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              const progress =
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
               setUploadProgress(progress);
               console.log(`Upload is ${progress}% done`);
             },
@@ -410,7 +431,7 @@ export default function HomePage({ setValue }: HomePageProps) {
                     justifyContent: "space-between",
                     gap: 2,
                     mb: 10,
-                    mt: 10
+                    mt: 10,
                   }}
                 >
                   <Paper
@@ -435,7 +456,7 @@ export default function HomePage({ setValue }: HomePageProps) {
                       alt="Employee Avatar"
                       src={previewUrl || "./employee.jpg"}
                       sx={{ margin: "auto", width: 100, height: 100 }}
-                      />
+                    />
                     <Typography>Employee</Typography>
                   </Paper>
 
@@ -460,8 +481,8 @@ export default function HomePage({ setValue }: HomePageProps) {
                     <Avatar
                       alt="Employer Avatar"
                       src="/employer.jpg"
-                      sx={{ margin: "auto", width: 100, height: 100 }} 
-                      />
+                      sx={{ margin: "auto", width: 100, height: 100 }}
+                    />
                     <Typography>Employer</Typography>
                   </Paper>
                 </Box>
@@ -621,7 +642,7 @@ export default function HomePage({ setValue }: HomePageProps) {
                           ? "outlined"
                           : "contained"
                       }
-                      onClick={() => handleAvailabilityChange(day)}
+                      onClick={() => handleAvailabilityChange(day, "")}
                       sx={{ mr: 1, mb: 1 }}
                     >
                       {day.toUpperCase()}
