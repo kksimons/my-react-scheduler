@@ -85,7 +85,9 @@ export default function HomePage({ setValue }) {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const userDoc = await fetchUserRoleAndProfile(user.uid);
+        console.log("Fetched userDoc:", userDoc); // Check what's returned
         if (userDoc) {
+          console.log("Setting role to:", userDoc.role);
           setRole(userDoc.role);
           setStoreProfilePic(userDoc.profilePic);
           setIsLoggedIn(true); // Mark user as logged in
@@ -94,10 +96,10 @@ export default function HomePage({ setValue }) {
         setIsLoggedIn(false); // User is logged out
       }
     });
-
+  
     // Cleanup listener when the component unmounts
     return () => unsubscribe();
-  }, [setIsLoggedIn, setRole, setStoreProfilePic]);
+  }, [setIsLoggedIn, setRole, setStoreProfilePic]);  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -142,10 +144,9 @@ export default function HomePage({ setValue }) {
         const employeeDoc = employeeQuerySnapshot.docs[0].data();
         console.log("Employee document found: ", employeeDoc); // Log for debugging
   
-        // Use employeeType as the role instead of just 'employee'
-        const role = employeeDoc.employeeType || "employee";
+        // Use the employeeType from Firestore instead of hardcoding the role
         return {
-          role: role, // Set role based on employeeType
+          role: employeeDoc.employeeType, // Get the actual employee type (server, busser, cook, etc.)
           profilePic: employeeDoc.profilePic || null,
         };
       }
@@ -259,7 +260,6 @@ export default function HomePage({ setValue }) {
     }
   };
 
-  // Added handleScheduleUpdate to dynamically switch tabs based on role
   const handleScheduleUpdate = (userRole) => {
     if (userRole === "server") {
       setValue(1); // Switch to 'Servers Schedule'
@@ -270,11 +270,11 @@ export default function HomePage({ setValue }) {
     } else if (userRole === "cook") {
       setValue(3); // Switch to 'Cooks Schedule'
       setCurrentTab(3); // Persist in store
-    } else if (userRole === "manager") {
-      setValue(1); // Managers default to 'Servers Schedule'
+    } else if (userRole === "employer") {
+      setValue(1); // Employers default to 'Servers Schedule'
       setCurrentTab(1); // Persist in store
     }
-  };
+  };  
 
   const handleProfilePicUpload = (e) => {
     const file = e.target.files[0];

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Box, Tab, Tabs, Typography, Avatar, Button } from "@mui/material";
+import { Box, Tab, Tabs, Avatar, Button } from "@mui/material";
 import ServersSchedule from "./schedules/ServersSchedule";
 import BussersSchedule from "./schedules/BussersSchedule";
 import CooksSchedule from "./schedules/CooksSchedule";
@@ -22,9 +22,25 @@ export default function App() {
     setCurrentTab,
   } = useUserStore();
 
+  // Remap currentTab to ensure it's always valid for the role
+  const mapCurrentTab = () => {
+    if (role === "server" && currentTab > 1) return 1;
+    if (role === "busser" && currentTab > 1) return 1; // Remap for busser
+    if (role === "cook" && currentTab > 1) return 1; // Remap for cook
+    return currentTab; // Keep the currentTab if it's valid
+  };
+
   const handleTabChange = (event, newValue) => {
     setCurrentTab(newValue); // Persist the tab in Zustand store
   };
+
+  useEffect(() => {
+    // Ensure the currentTab is valid whenever role changes
+    const validTab = mapCurrentTab();
+    if (validTab !== currentTab) {
+      setCurrentTab(validTab); // Remap to a valid tab
+    }
+  }, [role, currentTab, setCurrentTab]);
 
   useEffect(() => {
     // Listen for changes to the user's authentication state
@@ -39,9 +55,9 @@ export default function App() {
           if (userDoc.role === "server") {
             setCurrentTab(1); // Set to Servers schedule
           } else if (userDoc.role === "busser") {
-            setCurrentTab(2); // Set to Bussers schedule
+            setCurrentTab(1); // Set to Bussers schedule (remapped)
           } else if (userDoc.role === "cook") {
-            setCurrentTab(3); // Set to Cooks schedule
+            setCurrentTab(1); // Set to Cooks schedule (remapped)
           } else if (userDoc.role === "employer") {
             setCurrentTab(1); // Employers default to Servers schedule
           }
@@ -59,7 +75,7 @@ export default function App() {
     return () => unsubscribe();
   }, [setRole, setProfilePic, setIsLoggedIn, setCurrentTab]);
 
-  // Fetch role and profile picture from either 'employees' or 'employers' collection
+  // Fetch role and profile picture from Firestore
   const fetchUserRoleAndProfile = async (userId) => {
     try {
       let docRef = doc(db, "employees", userId);
@@ -98,6 +114,53 @@ export default function App() {
     }
   };
 
+  // Define the tabs based on role
+  const renderTabs = () => {
+    return (
+      <Tabs value={mapCurrentTab()} onChange={handleTabChange} aria-label="schedule tabs">
+        <Tab label="Home" />
+        {role === "employer" && [
+          <Tab label="Servers Schedule" key="servers-tab" />,
+          <Tab label="Bussers Schedule" key="bussers-tab" />,
+          <Tab label="Cooks Schedule" key="cooks-tab" />
+        ]}
+        {role === "server" && <Tab label="Servers Schedule" />}
+        {role === "busser" && <Tab label="Bussers Schedule" />}
+        {role === "cook" && <Tab label="Cooks Schedule" />}
+      </Tabs>
+    );
+  };
+
+  const renderTabContent = () => {
+    switch (mapCurrentTab()) {
+      case 0:
+        return <HomePage setValue={setCurrentTab} />;
+      case 1:
+        if (role === "server" || role === "employer") {
+          return <ServersSchedule />;
+        }
+        if (role === "busser") {
+          return <BussersSchedule />;
+        }
+        if (role === "cook") {
+          return <CooksSchedule />;
+        }
+        break;
+      case 2:
+        if (role === "employer") {
+          return <BussersSchedule />;
+        }
+        break;
+      case 3:
+        if (role === "employer") {
+          return <CooksSchedule />;
+        }
+        break;
+      default:
+        return null;
+    }
+  };
+  
   return (
     <div>
       {/* Header - Only show tabs if the user is logged in */}
@@ -112,22 +175,8 @@ export default function App() {
       >
         {isLoggedIn && (
           <>
-            {/* Tabs */}
-            <Tabs
-              value={currentTab} // Directly use currentTab from Zustand store
-              onChange={handleTabChange}
-              aria-label="schedule tabs"
-            >
-              <Tab label="Home" />
-              {role === "employer" && <Tab label="Servers Schedule" />}
-              {role === "employer" && <Tab label="Bussers Schedule" />}
-              {role === "employer" && <Tab label="Cooks Schedule" />}
-
-              {/* Employees see only their own schedules */}
-              {role === "server" && <Tab label="Servers Schedule" />}
-              {role === "busser" && <Tab label="Bussers Schedule" />}
-              {role === "cook" && <Tab label="Cooks Schedule" />}
-            </Tabs>
+            {/* Render the tabs based on role */}
+            {renderTabs()}
 
             {/* Profile Avatar and Logout Button */}
             <Box sx={{ display: "flex", alignItems: "center", ml: 2 }}>
@@ -143,26 +192,7 @@ export default function App() {
       </Box>
 
       {/* Tabs Content */}
-      {currentTab === 0 && (
-        <Box p={3}>
-          <HomePage setValue={setCurrentTab} />
-        </Box>
-      )}
-      {currentTab === 1 && (role === "server" || role === "employer") && (
-        <Box p={3}>
-          <ServersSchedule />
-        </Box>
-      )}
-      {currentTab === 2 && (role === "busser" || role === "employer") && (
-        <Box p={3}>
-          <BussersSchedule />
-        </Box>
-      )}
-      {currentTab === 3 && (role === "cook" || role === "employer") && (
-        <Box p={3}>
-          <CooksSchedule />
-        </Box>
-      )}
+      <Box p={3}>{renderTabContent()}</Box>
     </div>
   );
 }
