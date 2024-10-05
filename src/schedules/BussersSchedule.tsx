@@ -3,6 +3,7 @@ import { Scheduler } from "@aldabil/react-scheduler";
 import { Box, Button, TextField, Typography, Avatar, Paper } from "@mui/material";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../userAuth/firebase"; // Import Firebase Firestore instance
+import { useUserStore } from "../stores/useUserStore"; // Zustand store to access user role
 
 // Form data types
 interface FormData {
@@ -42,6 +43,8 @@ export default function BussersSchedule() {
   });
 
   const { shift1, shift2, shift3 } = shiftTimes;
+
+  const { role } = useUserStore(); // Zustand store to get user role
 
   // Fetch busser data from Firestore
   useEffect(() => {
@@ -212,7 +215,7 @@ export default function BussersSchedule() {
   return (
     <div>
       {/* Render Busser Cards */}
-      <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+      <Box sx={{ display: "flex", gap: 2, mb: 4, flexWrap: "wrap" }}>
         {bussers.map((employee) => (
           <Paper
             key={employee.id}
@@ -241,57 +244,59 @@ export default function BussersSchedule() {
         ))}
       </Box>
 
-      {/* Form for scheduling */}
-      <form onSubmit={handleSubmit}>
-        <Box sx={{ display: "flex", gap: "24px", marginTop: "20px" }}>
-          {/* Schedule Settings (Left) */}
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="h6" gutterBottom>
-              Schedule Settings
-            </Typography>
-            <TextField
-              label="Number of Employees"
-              type="number"
-              name="num_employees"
-              value={formData.num_employees}
-              onChange={handleInputChange}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-            />
-            <TextField
-              label="Shifts per Day"
-              type="number"
-              name="shifts_per_day"
-              value={formData.shifts_per_day}
-              onChange={handleInputChange}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-            />
-            <TextField
-              label="Total Days"
-              type="number"
-              name="total_days"
-              value={formData.total_days}
-              onChange={handleInputChange}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-            />
+      {/* Only show the form for managers (role === "employer") */}
+      {role === "employer" && (
+        <form onSubmit={handleSubmit}>
+          <Box sx={{ display: "flex", gap: "24px", marginTop: "20px" }}>
+            {/* Schedule Settings (Left) */}
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="h6" gutterBottom>
+                Schedule Settings
+              </Typography>
+              <TextField
+                label="Number of Employees"
+                type="number"
+                name="num_employees"
+                value={formData.num_employees}
+                onChange={handleInputChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+              <TextField
+                label="Shifts per Day"
+                type="number"
+                name="shifts_per_day"
+                value={formData.shifts_per_day}
+                onChange={handleInputChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+              <TextField
+                label="Total Days"
+                type="number"
+                name="total_days"
+                value={formData.total_days}
+                onChange={handleInputChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+            </Box>
           </Box>
-        </Box>
 
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          style={{ marginTop: "20px" }}
-          fullWidth
-        >
-          Generate Schedule
-        </Button>
-      </form>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            style={{ marginTop: "20px" }}
+            fullWidth
+          >
+            Generate Schedule
+          </Button>
+        </form>
+      )}
 
       {/* Scheduler for viewing events */}
       <Scheduler
