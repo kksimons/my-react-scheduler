@@ -126,6 +126,7 @@ export default function App() {
           </>
         )}
       </Box>
+
       {/* Tabs Content */}
       {value === 0 && (
         <Box p={3}>
@@ -146,25 +147,6 @@ export default function App() {
         </Box>
       )}
       {value === 3 && (role === "cook" || role === "employer") && (
-        <Box p={3}>
-          <Typography variant="h5">Cooks Schedule</Typography>
-          <CooksSchedule />
-        </Box>
-      )}
-      {/* Employer's View */}
-      {role === "employer" && value === 1 && (
-        <Box p={3}>
-          <Typography variant="h5">Servers Schedule</Typography>
-          <ServersSchedule />
-        </Box>
-      )}
-      {role === "employer" && value === 2 && (
-        <Box p={3}>
-          <Typography variant="h5">Bussers Schedule</Typography>
-          <BussersSchedule />
-        </Box>
-      )}
-      {role === "employer" && value === 3 && (
         <Box p={3}>
           <Typography variant="h5">Cooks Schedule</Typography>
           <CooksSchedule />
