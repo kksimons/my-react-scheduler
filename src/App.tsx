@@ -1,3 +1,4 @@
+import 'devextreme/dist/css/dx.light.css';
 import { useState } from "react";
 import { Box, Tab, Tabs, Typography } from "@mui/material";
 import ServersSchedule from "./schedules/ServersSchedule";
