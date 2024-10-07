@@ -8,7 +8,18 @@ import {
   Avatar,
   Paper,
 } from "@mui/material";
-import employeesData from "../data/employees.json"; // Importing the employees data for now, we can move off to firebase when it's ready and pull from there
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  orderBy,
+  limit,
+} from "firebase/firestore";
+import { db } from "../userAuth/firebase"; // Import Firebase Firestore instance
+import { useUserStore } from "../stores/useUserStore"; // Zustand store to access user role
+import { Timestamp } from "firebase/firestore";
 
 // Form data types
 interface FormData {
@@ -25,7 +36,7 @@ interface Event {
   start: Date;
   end: Date;
   color?: string;
-  admin_id: number;
+  admin_id: string; // Use `userId` which is a string in Firestore
   editable: boolean;
 }
 
@@ -38,11 +49,11 @@ export default function CooksSchedule() {
     total_days: "",
     employee_types: [],
   });
-  const [employeeColors, setEmployeeColors] = useState<{ [key: number]: string }>({}); // Store employee colors dynamically
+  const [employeeColors, setEmployeeColors] = useState<{
+    [key: string]: string;
+  }>({});
+  const [cooks, setCooks] = useState<any[]>([]); // State to hold cook employees
 
-  const [idMapping, setIdMapping] = useState<{ [key: number]: number }>({}); // Store the API index -> employee ID mapping
-
-  // Track shift times in the state
   const [shiftTimes, setShiftTimes] = useState({
     shift1: { start: "09:00", end: "13:00" },
     shift2: { start: "13:00", end: "17:00" },
@@ -51,24 +62,40 @@ export default function CooksSchedule() {
 
   const { shift1, shift2, shift3 } = shiftTimes;
 
-  // Fetch cook data and set the number of employees based on employee type
+  const { role } = useUserStore(); // Zustand store to get user role
+
+  // Fetch cook data from Firestore
   useEffect(() => {
-    const cooks = employeesData.filter(
-      (employee) => employee.employee_type === "cook"
-    );
+    const fetchCooks = async () => {
+      try {
+        const cooksQuery = query(
+          collection(db, "employees"),
+          where("employeeType", "==", "cook") // Ensure it matches the Firestore field
+        );
+        const querySnapshot = await getDocs(cooksQuery);
 
-    // Create a mapping of API index -> actual employee ID
-    const cookIdMapping: { [key: number]: number } = {};
-    cooks.forEach((cook, index) => {
-      cookIdMapping[index] = cook.id;
-    });
-    setIdMapping(cookIdMapping);
+        const fetchedCooks = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
 
-    setFormData((prev) => ({
-      ...prev,
-      num_employees: cooks.length.toString(),
-      employee_types: cooks.map(() => "full_time"), // Defaulting cooks to full-time
-    }));
+        console.log("Fetched Cooks:", fetchedCooks); // Log for debugging
+        setCooks(fetchedCooks);
+
+        setFormData((prev) => ({
+          ...prev,
+          num_employees: fetchedCooks.length.toString(),
+          employee_types: fetchedCooks.map(() => "full_time"),
+        }));
+
+        // Fetch the last saved schedule for cooks when the page loads
+        await fetchLastScheduleFromFirestore();
+      } catch (error) {
+        console.error("Error fetching cooks from Firestore:", error);
+      }
+    };
+
+    fetchCooks(); // Call the function to fetch cooks from Firestore
   }, []);
 
   // Adjust step and default shift times based on shifts_per_day
@@ -109,17 +136,98 @@ export default function CooksSchedule() {
     }
   };
 
+  // Function to generate random colors for employees
+  const generateRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
+  // Save schedule to Firestore under 'cookSchedule' collection
+  const saveScheduleToFirestore = async (scheduleData: {
+    events: Event[];
+    employeeColors: { [key: string]: string };
+  }) => {
+    try {
+      // Check if events exist
+      if (!scheduleData.events || !Array.isArray(scheduleData.events)) {
+        throw new Error("Invalid event data. No events to save.");
+      }
+
+      const scheduleCollectionRef = collection(db, "cookSchedules");
+
+      // Convert event start and end to Firestore Timestamps
+      const eventsWithTimestamp = scheduleData.events.map((event) => ({
+        ...event,
+        start: Timestamp.fromDate(new Date(event.start)),
+        end: Timestamp.fromDate(new Date(event.end)),
+      }));
+
+      // Save schedule to Firestore
+      await addDoc(scheduleCollectionRef, {
+        events: eventsWithTimestamp,
+        employeeColors: scheduleData.employeeColors,
+        timestamp: Timestamp.now(),
+      });
+
+      console.log("Schedule saved for cooks.");
+    } catch (error) {
+      console.error("Error saving schedule to Firestore:", error);
+    }
+  };
+
+  // Fetch the last generated schedule for cooks from Firestore
+  const fetchLastScheduleFromFirestore = async () => {
+    try {
+      const scheduleQuery = query(
+        collection(db, "cookSchedules"),
+        orderBy("timestamp", "desc"),
+        limit(1)
+      );
+
+      const querySnapshot = await getDocs(scheduleQuery);
+
+      if (!querySnapshot.empty) {
+        const lastSchedule = querySnapshot.docs[0].data();
+
+        // Ensure the fetched events are in the right format
+        const fetchedEvents = lastSchedule.events.map((event: any) => {
+          // Convert Firestore Timestamp to Date object
+          const startDate = event.start.toDate();
+          const endDate = event.end.toDate();
+
+          return {
+            ...event,
+            start: startDate,
+            end: endDate,
+          };
+        });
+
+        // Update state with fetched events and employeeColors
+        setEvents(fetchedEvents);
+        setEmployeeColors(lastSchedule.employeeColors || {}); // Default to empty object if undefined
+
+        console.log("Fetched last schedule from Firestore:", lastSchedule);
+      } else {
+        console.log("No previous schedule found.");
+      }
+    } catch (error) {
+      console.error("Error fetching last schedule from Firestore:", error);
+    }
+  };
+
   // Define the form submission handler
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const cooks = employeesData.filter(employee => employee.employee_type === "cook");
-
     const payload = {
-      num_employees: cooks.length,  // Number of cooks
+      num_employees: cooks.length, // Number of cooks from state
       shifts_per_day: parseInt(formData.shifts_per_day, 10),
       total_days: parseInt(formData.total_days, 10),
-      employee_types: cooks.map(employee => employee.work_type),  // Pass work types
+      employee_types: cooks.map((employee) => employee.workType), // Pass work types
     };
 
     const response = await fetch("http://localhost:80/api/v1/scheduler", {
@@ -133,7 +241,13 @@ export default function CooksSchedule() {
     const data = await response.json();
 
     const newEvents: Event[] = [];
-    const newEmployeeColors: { [key: number]: string } = {}; // Temporary object to store colors
+    const newEmployeeColors: { [key: string]: string } = {}; // Temporary object to store colors
+
+    // Map the employee index from the API to the actual userId from Firestore
+    const employeeIdMapping = cooks.reduce(
+      (acc, cook, index) => ({ ...acc, [index]: cook.id }),
+      {}
+    );
 
     // Generate events with shift times included
     data.schedules.forEach((dayObj: any, outerIndex: number) => {
@@ -142,7 +256,7 @@ export default function CooksSchedule() {
         const currentDate = new Date();
         currentDate.setDate(currentDate.getDate() + dayIndex);
 
-        shifts.forEach((item: any) => {
+        shifts.forEach((item: any, shiftIndex: number) => {
           let shiftStartHour, shiftEndHour;
 
           if (item.shift === 0) {
@@ -166,8 +280,11 @@ export default function CooksSchedule() {
           const [endHour, endMinute] = shiftEndHour.split(":");
           shiftEnd.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
 
-          // Map the API index to the actual employee ID
-          const employeeId = idMapping[item.employee];
+          // Ensure the event ID is unique by including a combination of day, shift, employee, and a unique shiftIndex or timestamp
+          const employeeId = employeeIdMapping[item.employee];
+          const uniqueEventId = `day${outerIndex + 1}-shift${
+            item.shift
+          }-emp${employeeId}-${shiftStart.getTime()}-${shiftIndex}`;
 
           // Assign a color to the employee if not already assigned
           if (!newEmployeeColors[employeeId]) {
@@ -175,11 +292,11 @@ export default function CooksSchedule() {
           }
 
           newEvents.push({
-            event_id: `day${outerIndex + 1}-shift${item.shift}-emp${employeeId}`,
+            event_id: uniqueEventId, // Ensure event_id is unique
             title: `Employee ${employeeId} Shift ${item.shift}`,
             start: shiftStart,
             end: shiftEnd,
-            color: newEmployeeColors[employeeId],  // Use dynamic color
+            color: newEmployeeColors[employeeId], // Use dynamic color
             admin_id: employeeId,
             editable: true,
           });
@@ -189,105 +306,101 @@ export default function CooksSchedule() {
 
     // Set events and colors after the schedule is generated
     setEvents(newEvents);
-    setEmployeeColors(newEmployeeColors); // Update employee colors dynamically after schedule generation
-  };
+    setEmployeeColors(newEmployeeColors);
 
-  // Function to generate random colors for employees
-  const generateRandomColor = () => {
-    const letters = "0123456789ABCDEF";
-    let color = "#";
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
+    // Save the generated schedule to Firestore
+    await saveScheduleToFirestore({
+      events: newEvents,
+      employeeColors: newEmployeeColors,
+    });
   };
 
   return (
     <div>
       {/* Render Cook Cards */}
-      <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-        {employeesData
-          .filter((employee) => employee.employee_type === "cook")
-          .map((employee) => (
-            <Paper
-              key={employee.id}
-              elevation={3}
-              sx={{
-                padding: 2,
-                display: "flex",
-                alignItems: "center",
-                gap: 2,
-                width: "300px",
-                backgroundColor: employeeColors[employee.id] || "#FFFFFF", // Use white by default, color after schedule generation
-              }}
-            >
-              <Avatar
-                src={employee.profilePic}
-                alt={employee.name}
-                sx={{ width: 56, height: 56 }}
-              />
-              <Box>
-                <Typography variant="h6">{employee.name}</Typography>
-                <Typography variant="body2" color="textSecondary">
-                  {employee.employee_type.charAt(0).toUpperCase() +
-                    employee.employee_type.slice(1)}
-                </Typography>
-              </Box>
-            </Paper>
-          ))}
+      <Box sx={{ display: "flex", gap: 2, mb: 4, flexWrap: "wrap" }}>
+        {cooks.map((employee) => (
+          <Paper
+            key={employee.id}
+            elevation={3}
+            sx={{
+              padding: 2,
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              width: "300px",
+              backgroundColor: employeeColors[employee.id] || "#FFFFFF", // Use white by default, color after schedule generation
+            }}
+          >
+            <Avatar
+              src={employee.profilePic}
+              alt={employee.name}
+              sx={{ width: 56, height: 56 }}
+            />
+            <Box>
+              <Typography variant="h6">{employee.name}</Typography>
+              <Typography variant="body2" color="textSecondary">
+                {employee.employeeType.charAt(0).toUpperCase() +
+                  employee.employeeType.slice(1)}
+              </Typography>
+            </Box>
+          </Paper>
+        ))}
       </Box>
 
-      {/* Form for scheduling */}
-      <form onSubmit={handleSubmit}>
-        <Box sx={{ display: "flex", gap: "24px", marginTop: "20px" }}>
-          {/* Schedule Settings (Left) */}
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="h6" gutterBottom>
-              Schedule Settings
-            </Typography>
-            <TextField
-              label="Number of Employees"
-              type="number"
-              name="num_employees"
-              value={formData.num_employees}
-              onChange={handleInputChange}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-            />
-            <TextField
-              label="Shifts per Day"
-              type="number"
-              name="shifts_per_day"
-              value={formData.shifts_per_day}
-              onChange={handleInputChange}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-            />
-            <TextField
-              label="Total Days"
-              type="number"
-              name="total_days"
-              value={formData.total_days}
-              onChange={handleInputChange}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-            />
+      {/* Only show the form for managers (role === "employer") */}
+      {role === "employer" && (
+        <form onSubmit={handleSubmit}>
+          <Box sx={{ display: "flex", gap: "24px", marginTop: "20px" }}>
+            {/* Schedule Settings (Left) */}
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="h6" gutterBottom>
+                Schedule Settings
+              </Typography>
+              <TextField
+                label="Number of Employees"
+                type="number"
+                name="num_employees"
+                value={formData.num_employees}
+                onChange={handleInputChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+              <TextField
+                label="Shifts per Day"
+                type="number"
+                name="shifts_per_day"
+                value={formData.shifts_per_day}
+                onChange={handleInputChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+              <TextField
+                label="Total Days"
+                type="number"
+                name="total_days"
+                value={formData.total_days}
+                onChange={handleInputChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+            </Box>
           </Box>
-        </Box>
 
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          style={{ marginTop: "20px" }}
-          fullWidth
-        >
-          Generate Schedule
-        </Button>
-      </form>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            style={{ marginTop: "20px" }}
+            fullWidth
+          >
+            Generate Schedule
+          </Button>
+        </form>
+      )}
 
       {/* Scheduler for viewing events */}
       <Scheduler

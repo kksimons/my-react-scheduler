@@ -4,7 +4,6 @@
     "name": "John Doe",
     "employee_type": "server",
     "profilePic": "./pexels-italo-melo-881954-2379004.jpg",
-    "color": "#50b500",
     "work_type": "full_time",
     "availability": {
       "mon": ["morning", "afternoon"],
@@ -19,7 +18,6 @@
     "name": "Jane Smith",
     "employee_type": "server",
     "profilePic": "./pexels-pixabay-415829.jpg",
-    "color": "#007BFF",
     "work_type": "part_time",
     "availability": {
       "mon": ["morning", "evening"],
@@ -34,7 +32,6 @@
     "name": "Sam Johnson",
     "employee_type": "server",
     "profilePic": "./pexels-stefanstefancik-91227.jpg",
-    "color": "#FFC107",
     "work_type": "full_time",
     "availability": {
       "mon": ["morning"],
@@ -49,7 +46,6 @@
     "name": "Alex Turner",
     "employee_type": "server",
     "profilePic": "./pexels-blitzboy-1040880.jpg",
-    "color": "#00FF99",
     "work_type": "part_time",
     "availability": {
       "mon": ["afternoon"],
@@ -64,7 +60,6 @@
     "name": "Paul Brown",
     "employee_type": "busser",
     "profilePic": "./pexels-cottonbro-6626903.jpg",
-    "color": "#900000",
     "work_type": "part_time",
     "availability": {
       "mon": ["morning"],
@@ -79,7 +74,6 @@
     "name": "Lily White",
     "employee_type": "busser",
     "profilePic": "./pexels-danxavier-1239288.jpg",
-    "color": "#28a745",
     "work_type": "full_time",
     "availability": {
       "mon": ["afternoon", "evening"],
@@ -94,7 +88,6 @@
     "name": "Emily Davis",
     "employee_type": "busser",
     "profilePic": "./pexels-bertellifotografia-573299.jpg",
-    "color": "#FF33FF",
     "work_type": "full_time",
     "availability": {
       "mon": ["morning", "afternoon"],
@@ -109,7 +102,6 @@
     "name": "Mark Green",
     "employee_type": "cook",
     "profilePic": "./pexels-linkedin-2182970.jpg",
-    "color": "#FF5733",
     "work_type": "full_time",
     "availability": {
       "mon": ["morning"],
@@ -124,7 +116,6 @@
     "name": "Anna Black",
     "employee_type": "cook",
     "profilePic": "./pexels-vinicius-wiesehofer-289347-1130626.jpg",
-    "color": "#C70039",
     "work_type": "part_time",
     "availability": {
       "mon": ["afternoon"],
@@ -139,7 +130,6 @@
     "name": "Grace Blue",
     "employee_type": "cook",
     "profilePic": "./pexels-olly-762020.jpg",
-    "color": "#900C3F",
     "work_type": "full_time",
     "availability": {
       "mon": ["morning", "evening"],
@@ -154,7 +144,6 @@
     "name": "Oliver Stone",
     "employee_type": "cook",
     "profilePic": "./pexels-rb-audiovisual-1819483.jpg",
-    "color": "#800080",
     "work_type": "part_time",
     "availability": {
       "mon": ["afternoon"],

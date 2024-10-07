@@ -8,7 +8,18 @@ import {
   Avatar,
   Paper,
 } from "@mui/material";
-import employeesData from "../data/employees.json"; // Importing the employees data for now, we can move off to firebase when it's ready and pull from there
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  orderBy,
+  limit,
+} from "firebase/firestore";
+import { db } from "../userAuth/firebase"; // Import Firebase Firestore instance
+import { useUserStore } from "../stores/useUserStore"; // Zustand store to access user role
+import { Timestamp } from "firebase/firestore";
 
 // Form data types
 interface FormData {
@@ -25,7 +36,7 @@ interface Event {
   start: Date;
   end: Date;
   color?: string;
-  admin_id: number;
+  admin_id: string; // Use `userId` which is a string in Firestore
   editable: boolean;
 }
 
@@ -38,10 +49,11 @@ export default function BussersSchedule() {
     total_days: "",
     employee_types: [],
   });
-  const [employeeColors, setEmployeeColors] = useState<{ [key: number]: string }>({}); // Store employee colors dynamically
-  const [idMapping, setIdMapping] = useState<{ [key: number]: number }>({}); // Store the API index -> employee ID mapping
+  const [employeeColors, setEmployeeColors] = useState<{
+    [key: string]: string;
+  }>({}); // Store employee colors dynamically
+  const [bussers, setBussers] = useState<any[]>([]); // State to hold busser employees
 
-  // Track shift times in the state
   const [shiftTimes, setShiftTimes] = useState({
     shift1: { start: "09:00", end: "13:00" },
     shift2: { start: "13:00", end: "17:00" },
@@ -50,24 +62,40 @@ export default function BussersSchedule() {
 
   const { shift1, shift2, shift3 } = shiftTimes;
 
-  // Fetch busser data and set the number of employees based on employee type
+  const { role } = useUserStore(); // Zustand store to get user role
+
+  // Fetch busser data from Firestore
   useEffect(() => {
-    const bussers = employeesData.filter(
-      (employee) => employee.employee_type === "busser"
-    );
+    const fetchBussers = async () => {
+      try {
+        const bussersQuery = query(
+          collection(db, "employees"),
+          where("employeeType", "==", "busser") // Ensure it matches the Firestore field
+        );
+        const querySnapshot = await getDocs(bussersQuery);
 
-    // Create a mapping of API index -> actual employee ID
-    const busserIdMapping: { [key: number]: number } = {};
-    bussers.forEach((busser, index) => {
-      busserIdMapping[index] = busser.id;
-    });
-    setIdMapping(busserIdMapping);
+        const fetchedBussers = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
 
-    setFormData((prev) => ({
-      ...prev,
-      num_employees: bussers.length.toString(),
-      employee_types: bussers.map(() => "full_time"), // Defaulting bussers to full-time
-    }));
+        console.log("Fetched Bussers:", fetchedBussers); // Log for debugging
+        setBussers(fetchedBussers);
+
+        setFormData((prev) => ({
+          ...prev,
+          num_employees: fetchedBussers.length.toString(),
+          employee_types: fetchedBussers.map(() => "full_time"),
+        }));
+
+        // Fetch the last saved schedule for bussers when the page loads
+        await fetchLastScheduleFromFirestore();
+      } catch (error) {
+        console.error("Error fetching bussers from Firestore:", error);
+      }
+    };
+
+    fetchBussers(); // Call the function to fetch bussers from Firestore
   }, []);
 
   // Adjust step and default shift times based on shifts_per_day
@@ -108,19 +136,98 @@ export default function BussersSchedule() {
     }
   };
 
+  // Function to generate random colors for employees
+  const generateRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
+  // Save schedule to Firestore under 'busserSchedules' collection
+  const saveScheduleToFirestore = async (scheduleData: {
+    events: Event[];
+    employeeColors: { [key: string]: string };
+  }) => {
+    try {
+      // Check if events exist
+      if (!scheduleData.events || !Array.isArray(scheduleData.events)) {
+        throw new Error("Invalid event data. No events to save.");
+      }
+
+      const scheduleCollectionRef = collection(db, "busserSchedules"); // Use 'busserSchedules' collection
+
+      // Convert event start and end to Firestore Timestamps
+      const eventsWithTimestamp = scheduleData.events.map((event) => ({
+        ...event,
+        start: Timestamp.fromDate(new Date(event.start)),
+        end: Timestamp.fromDate(new Date(event.end)),
+      }));
+
+      // Save schedule to Firestore
+      await addDoc(scheduleCollectionRef, {
+        events: eventsWithTimestamp,
+        employeeColors: scheduleData.employeeColors,
+        timestamp: Timestamp.now(),
+      });
+
+      console.log("Schedule saved for bussers.");
+    } catch (error) {
+      console.error("Error saving schedule to Firestore:", error);
+    }
+  };
+
+  // Fetch the last generated schedule for bussers from Firestore
+  const fetchLastScheduleFromFirestore = async () => {
+    try {
+      const scheduleQuery = query(
+        collection(db, "busserSchedules"),
+        orderBy("timestamp", "desc"),
+        limit(1)
+      );
+
+      const querySnapshot = await getDocs(scheduleQuery);
+
+      if (!querySnapshot.empty) {
+        const lastSchedule = querySnapshot.docs[0].data();
+
+        // Ensure the fetched events are in the right format
+        const fetchedEvents = lastSchedule.events.map((event: any) => {
+          // Convert Firestore Timestamp to Date object
+          const startDate = event.start.toDate();
+          const endDate = event.end.toDate();
+
+          return {
+            ...event,
+            start: startDate,
+            end: endDate,
+          };
+        });
+
+        // Update state with fetched events and employeeColors
+        setEvents(fetchedEvents);
+        setEmployeeColors(lastSchedule.employeeColors || {}); // Default to empty object if undefined
+
+        console.log("Fetched last schedule from Firestore:", lastSchedule);
+      } else {
+        console.log("No previous schedule found.");
+      }
+    } catch (error) {
+      console.error("Error fetching last schedule from Firestore:", error);
+    }
+  };
+
   // Define the form submission handler
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const bussers = employeesData.filter(
-      (employee) => employee.employee_type === "busser"
-    );
-
     const payload = {
-      num_employees: bussers.length, // Number of bussers
+      num_employees: bussers.length, // Number of bussers from state
       shifts_per_day: parseInt(formData.shifts_per_day, 10),
       total_days: parseInt(formData.total_days, 10),
-      employee_types: bussers.map((employee) => employee.work_type), // Pass work types
+      employee_types: bussers.map((employee) => employee.workType), // Pass work types
     };
 
     const response = await fetch("http://localhost:80/api/v1/scheduler", {
@@ -134,16 +241,21 @@ export default function BussersSchedule() {
     const data = await response.json();
 
     const newEvents: Event[] = [];
-    const newEmployeeColors: { [key: number]: string } = {}; // Temporary object to store colors
+    const newEmployeeColors: { [key: string]: string } = {}; // Temporary object to store colors
 
-    // Generate events with shift times included
+    // Map the employee index from the API to the actual userId from Firestore
+    const employeeIdMapping = bussers.reduce(
+      (acc, busser, index) => ({ ...acc, [index]: busser.id }),
+      {}
+    );
+
     data.schedules.forEach((dayObj: any, outerIndex: number) => {
       Object.keys(dayObj).forEach((dayKey, dayIndex) => {
         const shifts = dayObj[dayKey];
         const currentDate = new Date();
         currentDate.setDate(currentDate.getDate() + dayIndex);
 
-        shifts.forEach((item: any) => {
+        shifts.forEach((item: any, shiftIndex: number) => {
           let shiftStartHour, shiftEndHour;
 
           if (item.shift === 0) {
@@ -167,8 +279,11 @@ export default function BussersSchedule() {
           const [endHour, endMinute] = shiftEndHour.split(":");
           shiftEnd.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
 
-          // Map the API index to the actual employee ID
-          const employeeId = idMapping[item.employee];
+          // Ensure the event ID is unique by including a combination of day, shift, employee, and a unique shiftIndex or timestamp
+          const employeeId = employeeIdMapping[item.employee];
+          const uniqueEventId = `day${outerIndex + 1}-shift${
+            item.shift
+          }-emp${employeeId}-${shiftStart.getTime()}-${shiftIndex}`;
 
           // Assign a color to the employee if not already assigned
           if (!newEmployeeColors[employeeId]) {
@@ -176,7 +291,7 @@ export default function BussersSchedule() {
           }
 
           newEvents.push({
-            event_id: `day${outerIndex + 1}-shift${item.shift}-emp${employeeId}`,
+            event_id: uniqueEventId, // Ensure event_id is unique
             title: `Employee ${employeeId} Shift ${item.shift}`,
             start: shiftStart,
             end: shiftEnd,
@@ -191,104 +306,100 @@ export default function BussersSchedule() {
     // Set events and colors after the schedule is generated
     setEvents(newEvents);
     setEmployeeColors(newEmployeeColors); // Update employee colors dynamically after schedule generation
-  };
 
-  // Function to generate random colors for employees, maybe we can find a better one that doesn't make ugly ones sometime
-  const generateRandomColor = () => {
-    const letters = "0123456789ABCDEF";
-    let color = "#";
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
+    // Save the generated schedule to Firestore
+    await saveScheduleToFirestore({
+      events: newEvents,
+      employeeColors: newEmployeeColors,
+    });
   };
 
   return (
     <div>
       {/* Render Busser Cards */}
-      <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-        {employeesData
-          .filter((employee) => employee.employee_type === "busser")
-          .map((employee) => (
-            <Paper
-              key={employee.id}
-              elevation={3}
-              sx={{
-                padding: 2,
-                display: "flex",
-                alignItems: "center",
-                gap: 2,
-                width: "300px",
-                backgroundColor: employeeColors[employee.id] || "#FFFFFF", // Use white by default, color after schedule generation
-              }}
-            >
-              <Avatar
-                src={employee.profilePic}
-                alt={employee.name}
-                sx={{ width: 56, height: 56 }}
-              />
-              <Box>
-                <Typography variant="h6">{employee.name}</Typography>
-                <Typography variant="body2" color="textSecondary">
-                  {employee.employee_type.charAt(0).toUpperCase() +
-                    employee.employee_type.slice(1)}
-                </Typography>
-              </Box>
-            </Paper>
-          ))}
+      <Box sx={{ display: "flex", gap: 2, mb: 4, flexWrap: "wrap" }}>
+        {bussers.map((employee) => (
+          <Paper
+            key={employee.id}
+            elevation={3}
+            sx={{
+              padding: 2,
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              width: "300px",
+              backgroundColor: employeeColors[employee.id] || "#FFFFFF", // Use white by default, color after schedule generation
+            }}
+          >
+            <Avatar
+              src={employee.profilePic}
+              alt={employee.name}
+              sx={{ width: 56, height: 56 }}
+            />
+            <Box>
+              <Typography variant="h6">{employee.name}</Typography>
+              <Typography variant="body2" color="textSecondary">
+                {employee.employeeType.charAt(0).toUpperCase() +
+                  employee.employeeType.slice(1)}
+              </Typography>
+            </Box>
+          </Paper>
+        ))}
       </Box>
 
-      {/* Form for scheduling */}
-      <form onSubmit={handleSubmit}>
-        <Box sx={{ display: "flex", gap: "24px", marginTop: "20px" }}>
-          {/* Schedule Settings (Left) */}
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="h6" gutterBottom>
-              Schedule Settings
-            </Typography>
-            <TextField
-              label="Number of Employees"
-              type="number"
-              name="num_employees"
-              value={formData.num_employees}
-              onChange={handleInputChange}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-            />
-            <TextField
-              label="Shifts per Day"
-              type="number"
-              name="shifts_per_day"
-              value={formData.shifts_per_day}
-              onChange={handleInputChange}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-            />
-            <TextField
-              label="Total Days"
-              type="number"
-              name="total_days"
-              value={formData.total_days}
-              onChange={handleInputChange}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-            />
+      {/* Only show the form for managers (role === "employer") */}
+      {role === "employer" && (
+        <form onSubmit={handleSubmit}>
+          <Box sx={{ display: "flex", gap: "24px", marginTop: "20px" }}>
+            {/* Schedule Settings (Left) */}
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="h6" gutterBottom>
+                Schedule Settings
+              </Typography>
+              <TextField
+                label="Number of Employees"
+                type="number"
+                name="num_employees"
+                value={formData.num_employees}
+                onChange={handleInputChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+              <TextField
+                label="Shifts per Day"
+                type="number"
+                name="shifts_per_day"
+                value={formData.shifts_per_day}
+                onChange={handleInputChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+              <TextField
+                label="Total Days"
+                type="number"
+                name="total_days"
+                value={formData.total_days}
+                onChange={handleInputChange}
+                fullWidth
+                margin="normal"
+                variant="outlined"
+              />
+            </Box>
           </Box>
-        </Box>
 
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          style={{ marginTop: "20px" }}
-          fullWidth
-        >
-          Generate Schedule
-        </Button>
-      </form>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            style={{ marginTop: "20px" }}
+            fullWidth
+          >
+            Generate Schedule
+          </Button>
+        </form>
+      )}
 
       {/* Scheduler for viewing events */}
       <Scheduler
