@@ -1,6 +1,7 @@
-// src/firebase.js
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, GithubAuthProvider } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCey0QGSAn2QsMyKrHJQ5nojR92KOXMiE8",
@@ -12,7 +13,15 @@ const firebaseConfig = {
   measurementId: "G-KV9E3CL7BF"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 
-export { auth };
+// Initialize Firebase Authentication and Firestore
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+// GitHub Auth Provider
+const githubProvider = new GithubAuthProvider();
+
+export { db, auth, githubProvider, storage };

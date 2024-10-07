@@ -18,10 +18,10 @@
     "@mui/x-date-pickers": "^7.18.0",
     "@vitejs/plugin-react": "^4.3.1",
     "date-fns": "^4.1.0",
+    "firebase": "^10.14.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "devextreme": "24.1.4",
-    "devextreme-react": "24.1.4"
+    "zustand": "^5.0.0-rc.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
@@ -34,7 +34,6 @@
     "globals": "^15.9.0",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^5.4.1",
-    "devextreme-themebuilder": "24.1.4"
+    "vite": "^5.4.1"
   }
 }
