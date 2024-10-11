@@ -37,8 +37,8 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import Content from './Content';  // Assuming you have the Content component
-import SignInCard from './SignInCard';  // Assuming you have the SignInCard component
+import Content from './Content'; 
+import SignUpCard from './SignUpCard';
 
 export default function MainLayout() {
   return (
@@ -54,7 +54,7 @@ export default function MainLayout() {
           <Content />
         </Grid>
         <Grid item xs={12} md={6}>
-          <SignInCard />
+          <SignUpCard />
         </Grid>
       </Grid>
     </Box>

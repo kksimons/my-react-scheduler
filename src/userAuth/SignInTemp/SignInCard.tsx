@@ -11,8 +11,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';  // Import Firebase config
+import { signInUser } from '../services/authService'; 
 import ForgotPassword from './ForgotPassword';
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -42,28 +41,21 @@ export default function SignInCard() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const handleClickOpen = () => { setOpen(true); };
+  const handleClose = () => { setOpen(false); };
 
   const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    if (!validateInputs()) {
-      return;
-    }
+    if (!validateInputs()) return;
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log("User signed in:", userCredential.user);
+      await signInUser(email, password);
+      console.log("User signed in");
     } catch (error) {
-      console.error("Error signing in:");
+      console.log('Invalid credentials. Please try again.');
     }
   };
+
 
   const validateInputs = () => {
     let isValid = true;

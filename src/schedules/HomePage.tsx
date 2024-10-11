@@ -8,6 +8,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../userAuth/firebase";
 
 import SignInSide from "../userAuth/SignInTemp/SignInSide"; 
+import SignUpSide from "../userAuth/SignUpTemp/SignUpSide";
 
 const HomePage: React.FC = () => {
   const { isLoggedIn, setIsLoggedIn, setRole } = useUserStore();
@@ -30,7 +31,6 @@ const HomePage: React.FC = () => {
       {isLoggedIn ? (
         <Paper>
           <Typography variant="h6">You are logged in.</Typography>
-          <SignOut />
         </Paper>
       ) : (
         <Paper>
@@ -48,7 +48,7 @@ const HomePage: React.FC = () => {
               Already a user? Log In
             </Button>
           </Box>
-          {isNewUser ? <SignUp /> : <SignInSide />} 
+          {isNewUser ? <SignUpSide /> : <SignInSide />} 
         </Paper>
       )}
     </Box>

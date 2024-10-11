@@ -11,9 +11,20 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';  // Import Firebase config
-import ForgotPassword from './ForgotPassword';
+import { signUpUser } from '../services/authService'; // Use the service here
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+
+
+
+
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -33,35 +44,23 @@ const Card = styled(MuiCard)(({ theme }) => ({
   }),
 }));
 
-export default function SignInCard() {
+export default function SignUpCard() {
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
-  const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSignUp = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    if (!validateInputs()) {
-      return;
-    }
+    if (!validateInputs()) return;
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log("User signed in:", userCredential.user);
+      await signUpUser(email, password);
+      console.log("User signed up");
     } catch (error) {
-      console.error("Error signing in:");
+      console.log('Failed to create account. Try again.');
     }
   };
 
@@ -96,11 +95,11 @@ export default function SignInCard() {
         variant="h4"
         sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
       >
-        Sign in
+        Create Account
       </Typography>
       <Box
         component="form"
-        onSubmit={handleSignIn}
+        onSubmit={handleSignUp}
         noValidate
         sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}
       >
@@ -151,42 +150,23 @@ export default function SignInCard() {
             color={passwordError ? 'error' : 'primary'}
           />
         </FormControl>
-
-
-        {/* Box for Remember Me and Forgot Password Link on the same row */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          />
-          <Link
-            component="button"
-            type="button"
-            onClick={handleClickOpen}
-            variant="body2"
-            sx={{ alignSelf: 'baseline' }}
-          >
-            Forgot your password?
-          </Link>
-        </Box>
-
-        <ForgotPassword open={open} handleClose={handleClose} />
+        
         <Button 
          type="submit" 
          fullWidth variant="contained"
          sx={{ backgroundColor: '#5201C3', '&:hover': { backgroundColor: '#6200ea' } }}
          >
-          Sign in
+          Sign Up
         </Button>
         <Typography sx={{ textAlign: 'center' }}>
-          Don&apos;t have an account?{' '}
+          Already have an account?{' '}
           <span>
             <Link
               href="/material-ui/getting-started/templates/sign-in/"
               variant="body2"
               sx={{ alignSelf: 'center', fontSize: '18px' }}
             >
-              Sign up
+              Log in
             </Link>
             
           </span>
