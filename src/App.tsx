@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Tab, Tabs, Avatar, Button } from "@mui/material";
 import ServersSchedule from "./schedules/ServersSchedule";
 import BussersSchedule from "./schedules/BussersSchedule";
@@ -9,7 +9,11 @@ import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { useUserStore } from "./stores/useUserStore";
 
+// 1. Create function called App() 
 export default function App() {
+
+  //2. create const to store the firebase database value that include all the currentTab thingy 
+  // Note: db = database 
   const db = getFirestore();
   const {
     currentTab,
@@ -20,9 +24,12 @@ export default function App() {
     setProfilePic,
     setIsLoggedIn,
     setCurrentTab,
-  } = useUserStore();
+  } = useUserStore(); //put all those things in useUserStore()
 
-  // Remap currentTab to ensure it's always valid for the role (certain roles hides tabs and it causes issues)
+  //3. We want to user to pick role ( Manager or Employee), so we create selected role state 
+  const [selectedRole, setSelectedRole] = useState<string | null>(null); // New state for role selection
+
+  // 4. Remap currentTab to ensure it's always valid for the role (certain roles hide tabs and cause issues)
   const mapCurrentTab = () => {
     if (role === "server" && currentTab > 1) return 1;
     if (role === "busser" && currentTab > 1) return 1;
@@ -30,20 +37,32 @@ export default function App() {
     return currentTab;
   };
 
+  // 5. Because we have tab, we have to create a function to handle tab change 
   const handleTabChange = (newValue: number) => {
     setCurrentTab(newValue); // Trying to get this to stay in zustand but not sure it's needed
   };
 
+  //6. handle role selection, para role will take string as value. User select role and will be save in zustand state 
+  const handleRoleSelection = (role: string) => {
+    setSelectedRole(role); // Set selected role state
+    setRole(role); // Set role in zustand state
+  };
+
+
+  //7. Put everything together we have: setSelectedRole, mapCurrentTab, handleTabChange, handleRoleSelection
+
+  //8. Map change depends on user role 
   useEffect(() => {
     // Ensure the currentTab is valid whenever role changes
     const validTab = mapCurrentTab();
     if (validTab !== currentTab) {
       setCurrentTab(validTab); // Remap to a valid tab
     }
-  }, [role, currentTab, setCurrentTab]);
+  }, [role, currentTab, setCurrentTab]); 
 
+  //9. Listen for changes to the user's authentication state 
+  // omg im in my dum era 
   useEffect(() => {
-    // Listen for changes to the user's authentication state
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
         const userDoc = await fetchUserRoleAndProfile(user.uid);
@@ -138,7 +157,7 @@ export default function App() {
   const renderTabContent = () => {
     switch (mapCurrentTab()) {
       case 0:
-        return <HomePage setValue={setCurrentTab} />;
+        return <HomePage/>;
       case 1:
         if (role === "server" || role === "employer") {
           return <ServersSchedule />;
@@ -164,6 +183,30 @@ export default function App() {
         return null;
     }
   };
+
+  // Check if a role has been selected; if not, display role selection landing page
+  if (!selectedRole) {
+    return (
+      <div style={{ textAlign: 'center', padding: '50px' }}>
+        <h1>Welcome to PowerShift</h1>
+        <p>Please select your role:</p>
+        <Button 
+          variant="contained" 
+          onClick={() => handleRoleSelection('employer')} 
+          style={{ margin: '10px', padding: '10px 20px' }}
+        >
+          Manager
+        </Button>
+        <Button 
+          variant="contained" 
+          onClick={() => handleRoleSelection('server')} 
+          style={{ margin: '10px', padding: '10px 20px' }}
+        >
+          Employee
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div>

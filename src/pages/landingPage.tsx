@@ -1,14 +1,21 @@
 // src/pages/LandingPage.tsx
 import React, { useState } from "react";
-import { Box, Button, Typography, Paper, Avatar } from "@mui/material";
-import SignUpUser from "../userAuth/services/authService";
+import { Box, Button, Typography, Paper, Dialog, DialogTitle, DialogActions, DialogContent, DialogContentText } from "@mui/material";
+import signUpUser from "../userAuth/services/authService";
 
 const LandingPage: React.FC = () => {
+  const [showRoleDialog, setShowRoleDialog] = useState(false);
   const [role, setRole] = useState<"manager" | "employee" | null>(null);
 
-  // Handle role selection
+  // Handle showing the dialog to choose role after clicking "Start"
+  const handleStart = () => {
+    setShowRoleDialog(true); // Open the dialog for role selection
+  };
+
+  // Handle role selection (Manager or Employee)
   const handleRoleSelection = (selectedRole: "manager" | "employee") => {
-    setRole(selectedRole);
+    setRole(selectedRole);  // Set the selected role
+    setShowRoleDialog(false); // Close the dialog after selection
   };
 
   return (
@@ -22,40 +29,34 @@ const LandingPage: React.FC = () => {
         textAlign: "center",
       }}
     >
-      {!role ? (
-        <>
-          {/* Welcome Message */}
-          <Typography variant="h3" sx={{ mb: 4 }}>
-            Welcome To Power Shift
-          </Typography>
+      {/* Landing Page Message */}
+      <Typography variant="h3" sx={{ mb: 4 }}>
+        Welcome To Power Shift
+      </Typography>
 
-          {/* Role Selection */}
-          <Paper elevation={3} sx={{ padding: 4, width: "500px" }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Select Your Role
-            </Typography>
-            <Box sx={{ display: "flex", justifyContent: "space-around" }}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => handleRoleSelection("manager")}
-              >
-                Manager
-              </Button>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={() => handleRoleSelection("employee")}
-              >
-                Employee
-              </Button>
-            </Box>
-          </Paper>
-        </>
-      ) : (
-        // If role is selected, render the signup form based on role
-        <SignUpUser role={role} />
-      )}
+      {/* Start Button */}
+      <Button variant="contained" color="primary" onClick={handleStart}>
+        Start
+      </Button>
+
+      {/* Show Sign-Up Form if role is selected */}
+      {role && <signUpUser role={role} />}
+
+      {/* Dialog for selecting Manager or Employee */}
+      <Dialog open={showRoleDialog} onClose={() => setShowRoleDialog(false)}>
+        <DialogTitle>Choose Your Role</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Select whether you are a Manager or an Employee.</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleRoleSelection("manager")} color="primary">
+            Manager
+          </Button>
+          <Button onClick={() => handleRoleSelection("employee")} color="secondary">
+            Employee
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
