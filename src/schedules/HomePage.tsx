@@ -362,6 +362,8 @@ export default function HomePage({ setValue }: HomePageProps) {
       }}
     >
       {isLoggedIn ? (
+
+        // Logged in view
         <Paper
           elevation={3}
           sx={{ padding: 3, width: "500px", marginBottom: 4 }}
@@ -370,6 +372,9 @@ export default function HomePage({ setValue }: HomePageProps) {
             You are logged in, your profile will eventually be shown here to
             edit.
           </Typography>
+
+          <p>This is my test stuff</p>
+
         </Paper>
       ) : (
         <Paper

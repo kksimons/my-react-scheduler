@@ -20,6 +20,8 @@ import {
 import { db } from "../userAuth/firebase";
 import { useUserStore } from "../stores/useUserStore";
 import { Timestamp } from "firebase/firestore";
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 // Form data types
 interface FormData {
@@ -339,6 +341,39 @@ export default function ServersSchedule() {
     }
   };
 
+  // Function to export the schedule to PDF
+  const exportScheduleToPDF = async () => {
+    const scheduleElement = document.getElementById('schedule-container');
+
+    if (!scheduleElement) {
+      console.error('Schedule element not found!');
+      return;
+    }
+
+    const canvas = await html2canvas(scheduleElement);
+    const imgData = canvas.toDataURL('image/png');
+
+    const pdf = new jsPDF();
+    const imgWidth = 190; // Adjust the width
+    const pageHeight = pdf.internal.pageSize.height;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    let heightLeft = imgHeight;
+
+    let position = 0;
+
+    pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft >= 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    pdf.save('schedule.pdf');
+  };
+
   return (
     <div>
       {/* Render Server Cards */}
@@ -427,20 +462,32 @@ export default function ServersSchedule() {
       )}
 
       {/* Scheduler for viewing events */}
-      <Scheduler
-        events={events}
-        disableViewer
-        onEventClick={() => {
-          console.log("onEventClick");
-        }}
-        week={{
-          weekDays: [0, 1, 2, 3, 4, 5, 6],
-          weekStartOn: 1,
-          startHour: 9,
-          endHour: 24,
-          step: step, // Dynamic step value based on shifts_per_day
-        }}
-      />
+      <div id="schedule-container">
+        <Scheduler
+          events={events}
+          disableViewer
+          onEventClick={() => {
+            console.log("onEventClick");
+          }}
+          week={{
+            weekDays: [0, 1, 2, 3, 4, 5, 6],
+            weekStartOn: 1,
+            startHour: 9,
+            endHour: 24,
+            step: step, // Dynamic step value based on shifts_per_day
+          }}
+        />
+      </div>
+
+      <Button
+        variant="contained"
+        color="secondary"
+        onClick={exportScheduleToPDF}
+        style={{ marginTop: "20px" }}
+      >
+        Export Schedule as PDF
+      </Button>
+
     </div>
   );
 }
