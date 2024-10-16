@@ -333,7 +333,6 @@ export default function ServersSchedule() {
         employeeColors: newEmployeeColors,
       });
 
-      // Update UI with new events
       setEvents(newEvents);
       setEmployeeColors(newEmployeeColors);
     } catch (error) {
@@ -341,7 +340,7 @@ export default function ServersSchedule() {
     }
   };
 
-  // Function to export the schedule to PDF
+  // PDF export function
   const exportScheduleToPDF = async () => {
     const scheduleElement = document.getElementById('schedule-container');
 
@@ -354,7 +353,7 @@ export default function ServersSchedule() {
     const imgData = canvas.toDataURL('image/png');
 
     const pdf = new jsPDF();
-    const imgWidth = 190; // Adjust the width
+    const imgWidth = 190; 
     const pageHeight = pdf.internal.pageSize.height;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     let heightLeft = imgHeight;
@@ -376,7 +375,7 @@ export default function ServersSchedule() {
 
   return (
     <div>
-      {/* Render Server Cards */}
+      {/* Employee Cards */}
       <Box sx={{ display: "flex", gap: 2, mb: 4, flexWrap: "wrap" }}>
         {servers.map((employee) => (
           <Paper
@@ -407,11 +406,11 @@ export default function ServersSchedule() {
         ))}
       </Box>
 
-      {/* Only show the form for employers */}
+      {/* Only show form for employers */}
       {role === "employer" && (
         <form onSubmit={handleSubmit}>
           <Box sx={{ display: "flex", gap: "24px", marginTop: "20px" }}>
-            {/* Schedule Settings (Left) */}
+            {/* Schedule Settings */}
             <Box sx={{ flex: 1 }}>
               <Typography variant="h6" gutterBottom>
                 Schedule Settings
@@ -461,7 +460,7 @@ export default function ServersSchedule() {
         </form>
       )}
 
-      {/* Scheduler for viewing events */}
+      {/* Visual Schedule */}
       <div id="schedule-container">
         <Scheduler
           events={events}
