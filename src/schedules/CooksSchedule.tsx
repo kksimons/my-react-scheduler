@@ -20,6 +20,8 @@ import {
 import { db } from "../userAuth/firebase"; // Import Firebase Firestore instance
 import { useUserStore } from "../stores/useUserStore"; // Zustand store to access user role
 import { Timestamp } from "firebase/firestore";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 // Form data types
 interface FormData {
@@ -70,7 +72,7 @@ export default function CooksSchedule() {
       try {
         const cooksQuery = query(
           collection(db, "employees"),
-          where("employeeType", "==", "cook") // Ensure it matches the Firestore field
+          where("employeeType", "==", "cook")
         );
         const querySnapshot = await getDocs(cooksQuery);
 
@@ -315,6 +317,37 @@ export default function CooksSchedule() {
     });
   };
 
+  // Function to export schedule to PDF
+  const exportScheduleToPDF = async () => {
+    const schedulerElement = document.getElementById("scheduler");
+    if (!schedulerElement) {
+      console.error("Scheduler element not found.");
+      return;
+    }
+
+    const canvas = await html2canvas(schedulerElement);
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF();
+    const imgWidth = 190; // Set width of the image in the PDF
+    const pageHeight = pdf.internal.pageSize.height;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    let heightLeft = imgHeight;
+
+    let position = 0;
+
+    pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft >= 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    pdf.save("schedule.pdf");
+  };
+
   return (
     <div>
       {/* Render Cook Cards */}
@@ -329,7 +362,7 @@ export default function CooksSchedule() {
               alignItems: "center",
               gap: 2,
               width: "300px",
-              backgroundColor: employeeColors[employee.id] || "#FFFFFF", // Use white by default, color after schedule generation
+              backgroundColor: employeeColors[employee.id] || "#FFFFFF",
             }}
           >
             <Avatar
@@ -403,20 +436,32 @@ export default function CooksSchedule() {
       )}
 
       {/* Scheduler for viewing events */}
-      <Scheduler
-        events={events}
-        disableViewer
-        onEventClick={() => {
-          console.log("onEventClick");
-        }}
-        week={{
-          weekDays: [0, 1, 2, 3, 4, 5, 6],
-          weekStartOn: 1,
-          startHour: 9,
-          endHour: 24,
-          step: step, // Dynamic step value based on shifts_per_day
-        }}
-      />
+      <div id="scheduler">
+        <Scheduler
+          events={events}
+          disableViewer
+          onEventClick={() => {
+            console.log("onEventClick");
+          }}
+          week={{
+            weekDays: [0, 1, 2, 3, 4, 5, 6],
+            weekStartOn: 1,
+            startHour: 9,
+            endHour: 24,
+            step: step,
+          }}
+        />
+      </div>
+
+      <Button
+        variant="contained"
+        color="secondary"
+        onClick={exportScheduleToPDF}
+        style={{ marginTop: "20px" }}
+      >
+        Export Schedule as PDF
+      </Button>
+
     </div>
   );
 }
