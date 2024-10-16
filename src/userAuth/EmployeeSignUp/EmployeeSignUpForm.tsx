@@ -4,28 +4,16 @@ import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { useNavigate, Link as RouterLink  } from 'react-router-dom';
 import { SignUpEmployee } from '../../userAuth/services/SignUpEmployee';
 
+//-----------MUI STYLING IMPORT HERE -------------------------------------------------
+import { TextField, Button, Typography, Box, FormControl, FormGroup, FormControlLabel, Checkbox, Select, MenuItem, InputLabel, Link, SelectChangeEvent, } from '@mui/material';
+//------------------------------------------------------------------------------------------
 
-import {
-  TextField,
-  Button,
-  Typography,
-  Box,
-  FormControl,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
-  Select,
-  MenuItem,
-  InputLabel,
-  Link,
-  SelectChangeEvent,
-} from '@mui/material';
 
-//Define data type 
+//Define data type cuz u r using Typescript so u have to do it 
 interface EmployeeData {
   employeeFname: string;
   employeeLname: string;
-  employeeDOB: string;
+  employeeDob: string;
   employeePhone: string;
   employeeEmail: string;
   employeeType: string;
@@ -40,7 +28,7 @@ interface EmployeeData {
 interface EmployeeFormState {
   employeeFname: string;
   employeeLname: string;
-  employeeDOB: string;
+  employeeDob: string;
   employeePhone: string;
   employeeEmail: string;
   employeePassword: string;
@@ -54,7 +42,7 @@ const EmployeeSignUpForm: React.FC = () => {
   const [employee, setEmployee] = useState<EmployeeFormState>({
     employeeFname: '', //Emp first name 
     employeeLname: '', //Emp last name
-    employeeDOB: '', //emp dob 
+    employeeDob: '', //emp dob 
     employeePhone: '', //emp phone 
     employeeEmail: '', //emp email 
     employeePassword: '', //emp password 
@@ -122,20 +110,23 @@ const EmployeeSignUpForm: React.FC = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
+  
     const fullEmployeeData: EmployeeData = {
       ...employee,
-      employeeAvailability: availability 
+      employeeAvailability: availability, 
+      employeeDob: employee.employeeDob // Ensure that employeeDob is included
     };
-
+  
     try {
       await SignUpEmployee(fullEmployeeData, employee.employeePassword);
       setSubmitted(true);
-      navigate('/EmployeeDashboard'); // Navigate to Employee Dashboard after successful sign-up
+      navigate('/EmployeeSignInPage'); // Navigate to Employee Sign-In Page after successful sign-up
     } catch (error: any) {
       setError(`Failed to create employee account. Please try again. ${error.message}`);
       console.error('Error during employee sign-up:', error);
     }
   };
+  
 //-------------------------------------------------------------------------------------------------------
 
   return (
@@ -201,13 +192,12 @@ const EmployeeSignUpForm: React.FC = () => {
       <TextField
         label="Date of Birth"
         type="date"
-        name="employeeDOB"
-        value={employee.employeeDOB}
+        name="employeeDob"
+        value={employee.employeeDob}
         onChange={handleInputChange}
         required
         variant="outlined"
         fullWidth
-        InputLabelProps={{ shrink: true }}
       />
 
       {/* Employee Phone */}

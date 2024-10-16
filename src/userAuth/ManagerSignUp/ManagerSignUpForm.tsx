@@ -24,10 +24,6 @@ const Card = styled(MuiCard)(({ theme }) => ({
   [theme.breakpoints.up('sm')]: {
     width: '450px',
   },
-  ...theme.applyStyles('dark', {
-    boxShadow:
-      'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px',
-  } ),
 }));
 
 // Manager Sign Up Form Starts Here 
@@ -328,13 +324,13 @@ const ManagerSignUpForm: React.FC = () => {
         
         {/* Link to Sign-In Page */}
         <Typography sx={{ textAlign: 'center' }}>
-          Already have an account? Click on the Log In Button Below{' '}
+          Already have an account? Click on the Sign In Button Below{' '}
           <Link
             href="/ManagerSignInPage"
             variant="body2"
             sx={{ alignSelf: 'center', fontSize: '18px' }}
           >
-            <Button>Log In</Button>
+            <Button>Sign In</Button>
           </Link>
         </Typography>
       </Box>

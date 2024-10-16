@@ -6,13 +6,15 @@ import SignOut from '../userAuth/SignOut';
 
 
 
+
 const EmployeeDashboard: React.FC = () => {
     return (
         <Container>
             <Typography variant="h4">This Is Employee Dashboard</Typography>
             <Typography variant="subtitle1">Available Page:</Typography>
             <Box mt={2}>
-            < SignOut />
+
+                <SignOut/>
                 
             </Box>
         </Container>
