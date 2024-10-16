@@ -6,7 +6,7 @@ import { doc, setDoc } from "firebase/firestore";
 interface EmployeeData {
   employeeFname: string;
   employeeLname: string;
-  employeeDOB: string;
+  employeeDob: string;
   employeePhone: string;
   employeeEmail: string;
   employeeType: string;
@@ -22,7 +22,7 @@ export const SignUpEmployee = async (
   {
     employeeFname, // First name
     employeeLname, // Last name
-    employeeDOB, // Date of Birth
+    employeeDob, // Date of Birth
     employeePhone, // Phone Number
     employeeEmail, // Email
     employeeType, // Employment Type (Part-Time or Full-Time)
@@ -41,7 +41,7 @@ export const SignUpEmployee = async (
     const employeeData = { 
       employeeFname, 
       employeeLname, 
-      employeeDOB, 
+      employeeDob, 
       employeePhone, 
       employeeEmail, 
       employeeType, 
