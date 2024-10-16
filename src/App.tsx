@@ -10,6 +10,7 @@ import EmployeeSignUpPage from './userAuth/EmployeeSignUp/EmployeeSignUpPage';
 import EmployeeSignInPage from './userAuth/EmployeeSignIn/EmployeeSignInPage';
 import EmployeeDashboard from './components/EmployeeDashBoard';
 import ProtectedRoute from './components/ProtectedRoute';
+import SchedulerContainer from './schedules/SchedulerContainer';
 import { AuthProvider } from './userAuth/contexts/AuthContext';
 import { Typography, Box } from '@mui/material';
 
@@ -24,6 +25,7 @@ const App: React.FC = () => {
           <Route path="/ManagerSignInPage" element={<ManagerSignInPage />} />
           <Route path="/EmployeeSignUpPage" element={<EmployeeSignUpPage />} />
           <Route path="/EmployeeSignInPage" element={<EmployeeSignInPage />} />
+          <Route path="/scheduler" element={<SchedulerContainer />} />
 
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>

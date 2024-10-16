@@ -1,10 +1,14 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
-import './App.css'
+// src/main.tsx
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+import 'antd/dist/reset.css'; // or 'antd/dist/antd.css' based on your version
+import 'react-big-scheduler-stch/lib/css/style.css';
+
+ReactDOM.render(
+  <React.StrictMode>
     <App />
-  </StrictMode>,
-)
+  </React.StrictMode>,
+  document.getElementById('root')
+);

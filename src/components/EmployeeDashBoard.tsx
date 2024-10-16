@@ -12,6 +12,7 @@ const EmployeeDashboard: React.FC = () => {
             <Typography variant="subtitle1">Available Page:</Typography>
             <Box mt={2}>
                 <EmployeeLogOut />
+                
             </Box>
         </Container>
     );

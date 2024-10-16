@@ -25,9 +25,12 @@ const EmployeeSignInForm: React.FC = () => {
 
   return (
     <Box component="form" onSubmit={handleSignIn} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+      
       <Typography variant="h4">Employee Sign In</Typography>
+
       {error && <Typography color="error">{error}</Typography>}
       <TextField label="Email" variant="outlined" value={employeeEmail} onChange={(e) => setEmployeeEmail(e.target.value)} required />
+
       <TextField label="Password" variant="outlined" type="password" value={employeePassword} onChange={(e) => setEmployeePassword(e.target.value)} required />
       <Button type="submit" variant="contained" sx={{ backgroundColor: '#6200ea', '&:hover': { backgroundColor: '#4b00c7' } }}>
         Sign In
