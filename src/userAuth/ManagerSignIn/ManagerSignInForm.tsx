@@ -11,8 +11,8 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 
-import { signInUser } from '../services/authService'; 
-import ForgotPassword from './ForgotPassword';
+import { SignInManager } from '../services/SignInManager'; 
+// import ForgotPassword from './ManagerForgotPassword';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -37,19 +37,22 @@ export default function SignInCard() {
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
-  const [open, setOpen] = React.useState(false);
+  // const [open, setOpen] = React.useState(false); //forgot pass tab 
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
 
-  const handleClickOpen = () => { setOpen(true); };
-  const handleClose = () => { setOpen(false); };
+
+  //Those 2 lines initially were for the OPEN FORGOT PASSWORD TAB, but there was an error and idk how to fix so 
+  //i just remove the features (will do later)
+  // const handleClickOpen = () => { setOpen(true); };
+  // const handleClose = () => { setOpen(false); };
 
   const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!validateInputs()) return;
 
     try {
-      await signInUser(email, password);
+      await SignInManager(email, password);
       console.log("User signed in");
     } catch (error) {
       console.log('Invalid credentials. Please try again.');
@@ -151,7 +154,9 @@ export default function SignInCard() {
             control={<Checkbox value="remember" color="primary" />}
             label="Remember me"
           />
-          <Link
+
+          {/* I commented out the forgot pass button */}
+          {/* <Link
             component="button"
             type="button"
             onClick={handleClickOpen}
@@ -159,10 +164,10 @@ export default function SignInCard() {
             sx={{ alignSelf: 'baseline' }}
           >
             Forgot your password?
-          </Link>
+          </Link> */}
         </Box>
 
-        <ForgotPassword open={open} handleClose={handleClose} />
+        {/* <ForgotPassword open={open} handleClose={handleClose} /> */}
         <Button 
          type="submit" 
          fullWidth variant="contained"

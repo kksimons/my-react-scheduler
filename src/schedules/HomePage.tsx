@@ -7,8 +7,8 @@ import { useUserStore } from "../stores/useUserStore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../userAuth/firebase";
 
-import SignInSide from "../userAuth/SignInTemp/SignInSide"; 
-import SignUpSide from "../userAuth/SignUpTemp/SignUpSide";
+import SignInSide from "../userAuth/ManagerSignIn/SignInSide"; 
+import SignUpSide from "../userAuth/ManagerSignUp/SignUpSide";
 
 const HomePage: React.FC = () => {
   const { isLoggedIn, setIsLoggedIn, setRole } = useUserStore();
