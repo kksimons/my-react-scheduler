@@ -6,6 +6,7 @@ import { doc, setDoc } from "firebase/firestore";
 interface ManagerData {
   managerFname: string;
   managerLname: string;
+  managerDob: string;
   managerPosition: string; 
   managerEmail: string;
 }
@@ -14,6 +15,7 @@ interface ManagerData {
 export const SignUpManager = async (
   managerFname: string, //first name
   managerLname: string, //last name 
+  managerDob: string, //DOB
   managerPosition: string, //position
   managerEmail: string,  //email
   managerPassword: string //password 
@@ -25,7 +27,7 @@ export const SignUpManager = async (
     const manager = managerCredential.user; //const manager contains the manager sign in information 
 
     // Prepare manager database 
-    const managerData: ManagerData = { managerFname, managerLname, managerPosition, managerEmail, };
+    const managerData: ManagerData = { managerFname, managerLname, managerDob, managerPosition, managerEmail, };
 
     // Save manager data to Firestore in 'manager-info' collection
     await setDoc(doc(db, "manager-info", manager.uid), managerData);

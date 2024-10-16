@@ -2,8 +2,9 @@
 import React from 'react';
 import { Container, Typography, Box } from '@mui/material';
 import { styled } from '@mui/system';
+import SignOut from '../userAuth/SignOut';
 
-import EmployeeLogOut from '../userAuth/EmployeeSignIn/EmployeeLogOut';
+
 
 const EmployeeDashboard: React.FC = () => {
     return (
@@ -11,7 +12,7 @@ const EmployeeDashboard: React.FC = () => {
             <Typography variant="h4">This Is Employee Dashboard</Typography>
             <Typography variant="subtitle1">Available Page:</Typography>
             <Box mt={2}>
-                <EmployeeLogOut />
+            < SignOut />
                 
             </Box>
         </Container>

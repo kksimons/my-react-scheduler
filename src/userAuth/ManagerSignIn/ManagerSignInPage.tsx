@@ -6,7 +6,7 @@ import Grid from '@mui/material/Grid';
 import { styled } from '@mui/material/styles';
 import ManagerSignInForm from './ManagerSignInForm';
 import Content from '../ManagerSignUp/Content';
-import ForgotPassword from './ManagerForgotPassword';
+import ForgotPassword from '../ForgotPassword';
 
 const PageContainer = styled(Box)(({ theme }) => ({
   minHeight: '100vh',

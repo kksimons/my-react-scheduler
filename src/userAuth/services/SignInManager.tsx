@@ -7,6 +7,7 @@ import { doc, getDoc } from "firebase/firestore";
 interface ManagerData {
   managerFname: string;
   managerLname: string;
+  managerDOB: string;
   managerPosition: string;
   managerEmail: string;
 }

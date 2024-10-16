@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { Box, Button, TextField, Typography, Alert } from '@mui/material';
 import { sendPasswordResetEmail } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth } from './firebase';
+
 
 const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -11,12 +12,14 @@ const ForgotPassword: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
+  //Handle password reset 
   const handlePasswordReset = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage(null);
     setError(null);
     setLoading(true);
 
+    //send new password to email 
     try {
       await sendPasswordResetEmail(auth, email);
       setMessage('Password reset email sent! Please check your inbox.');
@@ -35,7 +38,7 @@ const ForgotPassword: React.FC = () => {
   };
 
   return (
-    <Box sx={{ mt: 4 }}>
+    <Box sx={{ mt: 2 }}>
       <Typography variant="h6" gutterBottom>
         Forgot Password
       </Typography>

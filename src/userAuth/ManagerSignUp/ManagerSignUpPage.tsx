@@ -2,8 +2,7 @@
 
 //MUI IMPORT HERE---------------
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
+import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 //-----------------------------------------
 
@@ -17,24 +16,35 @@ const PageContainer = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   padding: theme.spacing(4),
   backgroundColor: theme.palette.background.default,
+  flexDirection: 'column',
+}));
+
+const SectionContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-around',
+  alignItems: 'center',
+  width: '100%',
+  [theme.breakpoints.down('md')]: {
+    flexDirection: 'column',
+  },
 }));
 
 //Manager Sign Up Page Starts Here 
 const ManagerSignUpPage: React.FC = () => {
   return (
     <PageContainer>
-      <Grid container spacing={4} justifyContent="center" alignItems="center">
-
+      <SectionContainer>
         {/* Import Sign-Up Form Component Here  */}
-        <Grid item xs={12} md={6}>
+        <Box sx={{ width: '100%', maxWidth: 600, padding: 2 }}>
           <ManagerSignUpForm /> 
-        </Grid>
+        </Box>
         
         {/* Import Content Section Here */}
-        <Grid item xs={12} md={6}>
+        <Box sx={{ width: '100%', maxWidth: 600, padding: 2 }}>
           <Content />
-        </Grid>
-      </Grid>
+        </Box>
+      </SectionContainer>
     </PageContainer>
   );
 }

@@ -1,21 +1,16 @@
-// src/userAuth/components/ManagerSignUpForm.tsx 
+// src/userAuth/components/ManagerSignUpForm.tsx
 
 // ------ALL MUI IMPORTS HERE -----
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import MuiCard from '@mui/material/Card';
-import FormLabel from '@mui/material/FormLabel';
-import FormControl from '@mui/material/FormControl';
-import Link from '@mui/material/Link';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
+import { Box, Button, FormLabel, FormControl, Link, TextField, Typography, MenuItem, Select } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Alert from '@mui/material/Alert';
 // --------------------------------------------------
 
 import { SignUpManager } from '../services/SignUpManager'; // Correct import
 import { useNavigate } from 'react-router-dom';
+
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -32,29 +27,30 @@ const Card = styled(MuiCard)(({ theme }) => ({
   ...theme.applyStyles('dark', {
     boxShadow:
       'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px',
-  }),
+  } ),
 }));
 
 // Manager Sign Up Form Starts Here 
 const ManagerSignUpForm: React.FC = () => {
   const navigate = useNavigate(); 
-  
-  // Form State, set everything to nothing there 
+
+  // Form State, set everything to default empty strings
   const [managerFname, setManagerFname] = React.useState<string>('');
   const [managerLname, setManagerLname] = React.useState<string>('');
-  const [managerPosition, setManagerPosition] = React.useState<string>('');
+  const [managerDob, setManagerDob] = React.useState<string>(''); // Use correct hook name setManagerDob
+  const [managerPosition, setManagerPosition] = React.useState<string>('Manager'); // Set default to Manager
   const [managerEmail, setManagerEmail] = React.useState<string>('');
   const [managerPassword, setManagerPassword] = React.useState<string>('');
-  
-  // Error State----------------------------------------------------------------------
+
+  // Error State Handling ----------------------------------------------------------
   const [firstNameError, setFirstNameError] = React.useState<boolean>(false);
   const [firstNameErrorMessage, setFirstNameErrorMessage] = React.useState<string>('');
   
   const [lastNameError, setLastNameError] = React.useState<boolean>(false);
   const [lastNameErrorMessage, setLastNameErrorMessage] = React.useState<string>('');
-  
-  const [positionError, setPositionError] = React.useState<boolean>(false);
-  const [positionErrorMessage, setPositionErrorMessage] = React.useState<string>('');
+
+  const [dobError, setDobError] = React.useState<boolean>(false);
+  const [dobErrorMessage, setDobErrorMessage] = React.useState<string>(''); // Correct capitalization of dobError and dobErrorMessage
   
   const [emailError, setEmailError] = React.useState<boolean>(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState<string>('');
@@ -65,13 +61,33 @@ const ManagerSignUpForm: React.FC = () => {
   const [submissionError, setSubmissionError] = React.useState<string | null>(null);
   const [submissionSuccess, setSubmissionSuccess] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState<boolean>(false);
-  //----------------------------------------------------------------------------------------'
+  //----------------------------------------------------------------------------------------
 
-  
-  // Input Validation
+  // Date validation function to ensure DOB is not in the future or older than 115 years
+  const validateDob = (dob: string) => {
+    const selectedDate = new Date(dob);
+    const today = new Date();
+    const maxAgeDate = new Date(today.getFullYear() - 115, today.getMonth(), today.getDate());
+    
+    if (selectedDate > today) {
+      setDobError(true);
+      setDobErrorMessage('DOB cannot be in the future.');
+      return false;
+    } else if (selectedDate < maxAgeDate) {
+      setDobError(true);
+      setDobErrorMessage('DOB cannot be more than 115 years ago.');
+      return false;
+    }
+
+    setDobError(false);
+    setDobErrorMessage('');
+    return true;
+  };
+
+  // Input Validation Function
   const validateInputs = () => {
     let isValid = true;
-    
+
     // First Name Validation
     if (!managerFname.trim()) {
       setFirstNameError(true);
@@ -81,7 +97,7 @@ const ManagerSignUpForm: React.FC = () => {
       setFirstNameError(false);
       setFirstNameErrorMessage('');
     }
-    
+
     // Last Name Validation
     if (!managerLname.trim()) {
       setLastNameError(true);
@@ -91,17 +107,12 @@ const ManagerSignUpForm: React.FC = () => {
       setLastNameError(false);
       setLastNameErrorMessage('');
     }
-    
-    // Position Validation
-    if (!managerPosition.trim()) {
-      setPositionError(true);
-      setPositionErrorMessage('Position is required.');
+
+    // DOB Validation
+    if (!validateDob(managerDob)) {
       isValid = false;
-    } else {
-      setPositionError(false);
-      setPositionErrorMessage('');
     }
-    
+
     // Email Validation
     if (!managerEmail.trim() || !/\S+@\S+\.\S+/.test(managerEmail)) {
       setEmailError(true);
@@ -111,7 +122,7 @@ const ManagerSignUpForm: React.FC = () => {
       setEmailError(false);
       setEmailErrorMessage('');
     }
-    
+
     // Password Validation
     if (!managerPassword || managerPassword.length < 6) {
       setPasswordError(true);
@@ -121,40 +132,33 @@ const ManagerSignUpForm: React.FC = () => {
       setPasswordError(false);
       setPasswordErrorMessage('');
     }
-    
+
     return isValid;
   };
-  
-  // Handle Sign Up
+
+  // Handle Sign Up Submission
   const handleSignUp = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // Prevent default form submission
+    event.preventDefault();
     setSubmissionError(null);
     setSubmissionSuccess(null);
-    
-    // Validate inputs
+
+    // Validate inputs before submission
     if (!validateInputs()) return;
-    
     setLoading(true);
-    
+
     try {
-      // Pass the correct state variables to SignUpManager
-      await SignUpManager(managerFname, managerLname, managerPosition, managerEmail, managerPassword);
-      setSubmissionSuccess('Account created successfully! Redirecting to dashboard...');
-      
+      // Pass the correct state variables to the SignUpManager service
+      await SignUpManager(managerFname, managerLname, managerDob, managerPosition, managerEmail, managerPassword);
+      setSubmissionSuccess('Account created successfully! Redirecting to manager dashboard...');
       // Redirect to Manager Dashboard after a short delay
       setTimeout(() => {
-        navigate('/ManagerDashBoard'); // Ensure this route exists
-      }, 2000);
+        navigate('/ManagerDashBoard');
+      }, 1000);
     } catch (error: any) {
-      console.error('Failed to create account:', error);
-      
-      // Handle specific Firebase Auth errors
+      console.error('Failed to create account, please try again:', error);
+
       if (error.code === 'auth/email-already-in-use') {
         setSubmissionError('This email is already in use.');
-      } else if (error.code === 'auth/invalid-email') {
-        setSubmissionError('Invalid email address.');
-      } else if (error.code === 'auth/weak-password') {
-        setSubmissionError('Password is too weak.');
       } else {
         setSubmissionError('Failed to create account. Please try again.');
       }
@@ -163,6 +167,7 @@ const ManagerSignUpForm: React.FC = () => {
     }
   };
   
+  // Note: e = event 
   return (
     <Card variant="outlined">
       <Typography
@@ -230,29 +235,7 @@ const ManagerSignUpForm: React.FC = () => {
             color={lastNameError ? 'error' : 'primary'}
           />
         </FormControl>
-        
-        {/* Position Input */}
-        <FormControl>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <FormLabel htmlFor="managerPosition">Position</FormLabel>
-          </Box>
-          <TextField
-            error={positionError}
-            helperText={positionErrorMessage}
-            id="managerPosition"
-            type="text"
-            name="managerPosition"
-            placeholder="Manager"
-            autoComplete="organization-title"
-            required
-            fullWidth
-            variant="outlined"
-            value={managerPosition}
-            onChange={(e) => setManagerPosition(e.target.value)}
-            color={positionError ? 'error' : 'primary'}
-          />
-        </FormControl>
-        
+
         {/* Email Input */}
         <FormControl>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -296,7 +279,37 @@ const ManagerSignUpForm: React.FC = () => {
             color={passwordError ? 'error' : 'primary'}
           />
         </FormControl>
-        
+
+        {/* Position Select */}
+        <FormControl>
+          <FormLabel htmlFor="managerPosition">Position</FormLabel>
+          <Select
+            id="managerPosition"
+            value={managerPosition}
+            onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setManagerPosition(e.target.value)}
+            required
+            fullWidth
+          >
+            <MenuItem value="Manager">Manager</MenuItem>
+          </Select>
+        </FormControl>
+
+
+        {/* DOB Input */}
+        <FormControl>
+          <FormLabel htmlFor="managerDob">Date of Birth</FormLabel>
+          <TextField
+            error={dobError}
+            helperText={dobErrorMessage}
+            id="managerDob"
+            type="date"
+            required
+            fullWidth
+            value={managerDob}
+            onChange={(e) => setManagerDob(e.target.value)}
+          />
+        </FormControl>
+
         {/* Sign Up Button */}
         <Button 
           type="submit" 

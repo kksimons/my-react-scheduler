@@ -1,9 +1,7 @@
 // src/userAuth/components/Content.tsx
 
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
+import { Box, Stack, Typography } from '@mui/material/';
 
 import AutoFixHighRoundedIcon from '@mui/icons-material/AutoFixHighRounded';
 import ConstructionRoundedIcon from '@mui/icons-material/ConstructionRounded';

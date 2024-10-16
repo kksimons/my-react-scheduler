@@ -2,6 +2,7 @@
 
 import React from 'react';
 import EmployeeSignInCard from './EmployeeSignInPage';
+import ForgotPassword from '../ForgotPassword';
 import { Box, Typography } from '@mui/material';
 
 const EmployeeSignInPage: React.FC = () => {
@@ -11,6 +12,7 @@ const EmployeeSignInPage: React.FC = () => {
         Employee Sign In
       </Typography>
       <EmployeeSignInCard />
+      <ForgotPassword />
     </Box>
   );
 };

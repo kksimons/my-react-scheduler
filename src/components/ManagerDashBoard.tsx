@@ -1,9 +1,11 @@
 
-
 import React from 'react';
 import { Container, Typography, Button, Box } from '@mui/material';
 import { styled } from '@mui/system';
+
 import { ManagerViewScheduler } from '../schedules/ManagerViewScheduler';
+import SignOut from '../userAuth/SignOut';
+
 const ManagerDashBoard: React.FC = () => { 
     return (
         <Typography> 
@@ -11,6 +13,7 @@ const ManagerDashBoard: React.FC = () => {
                 Available Page: 
                 <Box>
                     <ManagerViewScheduler />
+                    <SignOut />
                 </Box>
                
         </Typography>
