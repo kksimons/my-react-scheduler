@@ -177,6 +177,7 @@ export default function App() {
           borderColor: "divider",
         }}
       >
+
         {isLoggedIn && (
           <>
             {/* Render the tabs based on role */}
