@@ -6,15 +6,16 @@ import { styled } from '@mui/system';
 import { ManagerViewScheduler } from '../schedules/ManagerViewScheduler';
 import SignOut from '../userAuth/SignOut';
 
+
 const ManagerDashBoard: React.FC = () => { 
     return (
         <Typography> 
-            This Is Employee DashBoard: 
-                Available Page: 
+            Manager DashBoard: 
                 <Box>
                     <ManagerViewScheduler />
-                    <SignOut />
+
                 </Box>
+                <SignOut />
                
         </Typography>
     );

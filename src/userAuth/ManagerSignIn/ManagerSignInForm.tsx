@@ -1,22 +1,23 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import MuiCard from '@mui/material/Card';
 import Checkbox from '@mui/material/Checkbox';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { styled } from '@mui/material/styles';
 
 import { SignInManager } from '../services/SignInManager'; 
 import Card from '@mui/material/Card';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+
 
 
 
 export default function SignInCard() {
+
+  const navigate = useNavigate();
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
@@ -37,7 +38,8 @@ export default function SignInCard() {
 
     try {
       await SignInManager(email, password);
-      console.log("User signed in");
+      console.log("Manager sign in successfully.");
+      navigate('/ManagerDashBoard');
     } catch (error) {
       console.log('Invalid credentials. Please try again.');
     }
@@ -159,19 +161,16 @@ export default function SignInCard() {
          >
           Sign in
         </Button>
-        <Typography sx={{ textAlign: 'center' }}>
-          Don&apos;t have an account?{' '}
-          <span>
-            <Link
-              href="/ManagerSignUpPage"
-              variant="body2"
-              sx={{ alignSelf: 'center', fontSize: '18px' }}
-            >
-              Sign up
-            </Link>
-            
-          </span>
-        </Typography>
+          {/* Link to Sign-In Page */}
+
+        <RouterLink 
+          to="/ManagerSignUpPage" 
+          style={{ alignSelf: 'center', fontSize: '18px', textDecoration: 'none', color: '#5201C3' }}
+        >
+          Sign Up
+        </RouterLink>
+
+
       </Box>
     </Card>
   );

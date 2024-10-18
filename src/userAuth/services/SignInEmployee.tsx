@@ -3,26 +3,18 @@
 import { auth, db } from "../firebase";
 import { signInWithEmailAndPassword, User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-
-interface EmployeeData {
-  employeeFname: string;
-  employeeLname: string;
-  employeePosition: string;
-  employeeEmail: string;
-}
+import { SignInEmployeeData } from "../../components/EmployeeData";  // Import partial data
 
 interface SignInResult {
   employee: User;
-  employeeData: EmployeeData;
+  employeeData: SignInEmployeeData;
 }
 
-// Function to sign in an employee and fetch employee data from Firestore
 export const signInEmployee = async (
-  employeeEmail: string,  // Email
-  employeePassword: string // Password
+  employeeEmail: string,
+  employeePassword: string
 ): Promise<SignInResult> => {
   try {
-    // Sign in the employee using Firebase Auth
     const employeeCredential = await signInWithEmailAndPassword(auth, employeeEmail, employeePassword);
     const employee = employeeCredential.user;
 
@@ -34,11 +26,11 @@ export const signInEmployee = async (
       throw new Error("Employee data not found in Firestore.");
     }
 
-    // Extract employee data
-    const employeeData = employeeDoc.data() as EmployeeData;
+    // Extract only the required fields for sign-in
+    const employeeData = employeeDoc.data() as SignInEmployeeData;
 
     return { employee, employeeData };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error during employee sign-in:", error);
     throw error;
   }

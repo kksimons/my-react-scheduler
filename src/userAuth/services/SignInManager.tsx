@@ -3,27 +3,18 @@
 import { auth, db } from "../firebase";
 import { signInWithEmailAndPassword, User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-
-interface ManagerData {
-  managerFname: string;
-  managerLname: string;
-  managerDOB: string;
-  managerPosition: string;
-  managerEmail: string;
-}
+import { SignInManagerData } from "../../components/ManagerData";  // Import the partial interface for sign-in
 
 interface SignInResult {
   manager: User;
-  managerData: ManagerData;
+  managerData: SignInManagerData;  // Use the partial interface
 }
 
-// signInManager starts here
 export const SignInManager = async (
-  managerEmail: string, // email
-  managerPassword: string // password
+  managerEmail: string,
+  managerPassword: string
 ): Promise<SignInResult> => {
   try {
-    // Authenticate manager with Firebase Auth
     const managerCredential = await signInWithEmailAndPassword(auth, managerEmail, managerPassword);
     const manager = managerCredential.user;
 
@@ -32,15 +23,15 @@ export const SignInManager = async (
     const managerDoc = await getDoc(managerDocRef);
 
     if (!managerDoc.exists()) {
-      throw new Error("Manager data not found in Firestore.");
+      throw new Error("Manager data not found in system service. Please sign in again or create an account.");
     }
 
-    const managerData = managerDoc.data() as ManagerData;
+    // Extract the required fields for sign-in
+    const managerData = managerDoc.data() as SignInManagerData;
 
     return { manager, managerData };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error during sign-in:", error);
-    // Optionally, handle specific Firebase Auth errors here
     throw error;
   }
 };

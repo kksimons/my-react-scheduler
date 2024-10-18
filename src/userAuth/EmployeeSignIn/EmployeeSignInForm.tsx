@@ -18,7 +18,7 @@ const EmployeeSignInForm: React.FC = () => {
       await signInEmployee(employeeEmail, employeePassword);
       navigate('/EmployeeDashBoard'); // Redirect after successful sign-in
     } catch (error: any) {
-      setError('Failed to sign in. Please check your credentials.');
+      setError('Failed to sign in. Please check your username and password.');
       console.error('Error during employee sign-in:', error);
     }
   };

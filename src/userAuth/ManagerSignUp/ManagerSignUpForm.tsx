@@ -3,13 +3,13 @@
 // ------ALL MUI IMPORTS HERE -----
 import * as React from 'react';
 import MuiCard from '@mui/material/Card';
-import { Box, Button, FormLabel, FormControl, Link, TextField, Typography, MenuItem, Select } from '@mui/material';
+import { Box, Button, FormLabel, FormControl, TextField, Typography, MenuItem, Select, Link as MUILink } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Alert from '@mui/material/Alert';
 // --------------------------------------------------
 
 import { SignUpManager } from '../services/SignUpManager'; // Correct import
-import { useNavigate } from 'react-router-dom';
+import { useNavigate , Link as RouterLink } from 'react-router-dom';
 
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -323,16 +323,14 @@ const ManagerSignUpForm: React.FC = () => {
         </Button>
         
         {/* Link to Sign-In Page */}
-        <Typography sx={{ textAlign: 'center' }}>
-          Already have an account? Click on the Sign In Button Below{' '}
-          <Link
-            href="/ManagerSignInPage"
+        <MUILink
+            component={RouterLink}
+            to="/ManagerSignInPage"
             variant="body2"
-            sx={{ alignSelf: 'center', fontSize: '18px' }}
+            sx={{ alignSelf: 'center', fontSize: '18px', textDecoration: 'none' }}
           >
-            <Button>Sign In</Button>
-          </Link>
-        </Typography>
+            Sign In
+        </MUILink>
       </Box>
     </Card>
   );

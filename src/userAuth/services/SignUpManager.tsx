@@ -1,35 +1,31 @@
 // src/userAuth/services/SignUpManager.tsx
+
 import { auth, db } from "../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore"; 
+import { doc, setDoc } from "firebase/firestore";
+import { ManagerData } from "../../components/ManagerData";  // Import the full ManagerData interface
 
-interface ManagerData {
-  managerFname: string;
-  managerLname: string;
-  managerDob: string;
-  managerPosition: string; 
-  managerEmail: string;
-}
-
-//signUpManager starts here 
 export const SignUpManager = async (
-  managerFname: string, //first name
-  managerLname: string, //last name 
-  managerDob: string, //DOB
-  managerPosition: string, //position
-  managerEmail: string,  //email
-  managerPassword: string //password 
+  managerFname: string,
+  managerLname: string,
+  managerDob: string,
+  managerPosition: string,
+  managerEmail: string,
+  managerPassword: string
 ) => {
   try {
-    // Create user with Firebase Auth "createUserWithEmailAndPassword"
-    //The reason why there is only auth,email,password is because this is what manager uses to SIGN IN
-    const managerCredential = await createUserWithEmailAndPassword( auth, managerEmail, managerPassword);
-    const manager = managerCredential.user; //const manager contains the manager sign in information 
+    const managerCredential = await createUserWithEmailAndPassword(auth, managerEmail, managerPassword);
+    const manager = managerCredential.user;
 
-    // Prepare manager database 
-    const managerData: ManagerData = { managerFname, managerLname, managerDob, managerPosition, managerEmail, };
+    const managerData: ManagerData = { 
+      managerFname, 
+      managerLname, 
+      managerDob, 
+      managerPosition, 
+      managerEmail 
+    };
 
-    // Save manager data to Firestore in 'manager-info' collection
+    // Save the manager's data to Firestore in the 'manager-info' collection
     await setDoc(doc(db, "manager-info", manager.uid), managerData);
 
     return manager;
