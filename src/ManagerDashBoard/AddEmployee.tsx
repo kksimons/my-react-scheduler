@@ -12,7 +12,7 @@ import Select from "react-select"; //react select for multi select
 
 //set value form 
 interface AddEmployeeProps {
-  onEmployeeAdded: () => void;
+  onEmployeeAdded: (newEmployee: any) => void;
 }
 
 const AddEmployee: React.FC<AddEmployeeProps> = ({ onEmployeeAdded }) => {

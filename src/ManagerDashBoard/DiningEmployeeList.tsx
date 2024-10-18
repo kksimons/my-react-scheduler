@@ -1,3 +1,4 @@
+import { EmployeeScheduler } from "./Schedules/EmployeeScheduler";
 
 
 
@@ -35,6 +36,7 @@ const DiningEmployeeList: React.FC<{ employees: any[] }> = ({ employees }) => {
             ))}
           </tbody>
         </table>
+        <EmployeeScheduler employees={employees} />
       </div>
     );
   };
