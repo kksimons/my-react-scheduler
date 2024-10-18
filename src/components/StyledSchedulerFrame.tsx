@@ -1,15 +1,15 @@
 // import styled from "styled-components";
 
-// function StyledSchedulerFrame(){
+function StyledSchedulerFrame(){
  
-//     } styled.div`
-//     position: relative;
-//     height: 60vh;
-//     width: 80vw;
-//     `;
+    } styled.div`
+    position: relative;
+    height: 60vh;
+    width: 80vw;
+    `;
 
-//     <StyledSchedulerFrame>
-//     <Scheduler {...props} />
-//     </StyledSchedulerFrame>
-// }
+    <StyledSchedulerFrame>
+    <Scheduler {...props} />
+    </StyledSchedulerFrame>
+}
 

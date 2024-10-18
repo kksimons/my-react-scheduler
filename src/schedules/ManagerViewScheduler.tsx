@@ -42,9 +42,9 @@ export function ManagerViewScheduler() {
         const employees: SchedulerData = employeeSnapshot.docs.map((doc): SchedulerRow => {
           const data = doc.data();
 
-          const firstName = data.employeeFname || 'FirstName';
-          const lastName = data.employeeLname || 'LastName';
-          const position = data.employeePosition || 'Position';
+          const firstName = data.employeeFname;
+          const lastName = data.employeeLname;
+          const position = data.employeePosition;
 
           // Convert Firestore Timestamps to JavaScript Dates
           const shiftStartDate = data.shiftStartDate
