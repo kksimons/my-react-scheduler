@@ -345,7 +345,7 @@ export default function BussersSchedule() {
       heightLeft -= pageHeight;
     }
 
-    pdf.save("schedule.pdf");
+    pdf.save("Bussers_Schedule.pdf");
   };
 
   return (

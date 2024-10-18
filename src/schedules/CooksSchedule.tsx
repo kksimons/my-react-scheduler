@@ -345,7 +345,7 @@ export default function CooksSchedule() {
       heightLeft -= pageHeight;
     }
 
-    pdf.save("schedule.pdf");
+    pdf.save("Cooks_Schedule.pdf");
   };
 
   return (

@@ -370,7 +370,7 @@ export default function ServersSchedule() {
       heightLeft -= pageHeight;
     }
 
-    pdf.save('schedule.pdf');
+    pdf.save('Servers_Schedule.pdf');
   };
 
   return (
