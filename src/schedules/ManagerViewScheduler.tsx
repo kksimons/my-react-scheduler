@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Scheduler } from '@bitnoi.se/react-scheduler';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../userAuth/firebase'; // Adjust the path to your Firebase config
-import '@bitnoi.se/react-scheduler/dist/style.css'; // Import Scheduler styles
 
 // Define types matching those expected by the Scheduler component
 type SchedulerProjectData = {

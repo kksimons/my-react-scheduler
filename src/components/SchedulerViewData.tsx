@@ -9,12 +9,12 @@ export interface SchedulerRowLabel {
 export interface SchedulerProjectData {
   id: string;
   title: string;
-  subtitle?: string;
+  subtitle: string; //optional 
   description?: string;
-  startDate: Date; // Should be a Date object
-  endDate: Date;   // Should be a Date object
+  startDate: Date; 
+  endDate: Date;  
   occupancy: number;
-  bgColor?: string;
+  bgColor?: string; //optional 
 }
 
 export interface SchedulerRow {
