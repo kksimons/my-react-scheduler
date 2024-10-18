@@ -4,8 +4,11 @@ import React from "react";
 
 function App() {
   return(
-    <Router />
-    // <Header />
+    <>
+        <Router />
+         {/* <Header /> */}
+    </>
+
   );
 }
 export default App;

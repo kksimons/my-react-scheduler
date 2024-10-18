@@ -1,9 +1,7 @@
-// THIS PAGE WILL DO: 
-// 1. This page will display employee lists (All, Dining, Kitchen, Add Employee). Each tab will display employees base on their employee_system (kitchen or dining) 
-// 2. It will auto update new employee 
-// 3. 
-
-
+// THIS PAGE WILL DO:
+// 1. This page will display employee lists (All, Dining, Kitchen, Add Employee). Each tab will display employees base on their employee_system (kitchen or dining)
+// 2. It will auto update new employee
+// 3.
 
 import React, { useState, useEffect } from "react";
 import { Box, Tab, Tabs } from "@mui/material";
@@ -18,11 +16,12 @@ import "@bitnoi.se/react-scheduler/dist/style.css";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import { EmployeeScheduler } from "./Schedules/EmployeeScheduler";
+import { Route, Routes } from "react-router-dom";
+import NavBar from "./Schedules/Nav-Bar";
 dayjs.extend(isBetween);
 
 // EmployeeList component to display all employees
 const EmployeeList: React.FC<{ employees: any[] }> = ({ employees }) => {
-
   if (employees.length === 0) {
     return <div>No employees found.</div>;
   }
@@ -86,7 +85,7 @@ const EmployeeList: React.FC<{ employees: any[] }> = ({ employees }) => {
 //         bgColor: employee.employee_system === "Dining Side" ? "rgb(254,165,177)" : "rgb(155,220,255)"
 //       }))
 //     }));
-    
+
 //     setSchedulerData(convertedData);
 //   }, [employees]);
 
@@ -144,16 +143,14 @@ const EmployeeList: React.FC<{ employees: any[] }> = ({ employees }) => {
 //   );
 // };
 
-
-
 // DiningEmployeeList and KitchenEmployeeList defined as above...
 const EmployeeManagement: React.FC = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const [employees, setEmployees] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null> (null);
+  const [error, setError] = useState<string | null>(null);
 
-  // Fetch employees from Firestore and display it in the table when we call the function 
+  // Fetch employees from Firestore and display it in the table when we call the function
   const fetchEmployees = async () => {
     try {
       setIsLoading(true);
@@ -162,7 +159,7 @@ const EmployeeManagement: React.FC = () => {
       const employeeSnapshot = await getDocs(employeeCollection);
       const employeeList = employeeSnapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
       console.log("Fetched employees:", employeeList);
       setEmployees(employeeList);
@@ -176,59 +173,45 @@ const EmployeeManagement: React.FC = () => {
 
   useEffect(() => {
     fetchEmployees();
-  }, []); //fetch employees data in our employee-info db 
+  }, []); //fetch employees data in our employee-info db
 
-  //Function to handle to add new employees into state employee 
+  //Function to handle to add new employees into state employee
   const handleEmployeeAdded = (newEmployee: any) => {
     setEmployees((prevEmployees) => [...prevEmployees, newEmployee]);
     fetchEmployees();
   };
 
-
   // Handle tab change
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabIndex(newValue);
   };
 
+  //Render loading or error states
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
-    <Box className="employee-management-container" style={{padding: '20px'}}>
-      {isLoading ? (
-        <div>Loading...</div>
-      ) : error ? (
-        <div>Error: {error}</div>
-      ) : (
-<>
-        {/* Tabs for navigation */}
-        <Tabs value={tabIndex} onChange={handleTabChange}>
-          <Tab label="All Employee" />
-          <Tab label="Dining Employee" />
-          <Tab label="Kitchen Employee" />
-          <Tab label="Add Employee" />
-        </Tabs>
+    <div className="employee-management-container" style={{padding: '20px'}}>
+      <div>
+      <NavBar tabIndex={tabIndex} handleTabChange={handleTabChange} />
 
-        {/* Tab content */}
-        {/* The first one has only {employees because it's fetch emp without any filter, so it will show all emp we have} */}
-        {tabIndex === 0 && <EmployeeList employees={employees} />} 
-
-        {/* Dining employee tab, add filter */}
-        {tabIndex === 1 && <DiningEmployeeList employees={employees.filter(emp => emp.employee_system === "Dining Side")} />}
-
-        {/* Kitchen employee tab, add filter */}
-        {tabIndex === 2 && <KitchenEmployeeList employees={employees.filter(emp => emp.employee_system === "Kitchen Side")} />}
-
-        {/* Add employee tab */}
-        {tabIndex === 3 && (
-          <AddEmployee 
-            onEmployeeAdded={handleEmployeeAdded}
-          />
-        )}
-      </>
-      )}
+      </div>
+      <Box style={{ marginTop: "5px" }}>
+        {tabIndex === 0 && <EmployeeList employees={employees} />}
+        {tabIndex === 1 && <DiningEmployeeList employees={employees.filter((emp) => emp.employee_system === "Dining Side")} />}
+        {tabIndex === 2 && <KitchenEmployeeList employees={employees.filter((emp) => emp.employee_system === "Kitchen Side")} />}
+        {tabIndex === 3 && <AddEmployee onEmployeeAdded={handleEmployeeAdded} />}
+        {tabIndex === 4 && <EmployeeScheduler employees={employees} />}
 
     </Box>
+    </div>
+    
   );
 };
 
 export default EmployeeManagement;
-
-

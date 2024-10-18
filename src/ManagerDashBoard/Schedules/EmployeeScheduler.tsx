@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box } from "@mui/material";
-import { Scheduler, SchedulerData } from "@bitnoi.se/react-scheduler";
+import { Scheduler, SchedulerData, LocaleType } from "@bitnoi.se/react-scheduler";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import enDayjsTranslations from "dayjs/locale/en";
