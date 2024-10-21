@@ -361,44 +361,39 @@ export default function HomePage({ setValue }: HomePageProps) {
         marginTop: 20,
       }}
     >
-      {isLoggedIn ? (
-        <Paper
-          elevation={3}
-          sx={{ padding: 3, width: "500px", marginBottom: 4 }}
-        >
-          <Typography variant="h6" gutterBottom>
-            You are logged in, your profile will eventually be shown here to
-            edit.
-          </Typography>
-        </Paper>
-      ) : (
-        <Paper
-          elevation={3}
-          sx={{ padding: 3, width: "500px", marginBottom: 4 }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              mb: 2,
-              gap: 1,
-            }}
-          >
-            <Button
-              variant={isNewUser ? "contained" : "outlined"}
-              onClick={() => setIsNewUser(true)}
-              fullWidth
-            >
-              New here? Sign up
-            </Button>
-            <Button
-              variant={!isNewUser ? "contained" : "outlined"}
-              onClick={() => setIsNewUser(false)}
-              fullWidth
-            >
-              Already a user? Sign in
-            </Button>
-          </Box>
+{isLoggedIn ? (
+  userInfo.role === 'employer' ? ( // Check if the user is an employer 
+
+    
+    // Employer Home page
+    <Paper elevation={3} sx={{ padding: 3, width: "500px", marginBottom: 4 }}>
+      <Typography variant="h6" gutterBottom>
+        You are logged in, but this section is for employers only.
+      </Typography>
+    </Paper>
+  ) : (
+
+    // Employee Home page
+    <Paper elevation={3} sx={{ padding: 3, width: "1000px", height: "1000px", marginBottom: 4 }}>
+      <Typography variant="h6" gutterBottom>
+        Welcome to your profile! You can edit your details here.
+      </Typography>
+      {/* Insert your user profile display/edit form here */}
+
+      
+    </Paper>
+
+  )
+) : (
+  <Paper elevation={3} sx={{ padding: 3, width: "500px", marginBottom: 4 }}>
+    <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2, gap: 1 }}>
+      <Button variant={isNewUser ? "contained" : "outlined"} onClick={() => setIsNewUser(true)} fullWidth>
+        New here? Sign up
+      </Button>
+      <Button variant={!isNewUser ? "contained" : "outlined"} onClick={() => setIsNewUser(false)} fullWidth>
+        Already a user? Sign in
+      </Button>
+    </Box>
 
           {isNewUser ? (
             <Box>
