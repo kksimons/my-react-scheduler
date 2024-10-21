@@ -70,6 +70,8 @@ export default function HomePage({ setValue }: HomePageProps) {
     shiftDetails: any[];
   }
 
+  const { role } = useUserStore(); // Zustand store to get user role
+
   const [userInfo, setUserInfo] = useState<UserInfo>({
     email: "",
     password: "",
@@ -362,7 +364,7 @@ export default function HomePage({ setValue }: HomePageProps) {
       }}
     >
 {isLoggedIn ? (
-  userInfo.role === 'employer' ? ( // Check if the user is an employer 
+  isLoggedIn && role === "employer" ? ( // Check if the user is an employer 
 
     
     // Employer Home page
