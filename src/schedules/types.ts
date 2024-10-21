@@ -1,7 +1,7 @@
-// src/schedules/types.ts
+// // src/schedules/types.ts
 
-import { EventItem as SchedulerEventItem } from 'react-big-scheduler-stch';
+// import { EventItem as SchedulerEventItem } from 'react-big-scheduler-stch';
 
-export interface CustomEventItem extends SchedulerEventItem {
-  exdates: string[]; // Ensure exdates are present
-}
+// export interface CustomEventItem extends SchedulerEventItem {
+//   exdates: string[]; // Ensure exdates are present
+// }

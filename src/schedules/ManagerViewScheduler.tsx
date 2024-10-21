@@ -1,3 +1,6 @@
+//Code provided with assistance from ChatGPT, a language model developed by OpenAI.
+
+
 import React, { useState, useEffect } from 'react';
 import { Scheduler } from '@bitnoi.se/react-scheduler';
 import { collection, getDocs } from 'firebase/firestore';
@@ -24,20 +27,20 @@ type SchedulerRowLabel = {
 type SchedulerRow = {
   id: string;
   label: SchedulerRowLabel;
-  data: SchedulerProjectData[]; // Must be SchedulerProjectData[]
+  data: SchedulerProjectData[];  // hold multiple SchedulerProjectData objects
 };
 
-type SchedulerData = SchedulerRow[]; // SchedulerData is an array of SchedulerRow
+type SchedulerData = SchedulerRow[]; 
 
 export function ManagerViewScheduler() {
-  const [employeeData, setEmployeeData] = useState<SchedulerData>([]);
+  const [employeeData, setEmployeeData] = useState<SchedulerData>([]); 
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const fetchEmployees = async () => {
+    const fetchEmployees = async () => { //anonymoys function 
       try {
-        const employeeCollection = collection(db, 'employee-info');
-        const employeeSnapshot = await getDocs(employeeCollection);
+        const employeeCollection = collection(db, 'employee-info'); //reference to a collection in your Firestore database.
+        const employeeSnapshot = await getDocs(employeeCollection); //GetDocs() attempts to provide up-to-date data when possible by waiting for data from the server,
 
         const employees: SchedulerData = employeeSnapshot.docs.map((doc): SchedulerRow => {
           const data = doc.data();
@@ -48,14 +51,14 @@ export function ManagerViewScheduler() {
 
           // Convert Firestore Timestamps to JavaScript Dates
           const shiftStartDate = data.shiftStartDate
-            ? data.shiftStartDate.toDate()
+            ? data.shiftStartDate.toDate() //if start shift then make new date 
             : new Date(); // Default to current date if not available
           const shiftEndDate = data.shiftEndDate
             ? data.shiftEndDate.toDate()
             : new Date(); // Default to current date if not available
 
-          // Calculate occupancy (in seconds)
-          const occupancy = Math.floor(
+          // Calculate occupancy working hour (in seconds). for ex: shift starts from 8 to 4pm then 8x60x60x1000 then /1000milisecond = second 
+          const occupancy = Math.floor( //math floor will round number 
             (shiftEndDate.getTime() - shiftStartDate.getTime()) / 1000
           );
 
@@ -64,10 +67,10 @@ export function ManagerViewScheduler() {
               id: `${doc.id}-shift`,
               startDate: shiftStartDate,
               endDate: shiftEndDate,
-              occupancy: occupancy > 0 ? occupancy : 3600, // Provide a default if occupancy is zero
+              occupancy: occupancy > 0 ? occupancy : 3600, // Provide a default if occupancy is zero, but i dont like it and wants to remove the 3600 
               title: `Shift for ${position}`,
               subtitle: position,
-              bgColor: 'rgb(254,165,177)', // Or dynamic color
+              bgColor: 'rgb(254,165,177)', 
             },
           ];
 
