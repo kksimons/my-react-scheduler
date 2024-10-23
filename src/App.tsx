@@ -74,33 +74,35 @@ export default function App() {
 
     return () => unsubscribe();
   }, [setRole, setProfilePic, setIsLoggedIn, setCurrentTab]);
-
-  // Fetch role and profile picture from Firestore
+  
+  
   const fetchUserRoleAndProfile = async (userId: string) => {
     try {
-      let docRef = doc(db, "employees", userId);
-      let docSnap = await getDoc(docRef);
-
-      if (!docSnap.exists()) {
-        docRef = doc(db, "employers", userId);
-        docSnap = await getDoc(docRef);
+      let userDocRef = doc(db, "employees", userId);
+      let userDocSnap = await getDoc(userDocRef);
+  
+      // If not found in employees, check in employers
+      if (!userDocSnap.exists()) {
+        userDocRef = doc(db, "employers", userId);
+        userDocSnap = await getDoc(userDocRef);
       }
-
-      if (docSnap.exists()) {
-        const userData = docSnap.data();
+  
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
         return {
           role: userData.employeeType || userData.role || null,
           profilePic: userData.profilePic || null,
         };
       } else {
-        console.log("No such document!");
+        console.log("No such document found in Firestore!");
         return null;
       }
     } catch (error) {
-      console.error("Error fetching user role and profile picture:", error);
+      console.error("Error fetching user role and profile:", error);
       return null;
     }
   };
+  
 
   const handleLogout = async () => {
     try {
