@@ -213,6 +213,7 @@ export default function HomePage({ setValue }: HomePageProps) {
           name,
           employeeType,
           excludedDays,
+
         } = userInfo;
 
         const userCredential = await createUserWithEmailAndPassword(
@@ -348,6 +349,9 @@ export default function HomePage({ setValue }: HomePageProps) {
     }
   };
 
+
+  
+
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
     setErrorMessage("");
@@ -376,11 +380,64 @@ export default function HomePage({ setValue }: HomePageProps) {
   ) : (
 
     // Employee Home page
-    <Paper elevation={3} sx={{ padding: 3, width: "1000px", height: "1000px", marginBottom: 4 }}>
+    <Paper elevation={3} sx={{ padding: 3, width: "1000px", height: "500px", marginBottom: 4, marginTop: 4 }}>
       <Typography variant="h6" gutterBottom>
         Welcome to your profile! You can edit your details here.
       </Typography>
       {/* Insert your user profile display/edit form here */}
+
+      {/* Change Profile Picture Section */}
+    <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
+      Change Profile Picture
+    </Typography>
+    <Box sx={{ display: "flex", justifyContent: "center", cursor: "pointer", mb: 2 }}>
+      <Avatar
+        alt="Current Profile Picture"
+        src={previewUrl || "./placeholder-avatar.jpg"}
+        sx={{ width: 100, height: 100 }}
+        onClick={() => document.getElementById("profilePicInputChange")?.click()}
+      />
+      <input
+        accept="image/*"
+        id="profilePicInputChange"
+        type="file"
+        style={{ display: "none" }}
+        onChange={handleProfilePicUpload} // Reuse the existing upload handler
+      />
+    </Box>
+
+    {uploadProgress > 0 && uploadProgress < 100 && (
+      <LinearProgress variant="determinate" value={uploadProgress} sx={{ mb: 2 }} />
+    )}
+
+
+<Button
+  variant="contained"
+  color="secondary"
+  onClick={async () => {
+    if (isLoggedIn) {
+      const userId = auth.currentUser?.uid; // Get the current user's ID
+      if (userId) {
+        const profilePicUrl = await uploadProfilePicToStorage(userId);
+        if (profilePicUrl) {
+          setStoreProfilePic(profilePicUrl);
+          setSuccessMessage("Profile picture uploaded successfully!");
+        } else {
+          setErrorMessage("Failed to upload profile picture.");
+        }
+      } else {
+        setErrorMessage("User is not logged in.");
+      }
+    } else {
+      setErrorMessage("Please log in to upload a profile picture.");
+    }
+  }}
+>
+  Upload Profile Picture
+</Button>
+
+
+    {/* Insert your user profile display/edit form here */}
 
       
     </Paper>
