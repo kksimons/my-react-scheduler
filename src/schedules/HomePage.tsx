@@ -289,6 +289,9 @@ export default function HomePage({ setValue }: HomePageProps) {
     } else if (userRole === "cook") {
       setValue(3); // Switch to 'Cooks Schedule'
       setCurrentTab(3); // Persist in store
+    } else if (userRole === "employee") {
+      setValue(4); // Switch to 'Cooks Schedule'
+      setCurrentTab(4); // Persist in store
     } else if (userRole === "employer") {
       setValue(1); // Employers default to 'Servers Schedule'
       setCurrentTab(1); // Persist in store

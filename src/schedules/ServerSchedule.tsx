@@ -37,7 +37,6 @@ interface Event {
   title: string;
   start: Date;
   end: Date;
-  color?: string;
   admin_id: string;
   editable: boolean;
 }
@@ -45,7 +44,6 @@ interface Event {
 // for saveScheduleToFirestore
 interface ScheduleData {
   events: Event[];
-  employeeColors: { [key: string]: string };
 }
 
 export default function ServersSchedule() {
@@ -57,9 +55,7 @@ export default function ServersSchedule() {
     total_days: "",
     employee_types: [],
   });
-  const [employeeColors, setEmployeeColors] = useState<{
-    [key: string]: string;
-  }>({});
+  
   const [servers, setServers] = useState<any[]>([]); // State to hold server employees
   const { role } = useUserStore(); // Zustand store to get user role
 
@@ -142,15 +138,6 @@ export default function ServersSchedule() {
     }
   };
 
-  // Function to generate random colors for employees
-  const generateRandomColor = () => {
-    const letters = "0123456789ABCDEF";
-    let color = "#";
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  };
 
   // Save schedule to "serverSchedules" instead of "employerSchedule"
   const saveScheduleToFirestore = async (scheduleData: ScheduleData) => {
@@ -172,7 +159,6 @@ export default function ServersSchedule() {
       // Save schedule to Firestore
       const docRef = await addDoc(scheduleCollectionRef, {
         events: eventsWithTimestamp,
-        employeeColors: scheduleData.employeeColors,
         timestamp: Timestamp.now(),
       });
 
@@ -211,7 +197,7 @@ export default function ServersSchedule() {
 
         // Update state with fetched events and employeeColors
         setEvents(fetchedEvents);
-        setEmployeeColors(lastSchedule.employeeColors || {}); // Default to empty object if undefined
+
 
         console.log("Fetched last schedule from Firestore:", lastSchedule);
       } else {
@@ -225,8 +211,7 @@ export default function ServersSchedule() {
   useEffect(() => {
     // Log to check if events and employeeColors are updated correctly
     console.log("Events state updated:", events);
-    console.log("Employee Colors state updated:", employeeColors);
-  }, [events, employeeColors]);
+  }, [events]);
 
   // Define the form submission handler
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -255,7 +240,6 @@ export default function ServersSchedule() {
       }
 
       const newEvents: Event[] = [];
-      const newEmployeeColors: { [key: string]: string } = {}; // Temporary object to store colors
 
       // Map the employee index from the API to the actual userId from Firestore
       const employeeIdMapping = servers.reduce(
@@ -305,17 +289,12 @@ export default function ServersSchedule() {
               item.shift
             }-emp${employeeId}-${shiftStart.getTime()}-${shiftIndex}`;
 
-            // Assign a color to the employee if not already assigned
-            if (!newEmployeeColors[employeeId]) {
-              newEmployeeColors[employeeId] = generateRandomColor(); // Use a random color generator
-            }
 
             newEvents.push({
               event_id: uniqueEventId, // Ensure event_id is unique
               title: `Employee ${employeeId} Shift ${item.shift}`,
               start: shiftStart,
               end: shiftEnd,
-              color: newEmployeeColors[employeeId], // Use dynamic color
               admin_id: employeeId,
               editable: true,
             });
@@ -325,16 +304,15 @@ export default function ServersSchedule() {
 
       // Set events and colors after the schedule is generated
       setEvents(newEvents);
-      setEmployeeColors(newEmployeeColors);
 
       // Save the generated schedule to Firestore
       await saveScheduleToFirestore({
         events: newEvents,
-        employeeColors: newEmployeeColors,
+
       });
 
       setEvents(newEvents);
-      setEmployeeColors(newEmployeeColors);
+
     } catch (error) {
       console.error("Error generating or saving schedule:", error);
     }
@@ -387,7 +365,6 @@ export default function ServersSchedule() {
               alignItems: "center",
               gap: 2,
               width: "300px",
-              backgroundColor: employeeColors[employee.id] || "#FFFFFF", // Use white by default, color after schedule generation
             }}
           >
             <Avatar

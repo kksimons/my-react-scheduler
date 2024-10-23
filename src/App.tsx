@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Box, Tab, Tabs, Avatar, Button } from "@mui/material";
-import ServersSchedule from "./schedules/ServersSchedule";
+import ServersSchedule from "./schedules/ServerSchedule";
 import BussersSchedule from "./schedules/BussersSchedule";
 import CooksSchedule from "./schedules/CooksSchedule";
 import HomePage from "./schedules/HomePage";
@@ -8,6 +8,8 @@ import { auth } from "./userAuth/firebase";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { useUserStore } from "./stores/useUserStore";
+import AppFullCalendar from "./schedules/AppFullCalendar";
+
 
 export default function App() {
   const db = getFirestore();
@@ -27,6 +29,7 @@ export default function App() {
     if (role === "server" && currentTab > 1) return 1;
     if (role === "busser" && currentTab > 1) return 1;
     if (role === "cook" && currentTab > 1) return 1;
+    if (role === "employee" && currentTab > 1) return 1;
     return currentTab;
   };
 
@@ -58,6 +61,8 @@ export default function App() {
             setCurrentTab(1); // Set to Bussers schedule (remapped)
           } else if (userDoc.role === "cook") {
             setCurrentTab(1); // Set to Cooks schedule (remapped)
+          } else if (userDoc.role === "employee") {
+            setCurrentTab(1);
           } else if (userDoc.role === "employer") {
             setCurrentTab(1); // Employers default to Servers schedule
           }
@@ -129,10 +134,14 @@ export default function App() {
           <Tab label="Servers Schedule" key="servers-tab" />,
           <Tab label="Bussers Schedule" key="bussers-tab" />,
           <Tab label="Cooks Schedule" key="cooks-tab" />,
+          <Tab label="Full Schedule" key="full-tab" />,
+          
+
         ]}
         {role === "server" && <Tab label="Servers Schedule" />}
         {role === "busser" && <Tab label="Bussers Schedule" />}
         {role === "cook" && <Tab label="Cooks Schedule" />}
+        {role === "employee" && <Tab label="Full Schedule" />}
       </Tabs>
     );
   };
@@ -150,6 +159,9 @@ export default function App() {
         }
         if (role === "cook") {
           return <CooksSchedule />;
+        }
+        if (role === "employee") {
+          return <AppFullCalendar />
         }
         break;
       case 2:
