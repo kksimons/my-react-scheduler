@@ -1,3 +1,9 @@
+## Docker (docker must be installed and running: https://docs.docker.com/desktop/install/windows-install/)
+`docker pull kksimons/scheduler:latest`
+
+This means you've got to post to port 80
+`docker run -p 80:5000 kksimons/scheduler:latest`
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

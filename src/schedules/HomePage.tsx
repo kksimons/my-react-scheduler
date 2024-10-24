@@ -35,6 +35,8 @@ import {
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../userAuth/firebase";
 import { useUserStore } from "../stores/useUserStore";
+import EmployeeList from "../manager-dashboard/EmployeeManagement";
+import EmployeeManagement from "../manager-dashboard/EmployeeManagement";
 
 // I hate you typescript
 interface HomePageProps {
@@ -358,17 +360,19 @@ export default function HomePage({ setValue }: HomePageProps) {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        marginTop: 20,
+        // marginTop: 20,
+        // width: "full",
       }}
     >
       {isLoggedIn ? (
         <Paper
           elevation={3}
-          sx={{ padding: 3, width: "500px", marginBottom: 4 }}
+          sx={{ padding: 3, width: "full", marginBottom: 4 }}
         >
+
           <Typography variant="h6" gutterBottom>
-            You are logged in, your profile will eventually be shown here to
-            edit.
+            <EmployeeManagement />
+          
           </Typography>
         </Paper>
       ) : (
