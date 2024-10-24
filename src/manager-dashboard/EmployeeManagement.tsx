@@ -13,7 +13,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddEmployee from "./AddEmployee";
-import EmployeeScheduler from "./EmployeeScheduler";
+// import EmployeeScheduler from "./EmployeeScheduler";
 
 const EmployeeManagement: React.FC = () => {
   const [employees, setEmployees] = useState<any[]>([]);
