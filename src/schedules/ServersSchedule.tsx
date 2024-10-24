@@ -7,6 +7,17 @@ import {
   Typography,
   Avatar,
   Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  ToggleButtonGroup,
+  ToggleButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import {
   collection,
@@ -20,8 +31,10 @@ import {
 import { db } from "../userAuth/firebase";
 import { useUserStore } from "../stores/useUserStore";
 import { Timestamp } from "firebase/firestore";
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { FaTableColumns } from "react-icons/fa6";
+import { MdTableRows } from "react-icons/md";
 
 // Form data types
 interface FormData {
@@ -335,6 +348,7 @@ export default function ServersSchedule() {
 
       setEvents(newEvents);
       setEmployeeColors(newEmployeeColors);
+      handleCloseDialog(); // Close the modal after submission
     } catch (error) {
       console.error("Error generating or saving schedule:", error);
     }
@@ -342,151 +356,298 @@ export default function ServersSchedule() {
 
   // PDF export function
   const exportScheduleToPDF = async () => {
-    const scheduleElement = document.getElementById('schedule-container');
+    const scheduleElement = document.getElementById("schedule-container");
 
     if (!scheduleElement) {
-      console.error('Schedule element not found!');
+      console.error("Schedule element not found!");
       return;
     }
 
     const canvas = await html2canvas(scheduleElement);
-    const imgData = canvas.toDataURL('image/png');
+    const imgData = canvas.toDataURL("image/png");
 
     const pdf = new jsPDF();
-    const imgWidth = 190; 
+    const imgWidth = 190;
     const pageHeight = pdf.internal.pageSize.height;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     let heightLeft = imgHeight;
 
     let position = 0;
 
-    pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+    pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
     heightLeft -= pageHeight;
 
     while (heightLeft >= 0) {
       position = heightLeft - imgHeight;
       pdf.addPage();
-      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+      pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
     }
 
-    pdf.save('Servers_Schedule.pdf');
+    pdf.save("Servers_Schedule.pdf");
   };
+
+  // putting the new stuff here, can clean up later
+  // -------------------------------------------------- //
+  const [layout, setLayout] = useState("row"); // state for switching between columns and rows (row default)
+  const daysOfWeek = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+
+  // Group events by employee
+  const groupEventsByEmployee = () => {
+    const grouped: { [key: string]: Event[] } = {};
+    events.forEach((event) => {
+      if (!grouped[event.admin_id]) {
+        grouped[event.admin_id] = [];
+      }
+      grouped[event.admin_id].push(event);
+    });
+    return grouped;
+  };
+
+  const groupedEvents = groupEventsByEmployee();
+
+  // Open the modal dialog
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  // Close the modal dialog
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  // Modal control state
+  const [openDialog, setOpenDialog] = useState(false);
 
   return (
     <div>
-      {/* Employee Cards */}
-      <Box sx={{ display: "flex", gap: 2, mb: 4, flexWrap: "wrap" }}>
-        {servers.map((employee) => (
-          <Paper
-            key={employee.id}
-            elevation={3}
-            sx={{
-              padding: 2,
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-              width: "300px",
-              backgroundColor: employeeColors[employee.id] || "#FFFFFF", // Use white by default, color after schedule generation
-            }}
-          >
-            <Avatar
-              src={employee.profilePic}
-              alt={employee.name}
-              sx={{ width: 56, height: 56 }}
-            />
-            <Box>
-              <Typography variant="h6">{employee.name}</Typography>
-              <Typography variant="body2" color="textSecondary">
-                {employee.employeeType.charAt(0).toUpperCase() +
-                  employee.employeeType.slice(1)}
-              </Typography>
-            </Box>
-          </Paper>
-        ))}
-      </Box>
-
-      {/* Only show form for employers */}
+      {/* Anything that is universal to both calendars should go here, before the toggle layout button */}
       {role === "employer" && (
-        <form onSubmit={handleSubmit}>
-          <Box sx={{ display: "flex", gap: "24px", marginTop: "20px" }}>
-            {/* Schedule Settings */}
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="h6" gutterBottom>
-                Schedule Settings
-              </Typography>
-              <TextField
-                label="Number of Employees"
-                type="number"
-                name="num_employees"
-                value={formData.num_employees}
-                onChange={handleInputChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-              />
-              <TextField
-                label="Shifts per Day"
-                type="number"
-                name="shifts_per_day"
-                value={formData.shifts_per_day}
-                onChange={handleInputChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-              />
-              <TextField
-                label="Total Days"
-                type="number"
-                name="total_days"
-                value={formData.total_days}
-                onChange={handleInputChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-              />
-            </Box>
-          </Box>
-
+        <>
+          {/* Generate Schedule button to open the modal */}
           <Button
-            type="submit"
             variant="contained"
             color="primary"
+            onClick={handleOpenDialog}
             style={{ marginTop: "20px" }}
-            fullWidth
           >
             Generate Schedule
           </Button>
-        </form>
+
+          {/* Modal with the form */}
+          <Dialog
+            open={openDialog}
+            onClose={handleCloseDialog}
+            fullWidth
+            maxWidth="sm"
+          >
+            <DialogTitle>Generate Schedule</DialogTitle>
+            <DialogContent>
+              <form onSubmit={handleSubmit}>
+                <Box
+                  sx={{ display: "flex", flexDirection: "column", gap: "16px" }}
+                >
+                  <TextField
+                    label="Number of Employees"
+                    type="number"
+                    name="num_employees"
+                    value={formData.num_employees}
+                    onChange={handleInputChange}
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                  />
+                  <TextField
+                    label="Shifts per Day"
+                    type="number"
+                    name="shifts_per_day"
+                    value={formData.shifts_per_day}
+                    onChange={handleInputChange}
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                  />
+                  <TextField
+                    label="Total Days"
+                    type="number"
+                    name="total_days"
+                    value={formData.total_days}
+                    onChange={handleInputChange}
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                  />
+                </Box>
+                <DialogActions>
+                  <Button onClick={handleCloseDialog} color="secondary">
+                    Cancel
+                  </Button>
+                  <Button type="submit" color="primary">
+                    Generate
+                  </Button>
+                </DialogActions>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </>
       )}
 
-      {/* Visual Schedule */}
-      <div id="schedule-container">
-        <Scheduler
-          events={events}
-          disableViewer
-          onEventClick={() => {
-            console.log("onEventClick");
-          }}
-          week={{
-            weekDays: [0, 1, 2, 3, 4, 5, 6],
-            weekStartOn: 1,
-            startHour: 9,
-            endHour: 24,
-            step: step, // Dynamic step value based on shifts_per_day
-          }}
-        />
-      </div>
+      {/* Toggle Layout Button */}
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+        <ToggleButtonGroup
+          value={layout}
+          exclusive
+          onChange={(_, newLayout) => setLayout(newLayout)}
+          aria-label="layout toggle"
+        >
+          <ToggleButton value="row" aria-label="row view">
+            <MdTableRows size={24} />
+          </ToggleButton>
+          <ToggleButton value="column" aria-label="column view">
+            <FaTableColumns size={24} />
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
 
-      <Button
-        variant="contained"
-        color="secondary"
-        onClick={exportScheduleToPDF}
-        style={{ marginTop: "20px" }}
-      >
-        Export Schedule as PDF
-      </Button>
+      {/* Column layout - our previous schedule look */}
+      {layout === "column" && (
+        <>
+          {/* Employee Cards */}
+          <Box sx={{ display: "flex", gap: 2, mb: 4, flexWrap: "wrap" }}>
+            {servers.map((employee) => (
+              <Paper
+                key={employee.id}
+                elevation={3}
+                sx={{
+                  padding: 2,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                  width: "300px",
+                  backgroundColor: employeeColors[employee.id] || "#FFFFFF", // Use white by default, color after schedule generation
+                }}
+              >
+                <Avatar
+                  src={employee.profilePic}
+                  alt={employee.name}
+                  sx={{ width: 56, height: 56 }}
+                />
+                <Box>
+                  <Typography variant="h6">{employee.name}</Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    {employee.employeeType.charAt(0).toUpperCase() +
+                      employee.employeeType.slice(1)}
+                  </Typography>
+                </Box>
+              </Paper>
+            ))}
+          </Box>
 
+          {/* Visual Schedule */}
+          <div id="schedule-container">
+            <Scheduler
+              events={events}
+              disableViewer
+              onEventClick={() => {
+                console.log("onEventClick");
+              }}
+              week={{
+                weekDays: [0, 1, 2, 3, 4, 5, 6],
+                weekStartOn: 1,
+                startHour: 9,
+                endHour: 24,
+                step: step, // Dynamic step value based on shifts_per_day
+              }}
+            />
+          </div>
+
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={exportScheduleToPDF}
+            style={{ marginTop: "20px" }}
+          >
+            Export Schedule as PDF
+          </Button>
+        </>
+      )}
+
+      {/* Row layout placeholder */}
+      {layout === "row" && (
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h5" gutterBottom>
+            Employee Shift Schedule (Row Layout)
+          </Typography>
+
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Employee</TableCell>
+                {daysOfWeek.map((day) => (
+                  <TableCell key={day}>{day}</TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {servers.map((employee) => (
+                <TableRow key={employee.id}>
+                  {/* Employee Avatar and Name */}
+                  <TableCell>
+                    <Paper
+                      elevation={3}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        padding: 2,
+                        backgroundColor:
+                          employeeColors[employee.id] || "#FFFFFF",
+                      }}
+                    >
+                      <Avatar
+                        src={employee.profilePic}
+                        alt={employee.name}
+                        sx={{ width: 56, height: 56 }}
+                      />
+                      <Typography>{employee.name}</Typography>
+                    </Paper>
+                  </TableCell>
+
+                  {/* Display Shift Data for Each Day */}
+                  {daysOfWeek.map((day, index) => {
+                    const dayEvents = groupedEvents[employee.id]?.filter(
+                      (event) => {
+                        const eventDay = new Date(event.start).getDay(); // Get the day of the event
+                        return eventDay === index + 1; // Adjust index to match Monday = 1, Sunday = 7
+                      }
+                    );
+
+                    return (
+                      <TableCell key={day}>
+                        {dayEvents?.map((event) => (
+                          <Typography key={event.event_id}>
+                            Shift {event.title.split(" ")[3]}:{" "}
+                            {new Date(event.start).toLocaleTimeString()} -{" "}
+                            {new Date(event.end).toLocaleTimeString()}
+                          </Typography>
+                        )) || <Typography>No Shift</Typography>}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Box>
+      )}
     </div>
   );
 }
