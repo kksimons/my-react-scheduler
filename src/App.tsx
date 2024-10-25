@@ -61,9 +61,9 @@ export default function App() {
           if (userDoc.role === "server") {
             setCurrentTab(2); // Set to Servers schedule
           } else if (userDoc.role === "busser") {
-            setCurrentTab(2); // Set to Bussers schedule (remapped)
+            setCurrentTab(3); // Set to Bussers schedule (remapped)
           } else if (userDoc.role === "cook") {
-            setCurrentTab(2); // Set to Cooks schedule (remapped)
+            setCurrentTab(4); // Set to Cooks schedule (remapped)
           } else if (userDoc.role === "employer") {
             setCurrentTab(2); // Employers default to Servers schedule
           }
