@@ -50,7 +50,7 @@ export const EmployeeScheduler: React.FC<{ employees: any[] }> = ({ employees })
   };
 
   return (
-    <Box sx={{ display: 'flex', height: 'calc(100vh - 100px)' }}>
+    <Box sx={{ display: 'flex', height: 'full' }}>
       {/* Employee list sidebar */}
       <Paper elevation={3} sx={{ width: '250px', overflowY: 'auto', padding: 2 }}>
         <Typography variant="h6" gutterBottom>Employees</Typography>

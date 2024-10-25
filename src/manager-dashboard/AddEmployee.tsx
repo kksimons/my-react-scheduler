@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import { db } from "../userAuth/firebase";
 import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
 import Select from "react-select";
-import { Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { Button, Box, CssBaseline, Paper, Typography, ThemeProvider } from "@mui/material";
+import CustomTheme from "../customtheme";
 
 // Define the props interface for the component
 interface AddEmployeeProps {
@@ -27,7 +29,6 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({
   onEmployeeUpdated,
   initialData,
 }) => {
-  // Initialize form values
   const [values, setValues] = useState<FormValues>({
     firstName: initialData?.employee_fname || "",
     lastName: initialData?.employee_lname || "",
@@ -38,21 +39,13 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({
     availableShift: initialData?.employee_availability || "",
   });
 
-  // Firestore Collection Reference
-  const employeesCollectionRef = collection(db, "employees");
+  const employeesCollectionRef = collection(db, "employees"); 
 
-  // Handle form input changes
-  const handleChanges = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChanges = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setValues((prevValues) => ({
-      ...prevValues,
-      [name]: value,
-    }));
+    setValues((prevValues) => ({ ...prevValues, [name]: value }));
   };
 
-  // Handle multi-select changes for availability
   const handleMultiSelectChange = (selectedOptions: any) => {
     setValues((prevValues) => ({
       ...prevValues,
@@ -62,16 +55,12 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({
     }));
   };
 
-  // Capitalize the first letter of each word
   const capitalize = (str: string) => {
     return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
   };
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Prepare employee data for Firestore
     const employeeData = {
       employee_fname: capitalize(values.firstName),
       employee_lname: capitalize(values.lastName),
@@ -79,54 +68,26 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({
       employee_phone_number: values.phone,
       employee_position: capitalize(values.position),
       employee_type: capitalize(values.employeeType),
-      employee_system:
-        values.position === "Cook" ? "Kitchen Side" : "Dining Side",
+      employee_system: values.position === "Cook" ? "Kitchen Side" : "Dining Side",
       employee_availability: capitalize(values.availableShift),
     };
 
     try {
       if (initialData) {
         await updateDoc(doc(db, "employees", initialData.id), employeeData);
-        const updateEmployee = { id: initialData.id, ...employeeData };
-        onEmployeeUpdated(updateEmployee);
-
-        // Alert for successful update
-        window.alert(
-          `Employee ${employeeData.employee_fname} ${employeeData.employee_lname} has been updated.`
-        );
+        onEmployeeUpdated({ id: initialData.id, ...employeeData });
+        window.alert(`Employee ${employeeData.employee_fname} ${employeeData.employee_lname} has been updated.`);
       } else {
-        // Add new employee to Firestore
         const docRef = await addDoc(employeesCollectionRef, employeeData);
-        const newEmployee = { id: docRef.id, ...employeeData };
-
-        // Alert user of successful addition
-        window.alert(
-          `New employee ${employeeData.employee_fname} ${employeeData.employee_lname} has been added.`
-        );
-
-        // Callback to parent component
-        onEmployeeAdded(newEmployee);
+        onEmployeeAdded({ id: docRef.id, ...employeeData });
+        window.alert(`New employee ${employeeData.employee_fname} ${employeeData.employee_lname} has been added.`);
       }
-
-      // Reset form values
-      //   setValues({
-      //     firstName: "",
-      //     lastName: "",
-      //     dob: "",
-      //     phone: "",
-      //     employeeType: "",
-      //     position: "",
-      //     availableShift: "",
-      //   });
-
-      // Fetch updated employee list (function to be implemented)
-      // fetchEmployeeList();
+      // Reset form values can go here if needed.
     } catch (error) {
       console.error("Error adding employee:", error);
     }
   };
 
-  // Update values when initialData changes
   useEffect(() => {
     if (initialData) {
       setValues({
@@ -141,7 +102,6 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({
     }
   }, [initialData]);
 
-  // Shift options for availability
   const shiftOptions = [
     { value: "Morning", label: "Morning" },
     { value: "Evening", label: "Evening" },
@@ -150,100 +110,61 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({
   ];
 
   return (
-    <div className="add-employee-container">
-      <h1>Add New Employee</h1>
-      <div className="add-employee-form-container">
-        <form onSubmit={handleSubmit}>
-          {/* Form fields */}
-          <FormField
-            label="First Name"
-            name="firstName"
-            value={values.firstName}
-            onChange={handleChanges}
-            required
-          />
-          <FormField
-            label="Last Name"
-            name="lastName"
-            value={values.lastName}
-            onChange={handleChanges}
-            required
-          />
-          <FormField
-            label="Date of Birth"
-            name="dob"
-            type="date"
-            value={values.dob}
-            onChange={handleChanges}
-            required
-          />
-          <FormField
-            label="Phone Number"
-            name="phone"
-            type="tel"
-            value={values.phone}
-            onChange={handleChanges}
-            required
-          />
+    <ThemeProvider theme={CustomTheme}>
+      <CssBaseline />
+      <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
+        <Paper elevation={3} sx={{ maxWidth: 600, p: 4, borderRadius: 2 }}>
+          <Typography variant="h5" color="primary.dark" gutterBottom>
+            {initialData ? "Edit Employee" : "Add New Employee"}
+          </Typography>
+          <form onSubmit={handleSubmit}>
+            {/* Form fields */}
+            <FormField label="First Name" name="firstName" value={values.firstName} onChange={handleChanges} required />
+            <FormField label="Last Name" name="lastName" value={values.lastName} onChange={handleChanges} required />
+            <FormField label="Date of Birth" name="dob" type="date" value={values.dob} onChange={handleChanges} required />
+            <FormField label="Phone Number" name="phone" type="tel" value={values.phone} onChange={handleChanges} required />
 
-          {/* Employee Type dropdown */}
-          <div>
-            <label htmlFor="employeeType">Employee Type*</label>
-            <select
-              name="employeeType"
-              onChange={handleChanges}
-              value={values.employeeType}
-              required
-            >
-              <option value="">Select Employee Type*</option>
-              <option value="full-time">Full Time</option>
-              <option value="part-time">Part Time</option>
-            </select>
-          </div>
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body1" sx={{ mb: 1 }}>Employee Type</Typography>
+              <select name="employeeType" onChange={handleChanges} value={values.employeeType} required style={{ padding: "10px", width: "100%", borderRadius: "4px", border: "1px solid #ccc" }}>
+                <option value="">Select Employee Type</option>
+                <option value="full-time">Full Time</option>
+                <option value="part-time">Part Time</option>
+              </select>
+            </Box>
 
-          {/* Position dropdown */}
-          <div>
-            <label htmlFor="position">Position*</label>
-            <select
-              name="position"
-              onChange={handleChanges}
-              value={values.position}
-              required
-            >
-              <option value="">Select Position*</option>
-              <option value="Cook">Cook</option>
-              <option value="Busser">Busser</option>
-              <option value="Server">Server</option>
-              <option value="Host">Host</option>
-            </select>
-          </div>
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body1" sx={{ mb: 1 }}>Position</Typography>
+              <select name="position" onChange={handleChanges} value={values.position} required style={{ padding: "10px", width: "100%", borderRadius: "4px", border: "1px solid #ccc" }}>
+                <option value="">Select Position</option>
+                <option value="Cook">Cook</option>
+                <option value="Busser">Busser</option>
+                <option value="Server">Server</option>
+                <option value="Host">Host</option>
+              </select>
+            </Box>
 
-          {/* Available Shifts multi-select */}
-          <div>
-            <label htmlFor="availableShift">Available Shifts*</label>
-            <Select
-              isMulti
-              name="availableShift"
-              options={shiftOptions}
-              className="basic-multi-select"
-              classNamePrefix="select"
-              value={shiftOptions.filter((option) =>
-                values.availableShift.includes(option.value)
-              )}
-              onChange={handleMultiSelectChange}
-              required
-            />
-          </div>
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body1" sx={{ mb: 1 }}>Available Shifts</Typography>
+              <Select
+                isMulti
+                name="availableShift"
+                options={shiftOptions}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                value={shiftOptions.filter(option => values.availableShift.includes(option.value))}
+                onChange={handleMultiSelectChange}
+                required
+              />
+            </Box>
 
-          {/* Submit Button */}
-          <div className="button-style">
-            <Button type="submit" variant="contained" color="primary" fullWidth>
+            <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 3 }}>
               {initialData ? "Update Employee" : "Add Employee"}
             </Button>
-          </div>
-        </form>
-      </div>
-    </div>
+          </form>
+        </Paper>
+      </Box>
+    </ThemeProvider>
   );
 };
 
@@ -256,8 +177,8 @@ const FormField: React.FC<{
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   required?: boolean;
 }> = ({ label, name, type = "text", value, onChange, required }) => (
-  <div>
-    <label htmlFor={name}>{label}*</label>
+  <Box sx={{ mt: 2 }}>
+    <Typography variant="body1" sx={{ mb: 1 }}>{label}</Typography>
     <input
       type={type}
       placeholder={`Enter ${label}`}
@@ -265,8 +186,9 @@ const FormField: React.FC<{
       onChange={onChange}
       required={required}
       value={value}
+      style={{ padding: "10px", width: "100%", borderRadius: "4px", border: "1px solid #ccc" }}
     />
-  </div>
+  </Box>
 );
 
 export default AddEmployee;
