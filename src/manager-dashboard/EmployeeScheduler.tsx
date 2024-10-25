@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Box, List, ListItem, ListItemText, Paper, Typography } from "@mui/material";
 import { Scheduler, SchedulerData } from "@bitnoi.se/react-scheduler";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 export const EmployeeScheduler: React.FC<{ employees: any[] }> = ({ employees }) => {
-  const [schedulerData, setSchedulerData] = useState<SchedulerData>([]);
+  const [schedulerData, setSchedulerData] = useState<SchedulerData[]>([]);
   const [draggedEmployee, setDraggedEmployee] = useState<any | null>(null);
 
   // Convert employee data to scheduler format
   useEffect(() => {
-    const convertedData: SchedulerData = employees.map(employee => ({
+    const convertedData: SchedulerData[] = employees.map(employee => ({
       id: employee.id || Math.random().toString(),
       label: {
         title: `${employee.employee_fname} ${employee.employee_lname}`,
@@ -24,46 +25,66 @@ export const EmployeeScheduler: React.FC<{ employees: any[] }> = ({ employees })
     setDraggedEmployee(employee);
   };
 
-  // Prevent default to allow drop
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
   // Handle dropping an employee onto the scheduler
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    if (draggedEmployee) {
-      // Here you would implement the logic to add the dragged employee to the schedule
-      console.log('Dropped employee:', draggedEmployee);
-      // TODO: Update schedulerData with the new shift
-      setDraggedEmployee(null);
-    }
+  const handleDrop = (result: any) => {
+    if (!result.destination) return; // If dropped outside
+
+    const newScheduleEntry = {
+      id: draggedEmployee.id,
+      startTime: new Date(), // Set this to your desired start time
+      endTime: new Date(new Date().getTime() + 60 * 60 * 1000), // Example for a one-hour shift
+      title: `${draggedEmployee.employee_fname} ${draggedEmployee.employee_lname}`,
+    };
+
+    // Update schedulerData with the new shift for the dragged employee
+    setSchedulerData(prevData =>
+      prevData.map(emp =>
+        emp.id === draggedEmployee.id 
+          ? { ...emp, data: [...emp.data, newScheduleEntry] } 
+          : emp
+      )
+    );
+
+    console.log('Dropped employee:', draggedEmployee);
+    setDraggedEmployee(null); // Reset dragged employee
   };
 
   return (
-    <Box sx={{ display: 'flex', height: 'calc(100vh - 100px)' }}>
+    <Box sx={{ display: 'flex', height: 'full' }}>
       {/* Employee list sidebar */}
       <Paper elevation={3} sx={{ width: '250px', overflowY: 'auto', padding: 2 }}>
         <Typography variant="h6" gutterBottom>Employees</Typography>
-        <List>
-          {employees.map((employee) => (
-            <ListItem
-              key={employee.id}
-              button
-              draggable
-              onDragStart={(e: React.DragEvent<Element>) => handleDragStart(e, employee)}
-            >
-              <ListItemText 
-                primary={`${employee.employee_fname} ${employee.employee_lname}`}
-                secondary={employee.employee_position}
-              />
-            </ListItem>
-          ))}
-        </List>
+        <DragDropContext onDragEnd={handleDrop}>
+          <Droppable droppableId="employeeList">
+            {(provided) => (
+              <List ref={provided.innerRef} {...provided.droppableProps}>
+                {employees.map((employee, index) => (
+                  <Draggable key={employee.id} draggableId={employee.id} index={index}>
+                    {(provided) => (
+                      <ListItem 
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        button
+                        onDragStart={(e) => handleDragStart(e, employee)}
+                      >
+                        <ListItemText 
+                          primary={`${employee.employee_fname} ${employee.employee_lname}`}
+                          secondary={employee.employee_position}
+                        />
+                      </ListItem>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </List>
+            )}
+          </Droppable>
+        </DragDropContext>
       </Paper>
       
       {/* Scheduler component */}
-      <Box sx={{ flexGrow: 1, marginLeft: 2 }} onDragOver={handleDragOver} onDrop={handleDrop}>
+      <Box sx={{ flexGrow: 1, marginLeft: 2 }} onDragOver={(e) => e.preventDefault()}>
         <Scheduler
           data={schedulerData}
           onItemClick={(item) => console.log('Clicked item:', item)}
@@ -72,10 +93,12 @@ export const EmployeeScheduler: React.FC<{ employees: any[] }> = ({ employees })
             maxRecordsPerPage: 50,
             lang: "en",
             includeTakenHoursOnWeekendsInDayView: true,
-            showTooltip: true
+            showTooltip: true,
           }}
         />
       </Box>
     </Box>
   );
 };
+
+export default EmployeeScheduler;
