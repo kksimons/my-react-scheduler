@@ -32,17 +32,13 @@ const LandingPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ padding: 0, margin: 0 }}>
-      {/* Background Box with Linear Gradient */}
       <Box
         sx={{
           background: 'linear-gradient(97deg, rgba(233,104,255,1) 0%, rgba(69,91,235,1) 37%, rgba(34,24,167,1) 79%)',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          boxSizing: 'border-box',
-          padding: 0,
-          margin: 0,
+          height: "100vh",
         }}
       >
         {/* Landing Page Content */}
@@ -53,7 +49,6 @@ const LandingPage: React.FC = () => {
             maxWidth: '1200px',
             width: '100%',
             padding: '2rem',
-            boxSizing: 'border-box',
           }}
         >
           {/* Left Container */}
@@ -65,7 +60,6 @@ const LandingPage: React.FC = () => {
               justifyContent: 'center',
               alignItems: 'flex-start',
               padding: '2rem',
-              boxSizing: 'border-box',
             }}
           >
             <Stack spacing={2} alignItems="flex-start">
@@ -121,7 +115,7 @@ const LandingPage: React.FC = () => {
               flexDirection: 'column',
               justifyContent: 'center',
               paddingLeft: '1rem',
-              boxSizing: 'border-box',
+
             }}
           >
             <ContentText>Manage your team shifts effortlessly and efficiently.</ContentText>
@@ -131,7 +125,6 @@ const LandingPage: React.FC = () => {
           </Box>
         </Box>
       </Box>
-    </Box>
   );
 };
 

@@ -17,6 +17,7 @@ import {
   Snackbar,
   Alert,
   SelectChangeEvent,
+  createTheme,
 } from "@mui/material";
 import { auth } from "../userAuth/firebase";
 import {
@@ -39,6 +40,24 @@ import EmployeeList from "../manager-dashboard/EmployeeManagement";
 import EmployeeManagement from "../manager-dashboard/EmployeeManagement";
 
 // I hate you typescript
+// Define your custom theme here
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#8a2be2',  // Purple
+      contrastText: '#ffffff',  // White text on primary buttons
+    },
+    secondary: {
+      main: '#9b30ff',  // Lighter purple
+    },
+    background: {
+      default: '#f4f6f9', // Light background color
+    },
+  },
+  shape: {
+    borderRadius: 16, // Global border-radius for buttons and Paper
+  },
+});
 
 
 export default function HomePage() {
@@ -354,6 +373,7 @@ export default function HomePage() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        height: "100vh",
         // marginTop: 20,
         // width: "full",
       }}
@@ -384,6 +404,7 @@ export default function HomePage() {
           >
             <Button
               variant={isNewUser ? "contained" : "outlined"}
+              color="primary"
               onClick={() => setIsNewUser(true)}
               fullWidth
             >

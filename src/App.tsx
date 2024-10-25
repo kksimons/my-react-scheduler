@@ -74,7 +74,7 @@ export default function App() {
         setRole(null);
         setProfilePic(null);
         setIsLoggedIn(false);
-        setCurrentTab(0); // Reset to Home tab on logout
+        setCurrentTab(0); // Reset to landing page tab on logout
       }
     });
 
@@ -176,14 +176,14 @@ export default function App() {
   
 
   return (
-    <div>
+    <>
       {/* Header - Only show tabs if the user is logged in */}
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          borderBottom: 1,
+
           borderColor: "divider",
         }}
       >
@@ -211,7 +211,7 @@ export default function App() {
       </Box>
 
       {/* Tabs Content */}
-      <Box p={3}>{renderTabContent()}</Box>
-    </div>
+      <Box>{renderTabContent()}</Box>
+    </>
   );
 }
