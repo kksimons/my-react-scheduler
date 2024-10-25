@@ -4,6 +4,10 @@ import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
+import { CssBaseline, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, ThemeProvider, Typography } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import CustomTheme from "../customtheme";
 
 // Define the props interface for the component
 interface AddEmployeeProps {
@@ -151,100 +155,103 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({
   ];
 
   return (
-    <div className="add-employee-container">
-      <h1>Add New Employee</h1>
-      <div className="add-employee-form-container">
-        <form onSubmit={handleSubmit}>
-          {/* Form fields */}
-          <FormField
-            label="First Name"
-            name="firstName"
-            value={values.firstName}
-            onChange={handleChanges}
-            required
-          />
-          <FormField
-            label="Last Name"
-            name="lastName"
-            value={values.lastName}
-            onChange={handleChanges}
-            required
-          />
-          <FormField
-            label="Date of Birth"
-            name="dob"
-            type="date"
-            value={values.dob}
-            onChange={handleChanges}
-            required
-          />
-          <FormField
-            label="Phone Number"
-            name="phone"
-            type="tel"
-            value={values.phone}
-            onChange={handleChanges}
-            required
-          />
+    <ThemeProvider theme={CustomTheme}> 
+        <CssBaseline/>
+        <div className="add-employee-container">
+        <Typography variant="h6" color="primary.dark" gutterBottom>Add New Employees</Typography>
+          <div className="add-employee-form-container">
+            <form onSubmit={handleSubmit}>
+              {/* Form fields */}
+              <FormField
+                label="First Name"
+                name="firstName"
+                value={values.firstName}
+                onChange={handleChanges}
+                required
+              />
+              <FormField
+                label="Last Name"
+                name="lastName"
+                value={values.lastName}
+                onChange={handleChanges}
+                required
+              />
+              <FormField
+                label="Date of Birth"
+                name="dob"
+                type="date"
+                value={values.dob}
+                onChange={handleChanges}
+                required
+              />
+              <FormField
+                label="Phone Number"
+                name="phone"
+                type="tel"
+                value={values.phone}
+                onChange={handleChanges}
+                required
+              />
 
-          {/* Employee Type dropdown */}
-          <div>
-            <label htmlFor="employeeType">Employee Type*</label>
-            <select
-              name="employeeType"
-              onChange={handleChanges}
-              value={values.employeeType}
-              required
-            >
-              <option value="">Select Employee Type*</option>
-              <option value="full-time">Full Time</option>
-              <option value="part-time">Part Time</option>
-            </select>
-          </div>
+              {/* Employee Type dropdown */}
+              <div>
+                <label htmlFor="employeeType">Employee Type*</label>
+                <select
+                  name="employeeType"
+                  onChange={handleChanges}
+                  value={values.employeeType}
+                  required
+                >
+                  <option value="">Select Employee Type*</option>
+                  <option value="full-time">Full Time</option>
+                  <option value="part-time">Part Time</option>
+                </select>
+              </div>
 
-          {/* Position dropdown */}
-          <div>
-            <label htmlFor="position">Position*</label>
-            <select
-              name="position"
-              onChange={handleChanges}
-              value={values.position}
-              required
-            >
-              <option value="">Select Position*</option>
-              <option value="Cook">Cook</option>
-              <option value="Busser">Busser</option>
-              <option value="Server">Server</option>
-              <option value="Host">Host</option>
-            </select>
-          </div>
+              {/* Position dropdown */}
+              <div>
+                <label htmlFor="position">Position*</label>
+                <select
+                  name="position"
+                  onChange={handleChanges}
+                  value={values.position}
+                  required
+                >
+                  <option value="">Select Position*</option>
+                  <option value="Cook">Cook</option>
+                  <option value="Busser">Busser</option>
+                  <option value="Server">Server</option>
+                  <option value="Host">Host</option>
+                </select>
+              </div>
 
-          {/* Available Shifts multi-select */}
-          <div>
-            <label htmlFor="availableShift">Available Shifts*</label>
-            <Select
-              isMulti
-              name="availableShift"
-              options={shiftOptions}
-              className="basic-multi-select"
-              classNamePrefix="select"
-              value={shiftOptions.filter((option) =>
-                values.availableShift.includes(option.value)
-              )}
-              onChange={handleMultiSelectChange}
-              required
-            />
-          </div>
+              {/* Available Shifts multi-select */}
+              <div>
+                <label htmlFor="availableShift">Available Shifts*</label>
+                <Select
+                  isMulti
+                  name="availableShift"
+                  options={shiftOptions}
+                  className="basic-multi-select"
+                  classNamePrefix="select"
+                  value={shiftOptions.filter((option) =>
+                    values.availableShift.includes(option.value)
+                  )}
+                  onChange={handleMultiSelectChange}
+                  required
+                />
+              </div>
 
-          {/* Submit Button */}
-          <div className="button-style">
-            <Button type="submit" variant="contained" color="primary" fullWidth>
-              {initialData ? "Update Employee" : "Add Employee"}
-            </Button>
+              {/* Submit Button */}
+              <div className="button-style">
+                <Button type="submit" variant="contained" color="primary" fullWidth>
+                  {initialData ? "Update Employee" : "Add Employee"}
+                </Button>
+              </div>
+            </form>
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+    </ThemeProvider>
   );
 };
 

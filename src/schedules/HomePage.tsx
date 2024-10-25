@@ -109,12 +109,14 @@ export default function HomePage() {
     employeeType: "",
     workType: "",
     availability: {
-      mon: ["morning", "afternoon", "evening"],
-      tue: ["morning", "afternoon", "evening"],
-      wed: ["morning", "afternoon", "evening"],
-      thu: ["morning", "afternoon", "evening"],
-      fri: ["morning", "afternoon", "evening"],
+      mon: [],
+      tue: [],
+      wed: [],
+      thu: [],
+      fri: [],
     },
+    
+    
     excludedDays: [],
     shiftDetails: [],
   });
@@ -523,110 +525,120 @@ export default function HomePage() {
                   </Box>
                 )}
                 {/* Employee Flow */}
-                {step === 2 && userInfo.role === "employee" && (
-                  <Box>
-                    <Typography variant="h6" gutterBottom sx={{ mt: 4, mb: 4, fontSize:18, }}>
-                      Employee Details
-                    </Typography>
-                    <TextField
-                      name="name"
-                      label="Full Name"
-                      onChange={handleInputChange}
-                      fullWidth
+              {step === 2 && userInfo.role === "employee" && (
+                <Box
+                  sx={{
+                    maxWidth: '600px',  // Limit width to prevent overflow
+                    width: '100vh',
+                    height: '50vh',
+                    overflow: 'hidden',  // Hide overflow content if any
+                    overflowY: "auto", //scrolling effect 
+            
+                  }}
+                >
+                  <Typography variant="h6" gutterBottom sx={{ mt: 4, mb: 4, fontSize: 18 }}>
+                    Employee Details
+                  </Typography>
+                  
+                  <TextField
+                    name="name"
+                    label="Full Name"
+                    onChange={handleInputChange}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                  />
+                  
+                  <FormControl fullWidth sx={{ mb: 2 }}>
+                    <InputLabel id="employee-type-label">Employee Type</InputLabel>
+                    <Select
+                      labelId="employee-type-label"
+                      name="employeeType"
+                      value={userInfo.employeeType}
+                      onChange={handleSelectChange}
+                      label="Employee Type"
+                    >
+                      <MenuItem value="server">Server</MenuItem>
+                      <MenuItem value="busser">Busser</MenuItem>
+                      <MenuItem value="cook">Cook</MenuItem>
+                    </Select>
+                  </FormControl>
+                  
+                  <Typography variant="h6" gutterBottom sx={{ mt: 4, mb: 4, fontSize: 18 }}>
+                    Profile Picture
+                  </Typography>
+                  
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      mb: 2,
+                    }}
+                  >
+                    <Avatar
+                      alt="Click to Upload"
+                      src={previewUrl || "./placeholder-avatar.jpg"}
+                      sx={{ width: 100, height: 100, border: 1 }}
+                      onClick={() =>
+                        document.getElementById("profilePicInput")?.click()
+                      }
+                    />
+                    <input
+                      accept="image/*"
+                      id="profilePicInput"
+                      type="file"
+                      style={{ display: "none" }}
+                      onChange={handleProfilePicUpload}
+                    />
+                  </Box>
+
+                  {uploadProgress > 0 && uploadProgress < 100 && (
+                    <LinearProgress
+                      variant="determinate"
+                      value={uploadProgress}
                       sx={{ mb: 2 }}
                     />
-                    <FormControl fullWidth sx={{ mb: 2 }}>
-                      <InputLabel id="employee-type-label">
-                        Employee Type
-                      </InputLabel>
-                      <Select
-                        labelId="employee-type-label"
-                        name="employeeType"
-                        value={userInfo.employeeType}
-                        onChange={handleSelectChange}
-                        label="Employee Type"
-                      >
-                        <MenuItem value="server">Server</MenuItem>
-                        <MenuItem value="busser">Busser</MenuItem>
-                        <MenuItem value="cook">Cook</MenuItem>
-                      </Select>
-                    </FormControl>
-                    <Typography variant="h6" gutterBottom sx={{ mt: 4, mb: 4, fontSize:18 }}>
-                      Profile Picture
-                    </Typography>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        cursor: "pointer",
-                        mb: 2,
-                      }}
+                  )}
+
+                  <FormControl fullWidth sx={{ mb: 2 }}>
+                    <InputLabel id="work-type-label">Work Type</InputLabel>
+                    <Select
+                      labelId="work-type-label"
+                      name="workType"
+                      value={userInfo.workType}
+                      onChange={handleSelectChange}
+                      label="Work Type"
                     >
-                      <Avatar
-                        alt="Click to Upload"
-                        src={previewUrl || "./placeholder-avatar.jpg"}
-                        sx={{ width: 100, height: 100 }}
-                        onClick={() =>
-                          document.getElementById("profilePicInput")?.click()
-                        }
-                      />
-                      <input
-                        accept="image/*"
-                        id="profilePicInput"
-                        type="file"
-                        style={{ display: "none" }}
-                        onChange={handleProfilePicUpload}
-                      />
+                      <MenuItem value="full_time">Full-time</MenuItem>
+                      <MenuItem value="part_time">Part-time</MenuItem>
+                    </Select>
+                  </FormControl>
+
+                  <Typography variant="h6" gutterBottom sx={{ mt: 4, mb: 4 }}>
+                    Availability
+                  </Typography>
+                  
+                  {["mon", "tue", "wed", "thu", "fri"].map((day) => (
+                    <Box key={day}>
+                      <Typography variant="subtitle1">{day.toUpperCase()}</Typography>
+                      {["morning", "afternoon", "evening"].map((shift) => (
+                        <Button
+                          key={shift}
+                          variant={
+                            userInfo.availability[day].includes(shift)
+                              ? "contained"
+                              : "outlined"
+                          }
+                          onClick={() => handleAvailabilityChange(day, shift)}
+                          sx={{ mr: 1, mb: 1 }}
+                        >
+                          {shift}
+                        </Button>
+                      ))}
                     </Box>
-
-                    {uploadProgress > 0 && uploadProgress < 100 && (
-                      <LinearProgress
-                        variant="determinate"
-                        value={uploadProgress}
-                        sx={{ mb: 2 }}
-                      />
-                    )}
-
-                    <FormControl fullWidth sx={{ mb: 2 }}>
-                      <InputLabel id="work-type-label">Work Type</InputLabel>
-                      <Select
-                        labelId="work-type-label"
-                        name="workType"
-                        value={userInfo.workType}
-                        onChange={handleSelectChange}
-                        label="Work Type"
-                      >
-                        <MenuItem value="full_time">Full-time</MenuItem>
-                        <MenuItem value="part_time">Part-time</MenuItem>
-                      </Select>
-                    </FormControl>
-
-                    <Typography variant="h3" gutterBottom sx={{ mt: 4, mb: 4 }}>
-                      Availability
-                    </Typography>
-                    {["mon", "tue", "wed", "thu", "fri"].map((day) => (
-                      <Box key={day}>
-                        <Typography variant="subtitle1">
-                          {day.toUpperCase()}
-                        </Typography>
-                        {["morning", "afternoon", "evening"].map((shift) => (
-                          <Button
-                            key={shift}
-                            variant={
-                              userInfo.availability[day].includes(shift)
-                                ? "contained"
-                                : "outlined"
-                            }
-                            onClick={() => handleAvailabilityChange(day, shift)}
-                            sx={{ mr: 1, mb: 1 }}
-                          >
-                            {shift}
-                          </Button>
-                        ))}
-                      </Box>
-                    ))}
-                  </Box>
-                )}
+                  ))}
+                </Box>
+              )}
 
                 {/* Employer Flow */}
                 {step === 2 && userInfo.role === "employer" && (
