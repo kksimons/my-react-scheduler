@@ -144,10 +144,10 @@ export default function App() {
 
   const renderTabContent = () => {
     switch (mapCurrentTab()) {
-      case 0: 
-        return <LandingPage />; 
+      case 0:
+        return <LandingPage />;
       case 1:
-        return <HomePage setValue={setCurrentTab} />;
+        return <HomePage />;
       case 2:
         if (role === "server" || role === "employer") {
           return <ServersSchedule />;
@@ -173,6 +173,7 @@ export default function App() {
         return null;
     }
   };
+  
 
   return (
     <div>

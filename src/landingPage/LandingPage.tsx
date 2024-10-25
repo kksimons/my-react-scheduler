@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/system';
-import './landingpage-bg.jpg';
+import backgroundImage from './landingpage-bg.jpg'; 
 import { useUserStore } from "../stores/useUserStore";
 
 // Define theme colors as a constant
@@ -13,14 +13,22 @@ const themeColors = {
   tertiary: '#ffffff',    // White for text and highlights
 };
 
+const BackGroundImage = styled(Box)(
+  {
+    backgroundImage: `url(${backgroundImage})`,
+    backgroundSize: 'cover',  // Ensures the background image covers 100% width
+    backgroundPosition: "center center",
+    backgroundAttachment: "fixed",
+    backgroundRepeat: 'no-repeat',
+    
+  }
+);
 // Custom styles using styled API from MUI
 const LandingPageContainer = styled(Box)({
   display: 'flex',
   height: '100vh',
-  backgroundImage: `url(${require('./landingpage-bg.jpg')})`,
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
   padding: '2rem',
+  
 });
 
 const LeftContainer = styled(Box)({
@@ -83,24 +91,26 @@ const LandingPage: React.FC = () => {
   };
 
   return (
-    <LandingPageContainer>
-      {/* Left Container: Logo and Slogan */}
-      <LeftContainer>
-        <LogoText variant="h1">PowerShift</LogoText>
-        <SloganText variant="h4">Empower your shifts, streamline your work.</SloganText>
-        <StartButton onClick={handleStartNowClick}>
-          Start Now
-        </StartButton>
-      </LeftContainer>
+    <BackGroundImage>
+      <LandingPageContainer>
+        {/* Left Container: Logo and Slogan */}
+        <LeftContainer>
+          <LogoText variant="h1">PowerShift</LogoText>
+          <SloganText variant="h4">Empower your shifts, streamline your work.</SloganText>
+          <StartButton onClick={handleStartNowClick}>
+            Start Now
+          </StartButton>
+        </LeftContainer>
 
-      {/* Right Container: Content Text */}
-      <RightContainer>
-        <ContentText>Manage your team shifts effortlessly and efficiently.</ContentText>
-        <ContentText>Real-time updates to keep everyone informed.</ContentText>
-        <ContentText>Maximize productivity while minimizing stress.</ContentText>
-        <ContentText>Join us now and empower your business.</ContentText>
-      </RightContainer>
-    </LandingPageContainer>
+        {/* Right Container: Content Text */}
+        <RightContainer>
+          <ContentText>Manage your team shifts effortlessly and efficiently.</ContentText>
+          <ContentText>Real-time updates to keep everyone informed.</ContentText>
+          <ContentText>Maximize productivity while minimizing stress.</ContentText>
+          <ContentText>Join us now and empower your business.</ContentText>
+        </RightContainer>
+      </LandingPageContainer>
+    </BackGroundImage>
   );
 };
 

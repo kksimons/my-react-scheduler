@@ -39,11 +39,9 @@ import EmployeeList from "../manager-dashboard/EmployeeManagement";
 import EmployeeManagement from "../manager-dashboard/EmployeeManagement";
 
 // I hate you typescript
-interface HomePageProps {
-  setValue: (value: number) => void;
-}
 
-export default function HomePage({ setValue }: HomePageProps) {
+
+export default function HomePage() {
   const db = getFirestore();
   const [isNewUser, setIsNewUser] = useState(true);
   const [step, setStep] = useState(0);
@@ -283,19 +281,15 @@ export default function HomePage({ setValue }: HomePageProps) {
 
   const handleScheduleUpdate = (userRole: string) => {
     if (userRole === "server") {
-      setValue(1); // Switch to 'Servers Schedule'
-      setCurrentTab(1); // Persist in store
+      setCurrentTab(2); // Adjust tab index as per your tab structure
     } else if (userRole === "busser") {
-      setValue(2); // Switch to 'Bussers Schedule'handleInputChange
-      setCurrentTab(2); // Persist in store
+      setCurrentTab(2);
     } else if (userRole === "cook") {
-      setValue(3); // Switch to 'Cooks Schedule'
-      setCurrentTab(3); // Persist in store
+      setCurrentTab(2);
     } else if (userRole === "employer") {
-      setValue(1); // Employers default to 'Servers Schedule'
-      setCurrentTab(1); // Persist in store
+      setCurrentTab(2);
     }
-  };
+  }
 
   const handleProfilePicUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
