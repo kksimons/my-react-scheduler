@@ -28,7 +28,7 @@ const EmployeeManagement: React.FC = () => {
     try {
       setIsLoading(true);
       setError(null);
-      const employeeCollection = collection(db, "employee-info");
+      const employeeCollection = collection(db, "employee");
       const employeeSnapshot = await getDocs(employeeCollection);
       const employeeList = employeeSnapshot.docs.map((doc) => ({
         id: doc.id,

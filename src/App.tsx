@@ -128,6 +128,7 @@ export default function App() {
         onChange={(_, newValue) => handleTabChange(newValue)}
         aria-label="schedule tabs"
       >
+        <Tab label="Landing Page" sx={{display: 'none'}}/>
         <Tab label="Home" />
         {role === "employer" && [
           <Tab label="Servers Schedule" key="servers-tab" />,
@@ -140,6 +141,7 @@ export default function App() {
       </Tabs>
     );
   };
+
 
   const renderTabContent = () => {
     switch (mapCurrentTab()) {
