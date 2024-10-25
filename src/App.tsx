@@ -114,7 +114,7 @@ export default function App() {
       setIsLoggedIn(false);
       setRole(null);
       setProfilePic(null);
-      setCurrentTab(0); // Reset to Home tab after logout
+      setCurrentTab(1); // Reset to Home tab after logout
     } catch (error) {
       console.error("Error during logout:", error);
     }

@@ -6,7 +6,7 @@ import {
   Step,
   StepLabel,
   TextField,
-  Typography,
+
   Paper,
   Avatar,
   MenuItem,
@@ -18,7 +18,9 @@ import {
   Alert,
   SelectChangeEvent,
   createTheme,
+  CssBaseline,
 } from "@mui/material";
+
 import { auth } from "../userAuth/firebase";
 import {
   signInWithEmailAndPassword,
@@ -38,24 +40,34 @@ import { storage } from "../userAuth/firebase";
 import { useUserStore } from "../stores/useUserStore";
 import EmployeeList from "../manager-dashboard/EmployeeManagement";
 import EmployeeManagement from "../manager-dashboard/EmployeeManagement";
+import { ThemeProvider } from "@emotion/react";
+import { padding, typography } from '@mui/system';
+import Typography from '@mui/material/Typography';
 
 // I hate you typescript
 // Define your custom theme here
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#8a2be2',  // Purple
+      main: '#5C1CFE',  // Purple
       contrastText: '#ffffff',  // White text on primary buttons
     },
     secondary: {
       main: '#9b30ff',  // Lighter purple
     },
     background: {
-      default: '#f4f6f9', // Light background color
+      default: 'linear-gradient(97deg, rgba(233,104,255,1) 0%, rgba(69,91,235,1) 37%, rgba(34,24,167,1) 79%)', 
     },
+
   },
+  typography: {
+    fontSize: 16,
+  },
+
+
+  
   shape: {
-    borderRadius: 16, // Global border-radius for buttons and Paper
+    borderRadius: 8, // Global border-radius for buttons and Paper
   },
 });
 
@@ -368,436 +380,441 @@ export default function HomePage() {
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        height: "100vh",
-        // marginTop: 20,
-        // width: "full",
-      }}
-    >
-      {isLoggedIn ? (
-        <Paper
-          elevation={3}
-          sx={{ padding: 3, width: "full", marginBottom: 4 }}
-        >
-
-          <Typography variant="h6" gutterBottom>
-            <EmployeeManagement />
-          
-          </Typography>
-        </Paper>
-      ) : (
-        <Paper
-          elevation={3}
-          sx={{ padding: 3, width: "500px", marginBottom: 4 }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              mb: 2,
-              gap: 1,
-            }}
+    <ThemeProvider theme={theme}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          height: "100vh",
+          background: "linear-gradient(97deg, rgba(233,104,255,1) 0%, rgba(69,91,235,1) 37%, rgba(34,24,167,1) 79%)",
+  
+          // marginTop: 20,
+          // width: "full",
+        }}
+      >
+        {isLoggedIn ? (
+          <Paper
+            elevation={3}
+            sx={{ padding: 3, width: "full", marginBottom: 4 }}
           >
-            <Button
-              variant={isNewUser ? "contained" : "outlined"}
-              color="primary"
-              onClick={() => setIsNewUser(true)}
-              fullWidth
-            >
-              New here? Sign up
-            </Button>
-            <Button
-              variant={!isNewUser ? "contained" : "outlined"}
-              onClick={() => setIsNewUser(false)}
-              fullWidth
-            >
-              Already a user? Sign in
-            </Button>
-          </Box>
 
-          {isNewUser ? (
-            <Box>
-              {step === 0 && (
-                <Box>
-                  <Typography variant="h6" gutterBottom sx={{ mb: 4, mt: 2 }}>
-                    Create an Account
-                  </Typography>
-                  <TextField
-                    name="email"
-                    label="Email"
-                    onChange={handleInputChange}
-                    fullWidth
-                    sx={{ mb: 2 }}
-                  />
-                  <TextField
-                    name="password"
-                    label="Password"
-                    type="password"
-                    onChange={handleInputChange}
-                    fullWidth
-                    sx={{ mb: 2 }}
-                  />
-                </Box>
-              )}
-              {step === 1 && (
+            <Typography variant="h6" gutterBottom>
+              <EmployeeManagement />
+            
+            </Typography>
+          </Paper>
+        ) : (
+          <Paper
+            elevation={3}
+            sx={{ padding: 4, marginTop: 10 }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                mb: 2,
+                gap: 1,
+              }}
+            >
+              <Button
+                variant={isNewUser ? "contained" : "outlined"}
+                color="primary"
+                onClick={() => setIsNewUser(true)}
+                fullWidth
+              >
+                New here? Sign up
+              </Button>
+              <Button
+                variant={!isNewUser ? "contained" : "outlined"}
+                color="primary"
+                onClick={() => setIsNewUser(false)}
+                fullWidth
+              >
+                Already a user? Sign in
+              </Button>
+            </Box>
+
+            {isNewUser ? (
+              <Box>
+                {step === 0 && (
+                  <Box>
+                    <Typography variant="h6" gutterBottom sx={{ mb: 4, mt: 2 }}>
+                      Create an Account
+                    </Typography>
+                    <TextField
+                      name="email"
+                      label="Email"
+                      onChange={handleInputChange}
+                      fullWidth
+                      sx={{ mb: 4 }}
+                    />
+                    <TextField
+                      name="password"
+                      label="Password"
+                      type="password"
+                      onChange={handleInputChange}
+                      fullWidth
+                      sx={{ mb: 4 }}
+                    />
+                  </Box>
+                )}
+                {step === 1 && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      gap: 3,
+                      mb: 10,
+                      mt: 10,
+                    }}
+                  >
+                    <Paper
+                      elevation={3}
+                      sx={{
+                        padding: 3,
+                        backgroundColor:
+                          userInfo.role === "employee" ? "#C4BDFF" : "white",
+                        cursor: "pointer",
+                        width: "45%",
+                        textAlign: "center",
+                        border:
+                          userInfo.role === "employee"
+                            ? "2px #E7DDFF"
+                            : "1px #E7DDFF",
+                      }}
+                      onClick={() =>
+                        setUserInfo({ ...userInfo, role: "employee" })
+                      }
+                    >
+                      <Avatar
+                        alt="Employee Avatar"
+                        src={previewUrl || "./employee.jpg"}
+                        sx={{ margin: "auto", width: 100, height: 100 }}
+                      />
+                      <Typography>Employee</Typography>
+                    </Paper>
+
+                    <Paper
+                      elevation={3}
+                      sx={{
+                        padding: 2,
+                        backgroundColor:
+                          userInfo.role === "employer" ? "#C4BDFF" : "white",
+                        cursor: "pointer",
+                        width: "45%",
+                        textAlign: "center",
+                        border:
+                          userInfo.role === "employer"
+                            ? "2px #E7DDFF"
+                            : "1px #E7DDFF",
+                      }}
+                      onClick={() =>
+                        setUserInfo({ ...userInfo, role: "employer" })
+                      }
+                    >
+                      <Avatar
+                        alt="Employer Avatar"
+                        src="/employer.jpg"
+                        sx={{ margin: "auto", width: 100, height: 100 }}
+                      />
+                      <Typography>Employer</Typography>
+                    </Paper>
+                  </Box>
+                )}
+                {/* Employee Flow */}
+                {step === 2 && userInfo.role === "employee" && (
+                  <Box>
+                    <Typography variant="h6" gutterBottom sx={{ mt: 4, mb: 4, fontSize:18, }}>
+                      Employee Details
+                    </Typography>
+                    <TextField
+                      name="name"
+                      label="Full Name"
+                      onChange={handleInputChange}
+                      fullWidth
+                      sx={{ mb: 2 }}
+                    />
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                      <InputLabel id="employee-type-label">
+                        Employee Type
+                      </InputLabel>
+                      <Select
+                        labelId="employee-type-label"
+                        name="employeeType"
+                        value={userInfo.employeeType}
+                        onChange={handleSelectChange}
+                        label="Employee Type"
+                      >
+                        <MenuItem value="server">Server</MenuItem>
+                        <MenuItem value="busser">Busser</MenuItem>
+                        <MenuItem value="cook">Cook</MenuItem>
+                      </Select>
+                    </FormControl>
+                    <Typography variant="h6" gutterBottom sx={{ mt: 4, mb: 4, fontSize:18 }}>
+                      Profile Picture
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        mb: 2,
+                      }}
+                    >
+                      <Avatar
+                        alt="Click to Upload"
+                        src={previewUrl || "./placeholder-avatar.jpg"}
+                        sx={{ width: 100, height: 100 }}
+                        onClick={() =>
+                          document.getElementById("profilePicInput")?.click()
+                        }
+                      />
+                      <input
+                        accept="image/*"
+                        id="profilePicInput"
+                        type="file"
+                        style={{ display: "none" }}
+                        onChange={handleProfilePicUpload}
+                      />
+                    </Box>
+
+                    {uploadProgress > 0 && uploadProgress < 100 && (
+                      <LinearProgress
+                        variant="determinate"
+                        value={uploadProgress}
+                        sx={{ mb: 2 }}
+                      />
+                    )}
+
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                      <InputLabel id="work-type-label">Work Type</InputLabel>
+                      <Select
+                        labelId="work-type-label"
+                        name="workType"
+                        value={userInfo.workType}
+                        onChange={handleSelectChange}
+                        label="Work Type"
+                      >
+                        <MenuItem value="full_time">Full-time</MenuItem>
+                        <MenuItem value="part_time">Part-time</MenuItem>
+                      </Select>
+                    </FormControl>
+
+                    <Typography variant="h3" gutterBottom sx={{ mt: 4, mb: 4 }}>
+                      Availability
+                    </Typography>
+                    {["mon", "tue", "wed", "thu", "fri"].map((day) => (
+                      <Box key={day}>
+                        <Typography variant="subtitle1">
+                          {day.toUpperCase()}
+                        </Typography>
+                        {["morning", "afternoon", "evening"].map((shift) => (
+                          <Button
+                            key={shift}
+                            variant={
+                              userInfo.availability[day].includes(shift)
+                                ? "contained"
+                                : "outlined"
+                            }
+                            onClick={() => handleAvailabilityChange(day, shift)}
+                            sx={{ mr: 1, mb: 1 }}
+                          >
+                            {shift}
+                          </Button>
+                        ))}
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+
+                {/* Employer Flow */}
+                {step === 2 && userInfo.role === "employer" && (
+                  <Box>
+                    <Typography variant="h6" gutterBottom sx={{ mt: 4, mb: 4 }}>
+                      Profile Picture
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        mb: 3,
+                      }}
+                    >
+                      <Avatar
+                        alt="Click to Upload"
+                        src={previewUrl || "./placeholder-avatar.jpg"}
+                        sx={{ width: 100, height: 100, border: 2 }}
+                        onClick={() =>
+                          document.getElementById("profilePicInput")?.click()
+                        }
+                      />
+                      <input
+                        accept="image/*"
+                        id="profilePicInput"
+                        type="file"
+                        style={{ display: "none" }}
+                        onChange={handleProfilePicUpload}
+                      />
+                    </Box>
+
+                    {uploadProgress > 0 && uploadProgress < 100 && (
+                      <LinearProgress
+                        variant="determinate"
+                        value={uploadProgress}
+                        sx={{ mb: 2 }}
+                      />
+                    )}
+                    <Typography variant="h6" gutterBottom>
+                      Days of Operation
+                    </Typography>
+                    {["mon", "tue", "wed", "thu", "fri"].map((day) => (
+                      <Button
+                        key={day}
+                        variant={
+                          userInfo.excludedDays.includes(day)
+                            ? "outlined"
+                            : "contained"
+                        }
+                        onClick={() => handleAvailabilityChange(day, "")}
+                        sx={{ mr: 1, mb: 1 }}
+                      >
+                        {day.toUpperCase()}
+                      </Button>
+                    ))}
+
+                    <Typography variant="h6" gutterBottom>
+                      Shifts Per Day
+                    </Typography>
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                      <InputLabel id="shifts-per-day">Shifts per Day</InputLabel>
+                      <Select
+                        labelId="shifts-per-day"
+                        value={shiftsPerDay}
+                        onChange={handleShiftCountChange}
+                        label="Shifts per Day"
+                      >
+                        {[1, 2, 3].map((shift) => (
+                          <MenuItem key={shift} value={shift}>
+                            {shift}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+
+                    {shiftTimings.map((shift, index) => (
+                      <Box key={index} sx={{ display: "flex", gap: 2, mb: 2 }}>
+                        <TextField
+                          label={`Shift ${index + 1} Start Time`}
+                          type="time"
+                          value={shift.start}
+                          onChange={(e) =>
+                            handleShiftTimingChange(
+                              index,
+                              "start",
+                              e.target.value
+                            )
+                          }
+                          fullWidth
+                        />
+                        <TextField
+                          label={`Shift ${index + 1} End Time`}
+                          type="time"
+                          value={shift.end}
+                          onChange={(e) =>
+                            handleShiftTimingChange(index, "end", e.target.value)
+                          }
+                          fullWidth
+                        />
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+
+                {/* Stepper Controls */}
                 <Box
                   sx={{
                     display: "flex",
                     justifyContent: "space-between",
-                    gap: 2,
-                    mb: 10,
-                    mt: 10,
+                    mt: 3,
+                    mb: 7,
                   }}
                 >
-                  <Paper
-                    elevation={3}
-                    sx={{
-                      padding: 2,
-                      backgroundColor:
-                        userInfo.role === "employee" ? "lightblue" : "white",
-                      cursor: "pointer",
-                      width: "45%",
-                      textAlign: "center",
-                      border:
-                        userInfo.role === "employee"
-                          ? "2px solid blue"
-                          : "1px solid gray",
-                    }}
-                    onClick={() =>
-                      setUserInfo({ ...userInfo, role: "employee" })
+                  <Button disabled={step === 0} onClick={handleBack}>
+                    Back
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={
+                      step === steps.length - 1
+                        ? handleSignUpOrSignIn
+                        : handleNext
                     }
                   >
-                    <Avatar
-                      alt="Employee Avatar"
-                      src={previewUrl || "./employee.jpg"}
-                      sx={{ margin: "auto", width: 100, height: 100 }}
-                    />
-                    <Typography>Employee</Typography>
-                  </Paper>
-
-                  <Paper
-                    elevation={3}
-                    sx={{
-                      padding: 2,
-                      backgroundColor:
-                        userInfo.role === "employer" ? "lightblue" : "white",
-                      cursor: "pointer",
-                      width: "45%",
-                      textAlign: "center",
-                      border:
-                        userInfo.role === "employer"
-                          ? "2px solid blue"
-                          : "1px solid gray",
-                    }}
-                    onClick={() =>
-                      setUserInfo({ ...userInfo, role: "employer" })
-                    }
-                  >
-                    <Avatar
-                      alt="Employer Avatar"
-                      src="/employer.jpg"
-                      sx={{ margin: "auto", width: 100, height: 100 }}
-                    />
-                    <Typography>Employer</Typography>
-                  </Paper>
+                    {step === steps.length - 1 ? "Finish" : "Next"}
+                  </Button>
                 </Box>
-              )}
-              {/* Employee Flow */}
-              {step === 2 && userInfo.role === "employee" && (
-                <Box>
-                  <Typography variant="h6" gutterBottom sx={{ mt: 4, mb: 4 }}>
-                    Employee Details
-                  </Typography>
-                  <TextField
-                    name="name"
-                    label="Full Name"
-                    onChange={handleInputChange}
-                    fullWidth
-                    sx={{ mb: 2 }}
-                  />
-                  <FormControl fullWidth sx={{ mb: 2 }}>
-                    <InputLabel id="employee-type-label">
-                      Employee Type
-                    </InputLabel>
-                    <Select
-                      labelId="employee-type-label"
-                      name="employeeType"
-                      value={userInfo.employeeType}
-                      onChange={handleSelectChange}
-                      label="Employee Type"
-                    >
-                      <MenuItem value="server">Server</MenuItem>
-                      <MenuItem value="busser">Busser</MenuItem>
-                      <MenuItem value="cook">Cook</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <Typography variant="h6" gutterBottom sx={{ mt: 4, mb: 4 }}>
-                    Profile Picture
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      cursor: "pointer",
-                      mb: 2,
-                    }}
-                  >
-                    <Avatar
-                      alt="Click to Upload"
-                      src={previewUrl || "./placeholder-avatar.jpg"}
-                      sx={{ width: 100, height: 100 }}
-                      onClick={() =>
-                        document.getElementById("profilePicInput")?.click()
-                      }
-                    />
-                    <input
-                      accept="image/*"
-                      id="profilePicInput"
-                      type="file"
-                      style={{ display: "none" }}
-                      onChange={handleProfilePicUpload}
-                    />
-                  </Box>
 
-                  {uploadProgress > 0 && uploadProgress < 100 && (
-                    <LinearProgress
-                      variant="determinate"
-                      value={uploadProgress}
-                      sx={{ mb: 2 }}
-                    />
-                  )}
-
-                  <FormControl fullWidth sx={{ mb: 2 }}>
-                    <InputLabel id="work-type-label">Work Type</InputLabel>
-                    <Select
-                      labelId="work-type-label"
-                      name="workType"
-                      value={userInfo.workType}
-                      onChange={handleSelectChange}
-                      label="Work Type"
-                    >
-                      <MenuItem value="full_time">Full-time</MenuItem>
-                      <MenuItem value="part_time">Part-time</MenuItem>
-                    </Select>
-                  </FormControl>
-
-                  <Typography variant="h6" gutterBottom sx={{ mt: 4, mb: 4 }}>
-                    Availability
-                  </Typography>
-                  {["mon", "tue", "wed", "thu", "fri"].map((day) => (
-                    <Box key={day}>
-                      <Typography variant="subtitle1">
-                        {day.toUpperCase()}
-                      </Typography>
-                      {["morning", "afternoon", "evening"].map((shift) => (
-                        <Button
-                          key={shift}
-                          variant={
-                            userInfo.availability[day].includes(shift)
-                              ? "contained"
-                              : "outlined"
-                          }
-                          onClick={() => handleAvailabilityChange(day, shift)}
-                          sx={{ mr: 1, mb: 1 }}
-                        >
-                          {shift}
-                        </Button>
-                      ))}
-                    </Box>
+                {/* Stepper Below */}
+                <Stepper activeStep={step} sx={{ width: "100%", marginTop: 3 }}>
+                  {steps.map((label) => (
+                    <Step key={label}>
+                      <StepLabel>{label}</StepLabel>
+                    </Step>
                   ))}
-                </Box>
-              )}
-
-              {/* Employer Flow */}
-              {step === 2 && userInfo.role === "employer" && (
-                <Box>
-                  <Typography variant="h6" gutterBottom sx={{ mt: 4, mb: 4 }}>
-                    Profile Picture
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      cursor: "pointer",
-                      mb: 2,
-                    }}
-                  >
-                    <Avatar
-                      alt="Click to Upload"
-                      src={previewUrl || "./placeholder-avatar.jpg"}
-                      sx={{ width: 100, height: 100 }}
-                      onClick={() =>
-                        document.getElementById("profilePicInput")?.click()
-                      }
-                    />
-                    <input
-                      accept="image/*"
-                      id="profilePicInput"
-                      type="file"
-                      style={{ display: "none" }}
-                      onChange={handleProfilePicUpload}
-                    />
-                  </Box>
-
-                  {uploadProgress > 0 && uploadProgress < 100 && (
-                    <LinearProgress
-                      variant="determinate"
-                      value={uploadProgress}
-                      sx={{ mb: 2 }}
-                    />
-                  )}
-                  <Typography variant="h6" gutterBottom>
-                    Days of Operation
-                  </Typography>
-                  {["mon", "tue", "wed", "thu", "fri"].map((day) => (
-                    <Button
-                      key={day}
-                      variant={
-                        userInfo.excludedDays.includes(day)
-                          ? "outlined"
-                          : "contained"
-                      }
-                      onClick={() => handleAvailabilityChange(day, "")}
-                      sx={{ mr: 1, mb: 1 }}
-                    >
-                      {day.toUpperCase()}
-                    </Button>
-                  ))}
-
-                  <Typography variant="h6" gutterBottom>
-                    Shifts Per Day
-                  </Typography>
-                  <FormControl fullWidth sx={{ mb: 2 }}>
-                    <InputLabel id="shifts-per-day">Shifts per Day</InputLabel>
-                    <Select
-                      labelId="shifts-per-day"
-                      value={shiftsPerDay}
-                      onChange={handleShiftCountChange}
-                      label="Shifts per Day"
-                    >
-                      {[1, 2, 3].map((shift) => (
-                        <MenuItem key={shift} value={shift}>
-                          {shift}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-
-                  {shiftTimings.map((shift, index) => (
-                    <Box key={index} sx={{ display: "flex", gap: 2, mb: 2 }}>
-                      <TextField
-                        label={`Shift ${index + 1} Start Time`}
-                        type="time"
-                        value={shift.start}
-                        onChange={(e) =>
-                          handleShiftTimingChange(
-                            index,
-                            "start",
-                            e.target.value
-                          )
-                        }
-                        fullWidth
-                      />
-                      <TextField
-                        label={`Shift ${index + 1} End Time`}
-                        type="time"
-                        value={shift.end}
-                        onChange={(e) =>
-                          handleShiftTimingChange(index, "end", e.target.value)
-                        }
-                        fullWidth
-                      />
-                    </Box>
-                  ))}
-                </Box>
-              )}
-
-              {/* Stepper Controls */}
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  mt: 3,
-                  mb: 7,
-                }}
-              >
-                <Button disabled={step === 0} onClick={handleBack}>
-                  Back
-                </Button>
+                </Stepper>
+              </Box>
+            ) : (
+              <Box sx={{ padding:"2rem"}}>
+                {/* Login Form */}
+                <Typography variant="h6" gutterBottom>
+                  Sign In
+                </Typography>
+                <TextField
+                  name="email"
+                  label="Email"
+                  onChange={handleInputChange}
+                  fullWidth
+                  sx={{ mb: 4 }}
+                />
+                <TextField
+                  name="password"
+                  label="Password"
+                  type="password"
+                  onChange={handleInputChange}
+                  fullWidth
+                  sx={{ mb: 4 }}
+                />
                 <Button
                   variant="contained"
-                  onClick={
-                    step === steps.length - 1
-                      ? handleSignUpOrSignIn
-                      : handleNext
-                  }
+                  onClick={handleSignUpOrSignIn}
+                  fullWidth
                 >
-                  {step === steps.length - 1 ? "Finish" : "Next"}
+                  Sign In
                 </Button>
               </Box>
-
-              {/* Stepper Below */}
-              <Stepper activeStep={step} sx={{ width: "100%", marginTop: 3 }}>
-                {steps.map((label) => (
-                  <Step key={label}>
-                    <StepLabel>{label}</StepLabel>
-                  </Step>
-                ))}
-              </Stepper>
-            </Box>
-          ) : (
-            <Box>
-              {/* Login Form */}
-              <Typography variant="h6" gutterBottom>
-                Sign In
-              </Typography>
-              <TextField
-                name="email"
-                label="Email"
-                onChange={handleInputChange}
-                fullWidth
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                name="password"
-                label="Password"
-                type="password"
-                onChange={handleInputChange}
-                fullWidth
-                sx={{ mb: 2 }}
-              />
-              <Button
-                variant="contained"
-                onClick={handleSignUpOrSignIn}
-                fullWidth
-              >
-                Sign In
-              </Button>
-            </Box>
-          )}
-        </Paper>
-      )}
-
-      {/* Snackbar for success or error messages */}
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-      >
-        {errorMessage ? (
-          <Alert severity="error" onClose={handleCloseSnackbar}>
-            {errorMessage}
-          </Alert>
-        ) : (
-          <Alert severity="success" onClose={handleCloseSnackbar}>
-            {successMessage}
-          </Alert>
+            )}
+          </Paper>
         )}
-      </Snackbar>
-    </Box>
+
+        {/* Snackbar for success or error messages */}
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+        >
+          {errorMessage ? (
+            <Alert severity="error" onClose={handleCloseSnackbar}>
+              {errorMessage}
+            </Alert>
+          ) : (
+            <Alert severity="success" onClose={handleCloseSnackbar}>
+              {successMessage}
+            </Alert>
+          )}
+        </Snackbar>
+      </Box>
+    </ThemeProvider>
   );
 }
