@@ -1,23 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Box,
-  Button,
-  Stepper,
-  Step,
-  StepLabel,
-  TextField,
-  Typography,
-  Paper,
-  Avatar,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
-  LinearProgress,
-  Snackbar,
-  Alert,
-  SelectChangeEvent,
-} from "@mui/material";
+
 import { auth } from "../userAuth/firebase";
 import {
   signInWithEmailAndPassword,

@@ -1,5 +1,9 @@
 import { useEffect } from "react";
-import { Box, Tab, Tabs, Avatar, Button } from "@mui/material";
+import Box from '@mui/material/Box';
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
 import ServersSchedule from "./schedules/ServersSchedule";
 import BussersSchedule from "./schedules/BussersSchedule";
 import CooksSchedule from "./schedules/CooksSchedule";
@@ -8,6 +12,7 @@ import { auth } from "./userAuth/firebase";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { useUserStore } from "./stores/useUserStore";
+import LandingPage from "./landingPage/LandingPage";
 
 export default function App() {
   const db = getFirestore();
@@ -24,9 +29,10 @@ export default function App() {
 
   // Remap currentTab to ensure it's always valid for the role (certain roles hides tabs and it causes issues)
   const mapCurrentTab = () => {
-    if (role === "server" && currentTab > 1) return 1;
-    if (role === "busser" && currentTab > 1) return 1;
-    if (role === "cook" && currentTab > 1) return 1;
+    if (!isLoggedIn) return currentTab;
+    if (role === "server" && currentTab > 2) return 2; // Adjusted because LandingPage is now tab 0
+    if (role === "busser" && currentTab > 2) return 2;
+    if (role === "cook" && currentTab > 2) return 2;
     return currentTab;
   };
 
@@ -53,13 +59,13 @@ export default function App() {
 
           // Automatically set currentTab based on role
           if (userDoc.role === "server") {
-            setCurrentTab(1); // Set to Servers schedule
+            setCurrentTab(2); // Set to Servers schedule
           } else if (userDoc.role === "busser") {
-            setCurrentTab(1); // Set to Bussers schedule (remapped)
+            setCurrentTab(2); // Set to Bussers schedule (remapped)
           } else if (userDoc.role === "cook") {
-            setCurrentTab(1); // Set to Cooks schedule (remapped)
+            setCurrentTab(2); // Set to Cooks schedule (remapped)
           } else if (userDoc.role === "employer") {
-            setCurrentTab(1); // Employers default to Servers schedule
+            setCurrentTab(2); // Employers default to Servers schedule
           }
         }
         setIsLoggedIn(true);
@@ -122,6 +128,7 @@ export default function App() {
         onChange={(_, newValue) => handleTabChange(newValue)}
         aria-label="schedule tabs"
       >
+        <Tab label="Landing Page" />
         <Tab label="Home" />
         {role === "employer" && [
           <Tab label="Servers Schedule" key="servers-tab" />,
@@ -137,9 +144,11 @@ export default function App() {
 
   const renderTabContent = () => {
     switch (mapCurrentTab()) {
-      case 0:
-        return <HomePage setValue={setCurrentTab} />;
+      case 0: 
+        return <LandingPage />; 
       case 1:
+        return <HomePage setValue={setCurrentTab} />;
+      case 2:
         if (role === "server" || role === "employer") {
           return <ServersSchedule />;
         }
@@ -150,12 +159,12 @@ export default function App() {
           return <CooksSchedule />;
         }
         break;
-      case 2:
+      case 3:
         if (role === "employer") {
           return <BussersSchedule />;
         }
         break;
-      case 3:
+      case 4:
         if (role === "employer") {
           return <CooksSchedule />;
         }
