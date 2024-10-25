@@ -128,7 +128,6 @@ export default function App() {
         onChange={(_, newValue) => handleTabChange(newValue)}
         aria-label="schedule tabs"
       >
-        <Tab label="Landing Page" />
         <Tab label="Home" />
         {role === "employer" && [
           <Tab label="Servers Schedule" key="servers-tab" />,
