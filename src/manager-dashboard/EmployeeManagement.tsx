@@ -13,6 +13,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddEmployee from "./AddEmployee";
+import { EmployeeScheduler } from "./EmployeeScheduler";
 // import EmployeeScheduler from "./EmployeeScheduler";
 
 const EmployeeManagement: React.FC = () => {
@@ -28,7 +29,7 @@ const EmployeeManagement: React.FC = () => {
     try {
       setIsLoading(true);
       setError(null);
-      const employeeCollection = collection(db, "employee-info");
+      const employeeCollection = collection(db, "employees");
       const employeeSnapshot = await getDocs(employeeCollection);
       const employeeList = employeeSnapshot.docs.map((doc) => ({
         id: doc.id,
@@ -58,7 +59,7 @@ const EmployeeManagement: React.FC = () => {
   // Handle Delete Employee
   const handleDelete = async (id: string) => {
     try {
-      await deleteDoc(doc(db, "employee-info", id));
+      await deleteDoc(doc(db, "employees", id));
       setEmployees(employees.filter((emp) => emp.id !== id));
     } catch (error) {
       console.error("Error deleting employee:", error);
@@ -90,12 +91,12 @@ const EmployeeManagement: React.FC = () => {
   };
 
   // Convert employees data to Scheduler format
-  const schedulerData = employees.map((emp) => ({
-    id: emp.id,
-    title: `${emp.employee_fname} ${emp.employee_lname}`,
-    startDate: new Date(),
-    endDate: new Date(),
-  }));
+  // const schedulerData = employees.map((emp) => ({
+  //   id: emp.id,
+  //   title: `${emp.employee_fname} ${emp.employee_lname}`,
+  //   startDate: new Date(),
+  //   endDate: new Date(),
+  // }));
 
   return (
     <div
@@ -110,9 +111,9 @@ const EmployeeManagement: React.FC = () => {
           onEmployeeUpdated={handleEmployeeUpdated}
         />
       ) 
-      // : showScheduler ? (
-      //   <EmployeeScheduler employees={employees} />
-      // ) 
+      : showScheduler ? (
+        <EmployeeScheduler employees={employees} />
+      ) 
       : (
         <AllEmployeeList
           employees={employees}

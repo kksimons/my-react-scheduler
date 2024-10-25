@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { db } from "../userAuth/firebase";
 import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
 import Select from "react-select";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 
 // Define the props interface for the component
@@ -40,7 +39,7 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({
   });
 
   // Firestore Collection Reference
-  const employeesCollectionRef = collection(db, "employee-info");
+  const employeesCollectionRef = collection(db, "employees");
 
   // Handle form input changes
   const handleChanges = (
@@ -87,7 +86,7 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({
 
     try {
       if (initialData) {
-        await updateDoc(doc(db, "employee-info", initialData.id), employeeData);
+        await updateDoc(doc(db, "employees", initialData.id), employeeData);
         const updateEmployee = { id: initialData.id, ...employeeData };
         onEmployeeUpdated(updateEmployee);
 
