@@ -13,6 +13,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddEmployee from "./AddEmployee";
+import EmployeeScheduler from "./EmployeeScheduler";
 // import EmployeeScheduler from "./EmployeeScheduler";
 
 const EmployeeManagement: React.FC = () => {
@@ -28,7 +29,7 @@ const EmployeeManagement: React.FC = () => {
     try {
       setIsLoading(true);
       setError(null);
-      const employeeCollection = collection(db, "employee");
+      const employeeCollection = collection(db, "employees");
       const employeeSnapshot = await getDocs(employeeCollection);
       const employeeList = employeeSnapshot.docs.map((doc) => ({
         id: doc.id,
@@ -110,9 +111,9 @@ const EmployeeManagement: React.FC = () => {
           onEmployeeUpdated={handleEmployeeUpdated}
         />
       ) 
-      // : showScheduler ? (
-      //   <EmployeeScheduler employees={employees} />
-      // ) 
+      : showScheduler ? (
+        <EmployeeScheduler employees={employees} />
+      ) 
       : (
         <AllEmployeeList
           employees={employees}

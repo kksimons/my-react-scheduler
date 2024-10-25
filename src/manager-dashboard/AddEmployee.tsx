@@ -39,7 +39,7 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({
     availableShift: initialData?.employee_availability || "",
   });
 
-  const employeesCollectionRef = collection(db, "employee-info"); 
+  const employeesCollectionRef = collection(db, "employees"); 
 
   const handleChanges = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
