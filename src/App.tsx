@@ -214,7 +214,7 @@ export default function App() {
       </Box>
 
       {/* Main content with routes */}
-      <Box sx={{ padding: 3 }}>
+      <Box>
         <Routes>
           {/* Tab-based routes */}
           <Route path="/" element={<LandingPage />} />
