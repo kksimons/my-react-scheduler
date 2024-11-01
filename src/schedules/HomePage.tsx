@@ -396,16 +396,7 @@ export default function HomePage() {
         }}
       >
         {isLoggedIn ? (
-          <Paper
-            elevation={3}
-            sx={{ padding: 3, width: "full", marginBottom: 4 }}
-          >
-
-            <Typography variant="h6" gutterBottom>
-              <EmployeeManagement />
-            
-            </Typography>
-          </Paper>
+          <><EmployeeManagement /> </>
         ) : (
           <Paper
             elevation={3}

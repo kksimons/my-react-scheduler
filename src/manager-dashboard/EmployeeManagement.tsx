@@ -8,13 +8,30 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import AllEmployeeList from "./AllEmployeeList";
-import { Box, Button, Fab } from "@mui/material";
+import { Box, Button, Fab, styled, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddEmployee from "./AddEmployee";
 import EmployeeScheduler from "./EmployeeScheduler";
 // import EmployeeScheduler from "./EmployeeScheduler";
+
+const themeColors = {
+  primary: '#8a2be2',     // Purple color for buttons and accents
+  secondary: '#9b30ff',   // Lighter purple for hover effects
+  tertiary: '#ffffff',    // White for text and highlights
+};
+
+const ContentText = styled(Typography)({
+  color: themeColors.tertiary,
+  fontWeight: 400,
+  fontSize: '23px',
+  marginBottom: '3rem',
+  backgroundColor: 'rgba(85, 66, 253, 0.5)',
+  borderRadius: '1rem',
+  padding: '3rem 2rem',
+  boxSizing: 'border-box',
+});
 
 const EmployeeManagement: React.FC = () => {
   const [employees, setEmployees] = useState<any[]>([]);
@@ -90,38 +107,34 @@ const EmployeeManagement: React.FC = () => {
     setShowAddEmployee(false);
   };
 
-  // Convert employees data to Scheduler format
-  // const schedulerData = employees.map((emp) => ({
-  //   id: emp.id,
-  //   title: `${emp.employee_fname} ${emp.employee_lname}`,
-  //   startDate: new Date(),
-  //   endDate: new Date(),
-  // }));
 
   return (
-    <div
-      className="employee-management-container"
-      style={{ padding: "10px", position: "relative", minHeight: "100vh" }}
-    >
-      <h1>Employee Management</h1>
-      {showAddEmployee ? (
-        <AddEmployee
-          onEmployeeAdded={handleAddEmployee}
-          initialData={editEmployee}
-          onEmployeeUpdated={handleEmployeeUpdated}
-        />
-      ) 
-      : showScheduler ? (
-        <EmployeeScheduler employees={employees} />
-      ) 
-      : (
-        <AllEmployeeList
-          employees={employees}
-          onDelete={handleDelete}
-          onUpdate={handleUpdateEmployee}
-        />
-      )}
-      {!showAddEmployee && !showScheduler ? (
+    <Box
+    sx={{
+      height: '100%',
+      maxWidth: '1200px',
+      width: '100%',
+      padding: '2rem',
+    }}
+  >
+    {showAddEmployee ? (
+      <AddEmployee
+        onEmployeeAdded={handleAddEmployee}
+        initialData={editEmployee}
+        onEmployeeUpdated={handleEmployeeUpdated}
+      />
+    ) 
+    : showScheduler ? (
+      <EmployeeScheduler employees={employees} />
+    ) 
+    : (
+      <AllEmployeeList
+        employees={employees}
+        onDelete={handleDelete}
+        onUpdate={handleUpdateEmployee}
+      />
+    )}
+    {!showAddEmployee && !showScheduler ? (
       <>
         <Fab
           color="primary"
@@ -169,7 +182,7 @@ const EmployeeManagement: React.FC = () => {
         <ArrowBackIcon />
       </Fab>
     )}
-    </div>
+  </Box>
   );
 };
 

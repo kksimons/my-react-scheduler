@@ -1,8 +1,26 @@
-import { CssBaseline, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, ThemeProvider, Typography } from "@mui/material";
+import { Box, CssBaseline, IconButton, Paper, styled, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, ThemeProvider, Typography } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import React from "react"
 import CustomTheme from "../customtheme";
+
+const themeColors = {
+    primary: '#8a2be2',     // Purple color for buttons and accents
+    secondary: '#9b30ff',   // Lighter purple for hover effects
+    tertiary: '#ffffff',    // White for text and highlights
+  };
+
+const ContentText = styled(Typography)({
+    color: themeColors.tertiary,
+    fontWeight: 400,
+    fontSize: '23px',
+    marginBottom: '3rem',
+    backgroundColor: 'rgba(85, 66, 253, 0.5)',
+    borderRadius: '1rem',
+    padding: '3rem 2rem',
+    boxSizing: 'border-box',
+  });
+
 interface EmployeeListProps {
     employees: any[];
     onDelete: (id: string) => void;
@@ -15,14 +33,22 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees, onDelete, onUpda
       return <div>No employees found.</div>;
     }
     return (
-        <ThemeProvider theme={CustomTheme}>
-            <CssBaseline /> {/* To apply global background */}
+        <Box
+        sx={{
+        //   background: 'linear-gradient(97deg, rgba(233,104,255,1) 0%, rgba(69,91,235,1) 37%, rgba(34,24,167,1) 79%)',
+          justifyContent: 'center',
+          width: 'full',
+          alignItems: 'center',
+        //   height: '100vh',
+        }}
+      >
+            {/* <CssBaseline /> To apply global background */}
             <div className="employee-list-container">
-            <Typography variant="h6" color="primary.dark" gutterBottom>All Employees</Typography>
-            <TableContainer component={Paper} >
+            <Typography>All Employees</Typography>
+            <ContentText >
                 <Table>
                     <TableHead>
-                        <TableRow sx={{ backgroundColor: CustomTheme.palette.secondary.light }}>
+                        <TableRow sx={{ backgroundColor: '#9b30ff', border: 'rounded'}}>
                             <TableCell>First Name</TableCell>
                             <TableCell>Last Name</TableCell>
                             <TableCell>Date of Birth</TableCell>
@@ -30,6 +56,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees, onDelete, onUpda
                             <TableCell>Position</TableCell>
                             <TableCell>Employee Type</TableCell>
                             <TableCell>Available Shifts</TableCell>
+                            <TableCell></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -54,11 +81,11 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees, onDelete, onUpda
                         ) )}
                     </TableBody>
                 </Table>
-            </TableContainer>
+            </ContentText>
 
             {/* <EmployeeScheduler employees={employees} /> */}
             </div>
-        </ThemeProvider>
+        </Box>
       );
     }
 

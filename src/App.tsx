@@ -184,8 +184,8 @@ export default function App() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-
-          borderColor: "divider",
+          background: 'linear-gradient(97deg, rgba(233,104,255,1) 0%, rgba(69,91,235,1) 37%, rgba(34,24,167,1) 79%)'
+          // borderColor: "divider",
         }}
       >
 

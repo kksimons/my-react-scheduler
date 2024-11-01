@@ -1,7 +1,6 @@
 import { EmployeeScheduler } from "./EmployeeScheduler";
 
 
-
 const DiningEmployeeList: React.FC<{ employees: any[] }> = ({ employees }) => {
     const diningEmployees = employees.filter(
       (employee) => employee.employee_system === "Dining Side"
