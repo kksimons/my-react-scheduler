@@ -1,11 +1,12 @@
-// src/components/SchedulerViewData.ts
+// // src/components/SchedulerViewData.ts
 
-export interface SchedulerRowLabel {
-  icon: string; // Always a string
-  title: string;
-  subtitle: string;
-}
+// export interface SchedulerRowLabel {
+//   icon: string; // Always a string
+//   title: string;
+//   subtitle: string;
+// }
 
+<<<<<<< Updated upstream
 export interface SchedulerProjectData {
   id: string;
   title: string;
@@ -16,11 +17,23 @@ export interface SchedulerProjectData {
   occupancy: number;
   bgColor?: string; //optional 
 }
+=======
+// export interface SchedulerProjectData {
+//   id: string;
+//   title: string;
+//   subtitle?: string;
+//   description?: string;
+//   startDate: Date; 
+//   endDate: Date;   
+//   occupancy: number;
+//   bgColor?: string;
+// }
+>>>>>>> Stashed changes
 
-export interface SchedulerRow {
-  id: string;
-  label: SchedulerRowLabel;
-  data: SchedulerProjectData[]; // Ensure this matches the expected type
-}
+// export interface SchedulerRow {
+//   id: string;
+//   label: SchedulerRowLabel;
+//   data: SchedulerProjectData[]; 
+// }
 
-export type SchedulerDataType = SchedulerRow[];
+// export type SchedulerDataType = SchedulerRow[];

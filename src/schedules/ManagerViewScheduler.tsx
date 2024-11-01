@@ -4,9 +4,14 @@
 import React, { useState, useEffect } from 'react';
 import { Scheduler } from '@bitnoi.se/react-scheduler';
 import { collection, getDocs } from 'firebase/firestore';
+<<<<<<< Updated upstream
 import { db } from '../userAuth/firebase'; // Adjust the path to your Firebase config
+=======
+import { db } from '../userAuth/firebase'; 
+import '@bitnoi.se/react-scheduler/dist/style.css'; 
 
-// Define types matching those expected by the Scheduler component
+>>>>>>> Stashed changes
+
 type SchedulerProjectData = {
   id: string;
   startDate: Date;
