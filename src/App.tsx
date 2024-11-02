@@ -13,6 +13,8 @@ import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { useUserStore } from "./stores/useUserStore";
 import LandingPage from "./landingPage/LandingPage";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import ClassesPage from "./classesPage/ClassesPage";
 
 export default function App() {
   const db = getFirestore();
@@ -174,10 +176,10 @@ export default function App() {
         return null;
     }
   };
-  
+
 
   return (
-    <>
+    <Router>
       {/* Header - Only show tabs if the user is logged in */}
       <Box
         sx={{
@@ -211,8 +213,23 @@ export default function App() {
         )}
       </Box>
 
-      {/* Tabs Content */}
-      <Box>{renderTabContent()}</Box>
-    </>
+      {/* Main content with routes */}
+      <Box>
+        <Routes>
+          {/* Tab-based routes */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/servers" element={<ServersSchedule />} />
+          <Route path="/bussers" element={<BussersSchedule />} />
+          <Route path="/cooks" element={<CooksSchedule />} />
+
+          {/* Standalone page accessible via URL */}
+          <Route path="/classes" element={<ClassesPage />} />
+
+          {/* Tabs Content */}
+          <Route path="*" element={<Box>{renderTabContent()}</Box>} />
+            </Routes>
+          </Box>
+    </Router>
   );
 }
