@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, List, ListItem, ListItemText, Paper, Typography } from "@mui/material";
 import { Scheduler, SchedulerData } from "@bitnoi.se/react-scheduler";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+// import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 export const EmployeeScheduler: React.FC<{ employees: any[] }> = ({ employees }) => {
   const [schedulerData, setSchedulerData] = useState<SchedulerData[]>([]);
