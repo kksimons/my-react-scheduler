@@ -2,10 +2,6 @@ import React, { useEffect, useState } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
 import Button from "@mui/material/Button";
-
-// cribbed from: https://codepen.io/matteobruni/pen/ZEWbYzj
-
-
 import {
   FormControl,
   Select,
@@ -22,9 +18,9 @@ import {
   ToggleButtonGroup,
   IconButton,
 } from "@mui/material";
-import { IoMdAddCircleOutline } from "react-icons/io";
-import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
-import courseDefaults from "./courseDefaults.json"; // Import default data
+import { AiOutlinePlus } from "react-icons/ai";
+import courseDefaults from "./courseDefaults.json";
+import { Scheduler } from "@aldabil/react-scheduler";
 
 type DayInfo = {
   day: string;
@@ -44,10 +40,49 @@ type Course = {
   sections: Section[];
 };
 
+type ApiResponse = {
+  schedules: {
+    course: string;
+    day1: DayInfo;
+    day2: DayInfo;
+    professor: string;
+  }[];
+};
+
+interface Event {
+  event_id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  color: string;
+}
+
+// hardcoding these for now
+const colorMapping: { [key: string]: string } = {
+  "Software Testing and Deployment": "#3498db",
+  "Operating Systems": "#e74c3c",
+  "Emerging Trends in Software Development": "#2ecc71",
+  "Software Security": "#f1c40f",
+  "Capstone Project": "#9b59b6",
+};
+
 const ClassesPage: React.FC = () => {
   const [init, setInit] = useState(false);
   const [scheduleData, setScheduleData] = useState<Course[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [excludeWeekend, setExcludeWeekend] = useState<boolean>(true); // Default to exclude weekends
 
+  const dayOfWeekMap: { [key: string]: number } = {
+    M: 1,
+    Tu: 2,
+    W: 3,
+    Th: 4,
+    F: 5,
+    S: 6,
+    Su: 0,
+  };
+
+  //hardcoding these for now
   const courseOptions = [
     "CPRG 305 Software Testing and Deployment",
     "CPSY 300 Operating Systems",
@@ -71,7 +106,7 @@ const ClassesPage: React.FC = () => {
     }).then(() => {
       setInit(true);
     });
-    setScheduleData(courseDefaults); // Load default schedule data from JSON
+    setScheduleData(courseDefaults); // we're loading hardcoded data for now
   }, []);
 
   const handleToggle = (
@@ -119,17 +154,88 @@ const ClassesPage: React.FC = () => {
     alert("Data saved locally as JSON.");
   };
 
-  const handleSubmit = () => {
-    console.log("Schedule Data:", scheduleData);
-  };
-
-  if (!init) {
-    return (
-      <div style={{ color: "#fff", textAlign: "center", marginTop: "50px" }}>
-        Loading particles...
-      </div>
+  const handleSubmit = async () => {
+    console.log(
+      "Submitting data to API:",
+      JSON.stringify({ courses: scheduleData, exclude_weekend: excludeWeekend }, null, 2)
     );
-  }
+
+    try {
+      const response = await fetch(
+        "http://localhost:80/api/v1/class-scheduler",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ courses: scheduleData, exclude_weekend: excludeWeekend }),
+        }
+      );
+
+      if (response.ok) {
+        const result: ApiResponse = await response.json();
+        console.log(
+          "Received response from API:",
+          JSON.stringify(result, null, 2)
+        );
+        alert("Schedule submitted successfully!");
+
+        // Parse response to event format
+        const parsedEvents = result.schedules
+          .flatMap((scheduleEntry, index) => {
+            return ["day1", "day2"].map((dayKey) => {
+              const { day, start, end, format } =
+                scheduleEntry[dayKey as "day1" | "day2"];
+              const dayOfWeek = dayOfWeekMap[day];
+
+              if (dayOfWeek === undefined) {
+                console.warn(
+                  `Invalid day value: ${day} in entry key: ${scheduleEntry.course}`
+                );
+                return null; // Skip invalid day entries
+              }
+
+              // Set a fixed reference date (e.g., 2024-11-04, which is a Monday)
+              const referenceDate = new Date("2024-11-04T00:00:00");
+              const startDate = new Date(referenceDate);
+              startDate.setDate(referenceDate.getDate() + dayOfWeek - 1);
+              const [startHour, startMinute] = start.split(":").map(Number);
+              startDate.setHours(startHour, startMinute);
+
+              const endDate = new Date(startDate);
+              const [endHour, endMinute] = end.split(":").map(Number);
+              endDate.setHours(endHour, endMinute);
+
+              // let's get rid of the course code and put whether it's online or not in the title
+              const courseName = scheduleEntry.course.replace(/^[A-Z]+\s+\d+\s+/,'');
+              const isOnline = format === "online" ? " (Online)" : " (In-Person)";
+
+              console.log(
+                `Parsed Event - Course: ${courseName}, Day: ${day}, Start: ${startDate}, End: ${endDate}`
+              );
+
+              return {
+                event_id: `${index}-${dayKey}`,
+                title: `${courseName}${isOnline} - ${scheduleEntry.professor}`,
+                start: startDate,
+                end: endDate,
+                color: colorMapping[courseName] || "#000000", // default to black I guess?
+              } as Event;
+            });
+          })
+          .filter((event): event is Event => event !== null);
+
+        setEvents(parsedEvents);
+      } else {
+        const errorText = await response.text();
+        console.error("Server error:", errorText);
+        alert(`Failed to submit schedule: ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      alert("An error occurred while submitting the schedule.");
+    }
+  };
 
   const handleAddSection = (courseIndex: number) => {
     setScheduleData((prev) => {
@@ -142,6 +248,14 @@ const ClassesPage: React.FC = () => {
       return newSchedule;
     });
   };
+
+  if (!init) {
+    return (
+      <div style={{ color: "#fff", textAlign: "center", marginTop: "50px" }}>
+        Loading particles...
+      </div>
+    );
+  }
 
   return (
     <div
@@ -158,7 +272,7 @@ const ClassesPage: React.FC = () => {
           background: { color: { value: "#000000" } },
           fpsLimit: 60,
           particles: {
-            number: { value: 160, density: { enable: true, area: 800 } },
+            number: { value: 160, density: { enable: true } },
             color: { value: "#ff0000" },
             links: {
               enable: true,
@@ -198,6 +312,7 @@ const ClassesPage: React.FC = () => {
           borderRadius: "8px",
         }}
       >
+        {/* Form Inputs */}
         <Table>
           <TableHead>
             <TableRow>
@@ -220,8 +335,7 @@ const ClassesPage: React.FC = () => {
                         onChange={(e) =>
                           setScheduleData((prev) => {
                             const updated = [...prev];
-                            updated[courseIndex].course = e.target
-                              .value as string;
+                            updated[courseIndex].course = e.target.value as string;
                             return updated;
                           })
                         }
@@ -303,9 +417,7 @@ const ClassesPage: React.FC = () => {
                             )
                           }
                         >
-                          <ToggleButton value="in-person">
-                            In-Person
-                          </ToggleButton>
+                          <ToggleButton value="in-person">In-Person</ToggleButton>
                           <ToggleButton value="online">Online</ToggleButton>
                         </ToggleButtonGroup>
                       </TableCell>
@@ -328,7 +440,6 @@ const ClassesPage: React.FC = () => {
                     </TableRow>
                   ))
                 )}
-                {/* Add Section Button */}
                 <TableRow>
                   <TableCell colSpan={5} style={{ textAlign: "center" }}>
                     <IconButton onClick={() => handleAddSection(courseIndex)}>
@@ -361,6 +472,37 @@ const ClassesPage: React.FC = () => {
           >
             Submit
           </Button>
+        </div>
+
+        {/* Weekend Toggle */}
+        <div style={{ textAlign: "center", marginTop: "20px" }}>
+          <ToggleButtonGroup
+            value={excludeWeekend}
+            exclusive
+            onChange={(_, value) => {
+              if (value !== null) {
+                setExcludeWeekend(value);
+              }
+            }}
+          >
+            <ToggleButton value={true}>Exclude Weekends</ToggleButton>
+            <ToggleButton value={false}>Include Weekends</ToggleButton>
+          </ToggleButtonGroup>
+        </div>
+
+        <div style={{ marginTop: "20px" }}>
+          <Scheduler
+            events={events}
+            view="week"
+            onEventClick={(event) => alert(`Clicked on event: ${event.title}`)}
+            week={{
+              weekDays: [0, 1, 2, 3, 4, 5],
+              weekStartOn: 1,
+              startHour: 8,
+              endHour: 20,
+              step: 60,
+            }}
+          />
         </div>
       </TableContainer>
     </div>
