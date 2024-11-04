@@ -1,19 +1,10 @@
-// src/userAuth/services/SignInEmployee.ts
+// src/userAuth/services/SignInEmployee.js
 
 import { auth, db } from "../firebase";
-import { signInWithEmailAndPassword, User } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { SignInEmployeeData } from "../../components/EmployeeData";  // Import partial data
 
-interface SignInResult {
-  employee: User;
-  employeeData: SignInEmployeeData;
-}
-
-export const signInEmployee = async (
-  employeeEmail: string,
-  employeePassword: string
-): Promise<SignInResult> => {
+export const SignInEmployee = async (employeeEmail, employeePassword) => {
   try {
     const employeeCredential = await signInWithEmailAndPassword(auth, employeeEmail, employeePassword);
     const employee = employeeCredential.user;
@@ -27,7 +18,7 @@ export const signInEmployee = async (
     }
 
     // Extract only the required fields for sign-in
-    const employeeData = employeeDoc.data() as SignInEmployeeData;
+    const employeeData = employeeDoc.data();
 
     return { employee, employeeData };
   } catch (error) {

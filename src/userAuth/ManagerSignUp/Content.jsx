@@ -38,7 +38,7 @@ const items = [
 
 
 //Content starts here 
-const Content: React.FC = () => {
+const Content = () => {
   return (
     <Stack
       sx={{ flexDirection: 'column', alignSelf: 'center', gap: 4, maxWidth: 450 }}

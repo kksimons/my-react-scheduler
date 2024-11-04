@@ -52,10 +52,10 @@
 // export default ManagerSignUpPage;
 import React from 'react';
 import Box from '@mui/material/Box';
-import ManagerSignUpForm from '../../userAuth/ManagerSignUp/ManagerSignUpForm';
-import Content from '../../userAuth/ManagerSignUp/Content';
+import ManagerSignUpForm from './ManagerSignUpForm';
+import Content from './Content';
 
-const ManagerSignUpPage: React.FC = () => {
+const ManagerSignUpPage = () => {
   return (
     <Box
       sx={{

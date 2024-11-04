@@ -8,11 +8,11 @@ import ManagerDashboard from './components/ManagerDashBoard';
 import EmployeeSignUpPage from './userAuth/EmployeeSignUp/EmployeeSignUpPage';
 import EmployeeSignInPage from './userAuth/EmployeeSignIn/EmployeeSignInPage';
 import EmployeeDashboard from './components/EmployeeDashBoard';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './userAuth/contexts/ProtectedRoute';
 import { AuthProvider } from './userAuth/contexts/AuthContext';
 import { Typography, Box } from '@mui/material';
 
-const App: React.FC = () => {
+const App = () => {
   return (
     <AuthProvider>
       <Router>

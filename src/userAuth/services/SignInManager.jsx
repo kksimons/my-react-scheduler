@@ -1,19 +1,10 @@
-// src/userAuth/services/SignInManager.ts
+// src/userAuth/services/SignInManager.js
 
 import { auth, db } from "../firebase";
-import { signInWithEmailAndPassword, User } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { SignInManagerData } from "../../components/ManagerData";  // Import the partial interface for sign-in
 
-interface SignInResult {
-  manager: User;
-  managerData: SignInManagerData;  // Use the partial interface
-}
-
-export const SignInManager = async (
-  managerEmail: string,
-  managerPassword: string
-): Promise<SignInResult> => {
+export const SignInManager = async (managerEmail, managerPassword) => {
   try {
     const managerCredential = await signInWithEmailAndPassword(auth, managerEmail, managerPassword);
     const manager = managerCredential.user;
@@ -27,7 +18,7 @@ export const SignInManager = async (
     }
 
     // Extract the required fields for sign-in
-    const managerData = managerDoc.data() as SignInManagerData;
+    const managerData = managerDoc.data();
 
     return { manager, managerData };
   } catch (error) {

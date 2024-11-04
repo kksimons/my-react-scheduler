@@ -9,7 +9,7 @@ import LogoutIcon from '@mui/icons-material/Logout'; //log out icon from MUI
 
 
 //Log Out Start Here 
-const SignOut: React.FC = () => {
+const SignOut = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {

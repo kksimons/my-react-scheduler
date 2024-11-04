@@ -1,4 +1,4 @@
-// src/LandingPage.tsx
+// src/LandingPage.jsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Typography, Button, Box } from '@mui/material';
@@ -11,11 +11,11 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }));
 
 // Landing page starts here 
-const LandingPage: React.FC = () => {
+const LandingPage = () => {
   const navigate = useNavigate();
 
   // Handle select role, navigate based on the role selected
-  const handleRoleSelection = (role: string) => {
+  const handleRoleSelection = (role) => {
     if (role === 'Manager') {
       navigate('/ManagerSignUpPage'); // Navigate to manager sign-up page
     } else {
@@ -25,7 +25,6 @@ const LandingPage: React.FC = () => {
 
   return (
     <Container maxWidth="sm" sx={{ textAlign: 'center', padding: '50px 0' }}>
-
       {/* Welcome Line */}
       <Typography variant="h3" component="h1" gutterBottom>
         Welcome to PowerShift

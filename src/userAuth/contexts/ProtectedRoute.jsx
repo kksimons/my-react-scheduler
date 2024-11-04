@@ -2,12 +2,12 @@
 
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../userAuth/contexts/AuthContext';
+import { useAuth } from './AuthContext';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
-const ProtectedRoute: React.FC = () => {
+const ProtectedRoute = () => {
   const { user, loading, error } = useAuth();
 
   if (loading) {

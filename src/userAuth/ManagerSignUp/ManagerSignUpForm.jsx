@@ -27,7 +27,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
 }));
 
 // Manager Sign Up Form Starts Here 
-const ManagerSignUpForm: React.FC = () => {
+const ManagerSignUpForm = () => {
   const navigate = useNavigate(); 
 
   // Form State, set everything to default empty strings
@@ -60,7 +60,7 @@ const ManagerSignUpForm: React.FC = () => {
   //----------------------------------------------------------------------------------------
 
   // Date validation function to ensure DOB is not in the future or older than 115 years
-  const validateDob = (dob: string) => {
+  const validateDob = (dob) => {
     const selectedDate = new Date(dob);
     const today = new Date();
     const maxAgeDate = new Date(today.getFullYear() - 115, today.getMonth(), today.getDate());
@@ -133,7 +133,7 @@ const ManagerSignUpForm: React.FC = () => {
   };
 
   // Handle Sign Up Submission
-  const handleSignUp = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSignUp = async (event) => {
     event.preventDefault();
     setSubmissionError(null);
     setSubmissionSuccess(null);
@@ -146,11 +146,11 @@ const ManagerSignUpForm: React.FC = () => {
       // Pass the correct state variables to the SignUpManager service
       await SignUpManager(managerFname, managerLname, managerDob, managerPosition, managerEmail, managerPassword);
       setSubmissionSuccess('Account created successfully! Redirecting to manager dashboard...');
-      // Redirect to Manager Dashboard after a short delay
+      // Redirect to Manager Sign in after a short delay
       setTimeout(() => {
-        navigate('/ManagerDashBoard');
+        navigate('/ManagerSignUpPage');
       }, 1000);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Failed to create account, please try again:', error);
 
       if (error.code === 'auth/email-already-in-use') {
@@ -282,7 +282,7 @@ const ManagerSignUpForm: React.FC = () => {
           <Select
             id="managerPosition"
             value={managerPosition}
-            onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setManagerPosition(e.target.value)}
+            onChange={(e) => setManagerPosition(e.target.value)}
             required
             fullWidth
           >

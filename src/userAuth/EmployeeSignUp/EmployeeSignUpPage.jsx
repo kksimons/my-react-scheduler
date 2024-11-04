@@ -4,7 +4,7 @@ import React from 'react';
 import EmployeeSignUpForm from './EmployeeSignUpForm';
 import { Box, Typography } from '@mui/material';
 
-const EmployeeSignUpPage: React.FC = () => {
+const EmployeeSignUpPage = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 4 }}>
       <Typography variant="h3" gutterBottom>

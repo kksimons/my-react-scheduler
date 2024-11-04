@@ -7,7 +7,7 @@ import SignOut from '../userAuth/SignOut';
 
 
 
-const EmployeeDashboard: React.FC = () => {
+const EmployeeDashboard = () => {
     return (
         <Container>
             <Typography variant="h4">This Is Employee Dashboard</Typography>

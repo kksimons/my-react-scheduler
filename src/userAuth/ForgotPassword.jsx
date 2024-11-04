@@ -1,29 +1,28 @@
-// src/userAuth/ManagerSignIn/ForgotPassword.tsx
+// src/userAuth/ManagerSignIn/ForgotPassword.jsx
 
 import React, { useState } from 'react';
 import { Box, Button, TextField, Typography, Alert } from '@mui/material';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from './firebase';
 
+const ForgotPassword = () => {
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-const ForgotPassword: React.FC = () => {
-  const [email, setEmail] = useState<string>('');
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-
-  //Handle password reset 
-  const handlePasswordReset = async (e: React.FormEvent<HTMLFormElement>) => {
+  // Handle password reset
+  const handlePasswordReset = async (e) => {
     e.preventDefault();
     setMessage(null);
     setError(null);
     setLoading(true);
 
-    //send new password to email 
+    // Send new password to email
     try {
       await sendPasswordResetEmail(auth, email);
       setMessage('Password reset email sent! Please check your inbox.');
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error sending password reset email:', err);
       if (err.code === 'auth/user-not-found') {
         setError('No user found with this email.');

@@ -2,29 +2,32 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signInEmployee } from '../services/SignInEmployee';
+import { SignInEmployee } from '../services/SignInEmployee';
 import { TextField, Button, Typography, Box } from '@mui/material';
 
-const EmployeeSignInForm: React.FC = () => {
+const EmployeeSignInForm = () => {
+
+  const navigate = useNavigate();
+
   const [employeeEmail, setEmployeeEmail] = useState('');
   const [employeePassword, setEmployeePassword] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate();
 
-  const handleSignIn = async (e: React.FormEvent) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     try {
-      await signInEmployee(employeeEmail, employeePassword);
+      await SignInEmployee(employeeEmail, employeePassword);
       navigate('/EmployeeDashBoard'); // Redirect after successful sign-in
-    } catch (error: any) {
+    } catch (error) {
       setError('Failed to sign in. Please check your username and password.');
       console.error('Error during employee sign-in:', error);
     }
   };
 
   return (
-    <Box component="form" onSubmit={handleSignIn} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
       
       <Typography variant="h4">Employee Sign In</Typography>
 

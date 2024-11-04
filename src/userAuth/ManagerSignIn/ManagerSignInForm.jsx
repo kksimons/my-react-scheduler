@@ -32,7 +32,7 @@ export default function SignInCard() {
   // const handleClickOpen = () => { setOpen(true); };
   // const handleClose = () => { setOpen(false); };
 
-  const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (!validateInputs()) return;
 
@@ -81,7 +81,7 @@ export default function SignInCard() {
       </Typography>
       <Box
         component="form"
-        onSubmit={handleSignIn}
+        onSubmit={handleSubmit}
         noValidate
         sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}
       >

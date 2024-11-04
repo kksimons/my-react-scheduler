@@ -1,14 +1,8 @@
 import React from "react";
 import { Avatar, LinearProgress, Box } from "@mui/material";
 
-interface ProfilePictureUploadProps {
-  profilePic: File | null;
-  previewUrl: string | null;
-  handleProfilePicUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  uploadProgress: number;
-}
 
-const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
+const ProfilePictureUpload = ({
   profilePic,
   previewUrl,
   handleProfilePicUpload,
