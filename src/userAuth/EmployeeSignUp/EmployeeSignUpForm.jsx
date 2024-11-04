@@ -15,19 +15,18 @@ import {
   Typography,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { navigate, Link, RouterLink, Router } from 'react-router-dom';
 import SignUpEmployee from '../services/SignUpEmployee';
 
 const EmployeeSignUpForm = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    dob: '',
-    gender: '',
-    phoneNumber: '',
-    email: '',
-    password: '',
-    availability: {
+    employeeFirstName: '',
+    employeeLastName: '',
+    employeeDob: '',
+    employeeGender: '',
+    employeePhoneNumber: '',
+    employeeEmail: '',
+    employeePassword: '',
+    employeeAvailability: {
       monday: [],
       tuesday: [],
       wednesday: [],
@@ -35,7 +34,7 @@ const EmployeeSignUpForm = () => {
       friday: []
     },
     employeeType: '',
-    positions: []
+    employeePositions: []
   });
 
   const navigate = useNavigate();
@@ -51,11 +50,11 @@ const EmployeeSignUpForm = () => {
   const handleAvailabilityChange = (day, shift) => {
     setFormData((prevState) => ({
       ...prevState,
-      availability: {
-        ...prevState.availability,
-        [day]: prevState.availability[day].includes(shift)
-          ? prevState.availability[day].filter((s) => s !== shift)
-          : [...prevState.availability[day], shift]
+      employeeAvailability: {
+        ...prevState.employeeAvailability,
+        [day]: prevState.employeeAvailability[day].includes(shift)
+          ? prevState.employeeAvailability[day].filter((s) => s !== shift)
+          : [...prevState.employeeAvailability[day], shift]
       }
     }));
   };
@@ -63,29 +62,32 @@ const EmployeeSignUpForm = () => {
   const handlePositionChange = (position) => {
     setFormData((prevState) => ({
       ...prevState,
-      positions: prevState.positions.includes(position)
-        ? prevState.positions.filter((p) => p !== position)
-        : [...prevState.positions, position]
+      employeePositions: prevState.employeePositions.includes(position)
+        ? prevState.employeePositions.filter((p) => p !== position)
+        : [...prevState.employeePositions, position]
     }));
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const { firstName, lastName, dob, gender, phoneNumber, email, password, employeeType, positions, availability } = formData;
+    const { employeeFirstName, employeeLastName, employeeDob, employeeGender, employeePhoneNumber, employeeEmail, employeePassword, employeeType, employeePositions, employeeAvailability } = formData;
+
+    // Debugging: Log form data
+    console.log("Form Data:", formData);
 
     try {
       await SignUpEmployee({
-        firstName,
-        lastName,
-        dob,
-        gender,
-        phoneNumber,
-        email,
+        employeeFirstName,
+        employeeLastName,
+        employeeDob,
+        employeeGender,
+        employeePhoneNumber,
+        employeeEmail,
         employeeType,
-        positions,
-        availability
-      }, password);
+        employeePositions,
+        employeeAvailability
+      }, employeePassword);
       console.log("Employee signed up successfully.");
       navigate('/EmployeeDashBoard');
     } catch (error) {
@@ -99,8 +101,8 @@ const EmployeeSignUpForm = () => {
         <Grid item xs={12}>
           <TextField
             label="First Name"
-            name="firstName"
-            value={formData.firstName}
+            name="employeeFirstName"
+            value={formData.employeeFirstName}
             onChange={handleChange}
             required
             fullWidth
@@ -109,8 +111,8 @@ const EmployeeSignUpForm = () => {
         <Grid item xs={12}>
           <TextField
             label="Last Name"
-            name="lastName"
-            value={formData.lastName}
+            name="employeeLastName"
+            value={formData.employeeLastName}
             onChange={handleChange}
             required
             fullWidth
@@ -120,8 +122,8 @@ const EmployeeSignUpForm = () => {
           <TextField
             label="Date of Birth"
             type="date"
-            name="dob"
-            value={formData.dob}
+            name="employeeDob"
+            value={formData.employeeDob}
             onChange={handleChange}
             required
             fullWidth
@@ -134,8 +136,8 @@ const EmployeeSignUpForm = () => {
           <FormControl fullWidth required>
             <InputLabel>Gender</InputLabel>
             <Select
-              name="gender"
-              value={formData.gender}
+              name="employeeGender"
+              value={formData.employeeGender}
               onChange={handleChange}
             >
               <MenuItem value=""><em>Select</em></MenuItem>
@@ -149,8 +151,8 @@ const EmployeeSignUpForm = () => {
           <TextField
             label="Phone Number"
             type="tel"
-            name="phoneNumber"
-            value={formData.phoneNumber}
+            name="employeePhoneNumber"
+            value={formData.employeePhoneNumber}
             onChange={handleChange}
             required
             fullWidth
@@ -160,8 +162,8 @@ const EmployeeSignUpForm = () => {
           <TextField
             label="Email"
             type="email"
-            name="email"
-            value={formData.email}
+            name="employeeEmail"
+            value={formData.employeeEmail}
             onChange={handleChange}
             required
             fullWidth
@@ -171,8 +173,8 @@ const EmployeeSignUpForm = () => {
           <TextField
             label="Password"
             type="password"
-            name="password"
-            value={formData.password}
+            name="employeePassword"
+            value={formData.employeePassword}
             onChange={handleChange}
             required
             fullWidth
@@ -189,7 +191,7 @@ const EmployeeSignUpForm = () => {
                     key={shift}
                     control={
                       <Checkbox
-                        checked={formData.availability[day].includes(shift)}
+                        checked={formData.employeeAvailability[day].includes(shift)}
                         onChange={() => handleAvailabilityChange(day, shift)}
                       />
                     }
@@ -222,7 +224,7 @@ const EmployeeSignUpForm = () => {
                 key={position}
                 control={
                   <Checkbox
-                    checked={formData.positions.includes(position)}
+                    checked={formData.employeePositions.includes(position)}
                     onChange={() => handlePositionChange(position)}
                   />
                 }
