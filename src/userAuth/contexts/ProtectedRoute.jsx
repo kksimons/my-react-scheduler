@@ -12,7 +12,7 @@ const ProtectedRoute = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20%' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center'}}>
         <CircularProgress />
       </Box>
     );
@@ -20,7 +20,7 @@ const ProtectedRoute = () => {
 
   if (error) {
     return (
-      <Box sx={{ textAlign: 'center', marginTop: '20%' }}>
+      <Box sx={{ textAlign: 'center' }}>
         <Typography variant="h6" color="error">
           Error: {error.message}
         </Typography>
@@ -28,7 +28,7 @@ const ProtectedRoute = () => {
     );
   }
 
-  return user ? <Outlet /> : <Navigate to="/ManagerSignInPage" replace />;
+  return user ? <Outlet /> : <Navigate to="/SignUp" replace />;
 };
 
 export default ProtectedRoute;

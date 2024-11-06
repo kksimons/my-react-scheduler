@@ -1,35 +1,24 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Container, Typography, Button, Box } from "@mui/material";
-import { useAuth } from "./userAuth/contexts/AuthContext";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-// Select Role page starts here
-export function SelectRole() {
+const SelectRole = () => {
   const navigate = useNavigate();
-  const { setRole } = useAuth();
 
-  // Handle select role, navigate based on the role selected
-  const handleRoleSelection = (selectedRole) => {
-    if (selectedRole === "Manager") {
-      navigate("/ManagerSignUpPage"); // Navigate to manager sign-up page
+  const handleRoleSelection = (role) => {
+    if (role === 'Employer') {
+      navigate('/EmployerRegistrationPage'); // Direct to Employer form
     } else {
-      navigate("/EmployeeSignUpPage"); // Navigate to employee sign-up page
+      navigate('/EmployeeRegistrationPage'); // Direct to Employee form
     }
   };
 
   return (
-    <Container>
-      {/* Welcome Line */}
-      <Typography variant="h3">Select your role:</Typography>
-
-      <Button onClick={() => handleRoleSelection("/ManagerSignUpPage")}>Manager</Button>
-      <Typography>Create efficient schedule and manage your employees</Typography>
-
-      <Button onClick={() => handleRoleSelection("/EmployeeSignUpPage")}>Employee</Button>
-      <Typography>View schedule, request shift, manage your availability</Typography>
-
-    </Container>
+    <div>
+      <h2>Select Your Role</h2>
+      <button onClick={() => handleRoleSelection('Employer')}>Employer</button>
+      <button onClick={() => handleRoleSelection('Employee')}>Employee</button>
+    </div>
   );
-}
+};
 
 export default SelectRole;

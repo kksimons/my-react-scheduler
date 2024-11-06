@@ -252,12 +252,12 @@ import { auth, db } from '../firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 
-const EmployeeSignUpForm = () => {
+const EmployeeRegistationForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState(''); // Additional field example
 
-  const handleSignup = async (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
     
     try {
@@ -267,7 +267,8 @@ const EmployeeSignUpForm = () => {
       // Save additional data in Firestore
       await setDoc(doc(db, "employees", user.uid), {
         role, // Save the additional data here
-        email
+        email,
+        uid: user.uid
       });
 
       console.log("User signed up and additional data saved.");
@@ -277,7 +278,7 @@ const EmployeeSignUpForm = () => {
   };
 
   return (
-    <form onSubmit={handleSignup}>
+    <form onSubmit={handleSignUp}>
       <input
         type="email"
         value={email}
@@ -303,4 +304,4 @@ const EmployeeSignUpForm = () => {
   );
 };
 
-export default EmployeeSignUpForm;
+export default EmployeeRegistationForm;

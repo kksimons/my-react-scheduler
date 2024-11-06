@@ -4,7 +4,7 @@ import {  Typography, Box } from '@mui/material';
 // import { styled } from '@mui/system';
 
 
-import SignOut from '../userAuth/SignOut';
+import SignOut from '../userAuth/services/SignOut';
 
 
 const ManagerDashBoard = () => { 

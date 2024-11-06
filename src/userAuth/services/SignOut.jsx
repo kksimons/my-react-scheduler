@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth } from './firebase';
+import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { Button } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout'; //log out icon from MUI
@@ -21,10 +21,10 @@ const SignOut = () => {
         // it will Log the user out from Firebase Auth
         await signOut(auth);
         // After the user is logged out, they will be redirected to the landing page (LandingPage.tsx) 
-        navigate('/');
+        navigate('services/SignIn');
       }
     } catch (error) {
-      console.error('Error during log out:', error);
+      console.error('Error during sign out:', error);
     }
   };
 
