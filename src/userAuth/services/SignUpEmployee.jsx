@@ -1,27 +1,27 @@
-import { auth, db } from "../firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+// import { auth, db } from "../firebase";
+// import { createUserWithEmailAndPassword } from "firebase/auth";
+// import { doc, setDoc } from "firebase/firestore";
 
-// export const SignUpEmployee = async (employeeEmail, employeePassword) => {
+// export const SignUpEmployee = async (employeeData, employeePassword) => {
 //   try {
-//     const employeeCredential = await createUserWithEmailAndPassword(auth, employeeEmail, employeePassword);
+//     // Sign up the employee and get the user credential
+//     const employeeCredential = await createUserWithEmailAndPassword(auth, employeeData.employeeEmail, employeePassword);
 //     const employee = employeeCredential.user;
 
-//     const employeeData = {
-//       employeeFirstName: employeeData.employeeFirstName,
-//       employeeLastName: employeeData.employeeLastName,
-//       employeeDob: employeeData.employeeDob,
-//       employeeGender: employeeData.employeeGender,
-//       employeePhoneNumber: employeeData.employeePhoneNumber,
-//      // employeeEmail: employeeData.employeeEmail,
-//      // employeePassword: employeeData.employeePassword,
-//       employeeType: employeeData.employeeType,
-//       employeePositions: employeeData.employeePositions,
-//       employeeAvailability: JSON.stringify(employeeData.employeeAvailability)  // Convert availability to JSON string
+//     // Prepare sanitized employee data for Firestore (excluding sensitive information like password)
+//     const sanitizedEmployeeData = {
+//       employee_fname: employeeData.employeeFirstName,
+//       employee_lname: employeeData.employeeLastName,
+//       employee_dob: employeeData.employeeDob,
+//       employee_phone_number: employeeData.employeePhoneNumber.toString(), // Ensure phone number is a string
+//       employee_type: employeeData.employeeType,
+//       employee_position: employeeData.employeePositions.join(", "), // Convert array to a string, if needed
+//       employee_availability: JSON.stringify(employeeData.employeeAvailability), // Convert availability to JSON string
+//       employee_system: "some_value" // Placeholder for employee_system; replace with actual value
 //     };
 
-//     // Save employee data to Firestore
-//     await setDoc(doc(db, "employee-info", employee.uid), employeeData);
+//     // Save employee data to the Firestore "employees" collection using the employee's UID as the document ID
+//     await setDoc(doc(db, "employees", employee.uid), sanitizedEmployeeData);
 
 //     return employee;
 //   } catch (error) {
@@ -32,33 +32,3 @@ import { doc, setDoc } from "firebase/firestore";
 
 // export default SignUpEmployee;
 
-// In SignUpEmployee.jsx
-export const SignUpEmployee = async (employeeData) => {
-
-  const auth = getAuth();
-  try {
-    const employeeCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const employee = employeeCredential.user;
-
-    // Firestore employee data, removing sensitive information like password
-    const sanitizedEmployeeData = {
-      employeeFirstName: employeeData.employeeFirstName,
-      employeeLastName: employeeData.employeeLastName,
-      employeeDob: employeeData.employeeDob,
-      employeeGender: employeeData.employeeGender,
-      employeePhoneNumber: employeeData.employeePhoneNumber,
-      employeeType: employeeData.employeeType,
-      employeePositions: employeeData.employeePositions,
-      employeeAvailability: employeeData.employeeAvailability
-    };
-
-    // Save employee data to Firestore
-    await setDoc(doc(db, "employee-info", employee.uid), sanitizedEmployeeData);
-
-    return employee;
-  } catch (error) {
-    console.error("Error during employee sign-up:", error);
-    throw error;
-  }
-};
-export default SignUpEmployee;
