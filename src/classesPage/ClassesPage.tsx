@@ -19,7 +19,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { AiOutlinePlus } from "react-icons/ai";
-import courseDefaults from "./courseDefaults.json";
+import courseDefaults from "./courseDefaults4-1.json";
 import { Scheduler } from "@aldabil/react-scheduler";
 
 type DayInfo = {
@@ -162,7 +162,7 @@ const ClassesPage: React.FC = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:80/api/v1/class-scheduler",
+        "http://localhost:80/api/v1/class-scheduler-optimal",
         {
           method: "POST",
           headers: {
