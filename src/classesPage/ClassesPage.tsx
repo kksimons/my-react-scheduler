@@ -19,7 +19,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { AiOutlinePlus } from "react-icons/ai";
-import courseDefaults from "./courseDefaults4-1.json";
+import courseDefaults from "./courseDefaults3.json";
 import { Scheduler } from "@aldabil/react-scheduler";
 
 type DayInfo = {
@@ -64,6 +64,21 @@ const colorMapping: { [key: string]: string } = {
   "Emerging Trends in Software Development": "#2ecc71",
   "Software Security": "#f1c40f",
   "Capstone Project": "#9b59b6",
+  "Technical Communcations I": "#3498db",
+  "Introduction to Network Systems": "#e74c3c",
+  "Web Development 1": "#2ecc71",
+  "Object-Oriented Programming 1": "#f1c40f",
+  "Mathematics for Technolgists": "#9b59b6",
+  "Object-Oriented Programming 2": "#3498db",
+  "Database Design and Programming": "#e74c3c",
+  "Software Analysis and Design": "#2ecc71",
+  "User Experience and Design": "#f1c40f",
+  "Critical Thinking": "#9b59b6",
+  "Mobile Application Development": "#3498db",
+  "Object-Oriented Programming 3": "#e74c3c",
+  "Web Development 3": "#2ecc71",
+  "Database Programming": "#f1c40f",
+  "Software Projects: Analysis, Design, and Management": "#9b59b6",
 };
 
 const ClassesPage: React.FC = () => {
@@ -162,7 +177,7 @@ const ClassesPage: React.FC = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:80/api/v1/class-scheduler-optimal",
+        "http://localhost:80/api/v1/class-scheduler",
         {
           method: "POST",
           headers: {
@@ -175,7 +190,7 @@ const ClassesPage: React.FC = () => {
       if (response.ok) {
         const result: ApiResponse = await response.json();
         console.log(
-          "Received response from API:",
+          "Received response from API:", 
           JSON.stringify(result, null, 2)
         );
         alert("Schedule submitted successfully!");
@@ -498,7 +513,7 @@ const ClassesPage: React.FC = () => {
             week={{
               weekDays: [0, 1, 2, 3, 4, 5],
               weekStartOn: 1,
-              startHour: 8,
+              startHour: 7,
               endHour: 20,
               step: 60,
             }}
