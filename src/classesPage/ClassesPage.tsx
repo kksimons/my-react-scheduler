@@ -4,7 +4,6 @@ import { loadSlim } from "@tsparticles/slim";
 import courseData from "././data/courseDefaultsAll.json";
 import "./ClassesPage.css";
 import { CircularProgress } from "@mui/material";
-import "./utils/types";
 import { ApiResponse, Course, Event } from "./utils/types";
 import Schedule from "./Components/Schedule";
 import Toolbar from "./Components/Toolbar";
@@ -56,7 +55,7 @@ const ClassesPage: React.FC = () => {
       acc[className] = course.sections;
     }
     return acc;
-  }, {} as { [courseName: string]: Course['sections'] });  
+  }, {} as { [courseName: string]: Course["sections"] });
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -150,7 +149,9 @@ const ClassesPage: React.FC = () => {
 
   // using html2cavas like Mitchell had set up before to send just the scheduler component (point it at class)
   const handleDownload = async () => {
-    const scheduleElement = document.querySelector(".schedule-container") as HTMLElement;
+    const scheduleElement = document.querySelector(
+      ".schedule-container"
+    ) as HTMLElement;
     if (scheduleElement) {
       const canvas = await html2canvas(scheduleElement);
       const link = document.createElement("a");
@@ -170,7 +171,7 @@ const ClassesPage: React.FC = () => {
       );
       window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
     }
-  };  
+  };
 
   return (
     <div
@@ -264,6 +265,7 @@ const ClassesPage: React.FC = () => {
               setTool={setTool}
               selectedClasses={selectedClasses}
               handleClassSelection={handleClassSelection}
+              handleSubmit={handleSubmit} // Pass handleSubmit as a prop now so we can get the animation
             />
             {tool === "section" && selectedClasses.length > 0 && (
               <SectionDisplay sections={selectedSections} />

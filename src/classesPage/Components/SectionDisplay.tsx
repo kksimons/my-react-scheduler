@@ -1,3 +1,4 @@
+import React from 'react';
 import { Course } from '../utils/types';
 
 interface SectionDisplayProps {
@@ -12,7 +13,7 @@ const SectionDisplay: React.FC<SectionDisplayProps> = ({ sections }) => {
           <h3>{courseName}</h3>
           <div className="section-list">
             {courseSections.map((section, index) => (
-              <div key={index} className="section-detail">
+              <div key={index} className="dropdown-item section-detail">
                 <p>Day 1: {section.day1.day}, {section.day1.start} - {section.day1.end} ({section.day1.format})</p>
                 <p>Day 2: {section.day2.day}, {section.day2.start} - {section.day2.end} ({section.day2.format})</p>
                 <p>Professor: {section.professor}</p>
