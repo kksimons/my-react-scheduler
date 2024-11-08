@@ -9,6 +9,7 @@
   padding: 0;
 
 }
+
   /* text-align: center; */
 
  body {
@@ -65,3 +66,79 @@
   z-index: 2;
 }
 
+.container {
+  display: flex;
+}
+
+.employee-list {
+  width: 200px; /* Fixed width for employee list */
+}
+
+.calendar {
+  flex-grow: 1; /* Calendar takes remaining space */
+}
+
+
+/* Base styles for all devices */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Styles for mobile devices */
+@media (max-width: 600px) {
+
+  .employee-list-container {
+    height: auto;
+    
+  }
+
+    .container {
+        flex-direction: column; /* Stack items vertically */
+        padding: 10px; /* Add some padding */
+    }
+
+    .employee-list {
+        width: 100%; /* Full width on mobile */
+        margin-bottom: 10px; /* Space between elements */
+    }
+
+    .calendar {
+        width: 100%; /* Full width on mobile */
+    }
+}
+
+/* Styles for tablets */
+@media (min-width: 601px) and (max-width: 900px) {
+    .container {
+        flex-direction: row; /* Side by side layout */
+        padding: 20px; /* More padding for tablets */
+    }
+
+    .employee-list {
+        width: 30%; /* Adjust width for tablets */
+        margin-right: 20px; /* Space between employee list and calendar */
+    }
+
+    .calendar {
+        width: 70%; /* Adjust width for tablets */
+    }
+}
+
+/* Styles for desktops */
+@media (min-width: 901px) {
+    .container {
+        flex-direction: row; /* Side by side layout */
+        padding: 30px; /* More padding for desktops */
+    }
+
+    .employee-list {
+        width: 25%; /* Adjust width for desktops */
+        margin-right: 20px; /* Space between employee list and calendar */
+    }
+
+    .calendar {
+        width: 75%; /* Adjust width for desktops */
+    }
+}

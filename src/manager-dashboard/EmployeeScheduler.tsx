@@ -172,6 +172,7 @@ const EmployeeScheduler: React.FC<{ employees: Employee[] }> = ({
         alert("Please select an employee first.");
         return; // Prevent opening dialog if no employee is selected
       }
+      
 
       // Check for overlapping schedules
       if (hasOverlappingSchedule(selectedEmployeeId, start, end, null)) {
@@ -213,10 +214,12 @@ const EmployeeScheduler: React.FC<{ employees: Employee[] }> = ({
       return;
     }
 
+    
     if (!selectedEmployeeId) {
       alert("No employee selected.");
       return;
     }
+    
 
     // Check for overlapping schedules for the selected employee
     if (
@@ -254,7 +257,7 @@ const EmployeeScheduler: React.FC<{ employees: Employee[] }> = ({
     if (selectedEventId) {
       await updateSchedule(selectedEventId, {
         ...newEvent,
-        id: selectedEventId,
+        id: selectedEventId
       });
       setEvents((prev) =>
         prev.map((ev) =>
@@ -290,15 +293,14 @@ const EmployeeScheduler: React.FC<{ employees: Employee[] }> = ({
         sx={{
           backgroundColor: "#8a2be2",
           width: 200,
-          overflowY: "auto",
-          marginRight: 2,
-          padding: 2,
+          padding: 1,
+          marginTop: "5px",
         }}
       >
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h6" textAlign="center">
           Employees
         </Typography>
-        <List>
+        <List sx={{display: "flex", flexDirection: "column"}}>
           {employees.map((employee) => (
             <ListItem
               key={employee.id}
@@ -310,9 +312,12 @@ const EmployeeScheduler: React.FC<{ employees: Employee[] }> = ({
               }}
               style={{
                 cursor: "pointer",
-                padding: "5px",
-                backgroundColor:
-                  selectedEmployeeId === employee.id ? "#9b30ff" : "#8a2be2",
+                padding: "1px",
+                border:
+                  selectedEmployeeId === employee.id ? "2px solid black" : "none",
+                  borderRadius: "3px",
+                  backgroundColor: selectedEmployeeId === employee.id ? "#8a2be2" : "transparent",
+                  height: "72px",
               }}
             >
               <ListItemText
@@ -320,9 +325,9 @@ const EmployeeScheduler: React.FC<{ employees: Employee[] }> = ({
                 secondary={employee.employee_position}
                 sx={{
                   backgroundColor: "#9b30ff",
-                  padding: "8px",
+                  padding: "5px",
                   borderRadius: "4px",
-                  marginBottom: "4px",
+                  // marginBottom: "4px",
                 }}
               />
             </ListItem>
@@ -361,6 +366,8 @@ const EmployeeScheduler: React.FC<{ employees: Employee[] }> = ({
           dayFormat: (date: Date) => moment(date).format("ddd DD/MM"),
         }}
       />
+
+
 
       <Dialog open={openDialog} onClose={handleDialogClose}>
         <DialogTitle>
