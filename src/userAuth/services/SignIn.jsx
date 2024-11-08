@@ -34,6 +34,7 @@ export function SignIn ()  {
     if (result.user) {
       // Successful sign-in
       console.log("User signed in:", result.user);
+      navigate('/SelectRole'); // Redirect to role selection on successful login
     } else {
       // Error occurred during sign-in
       console.error("Sign-In Error:", result.errorMessage);
@@ -146,7 +147,7 @@ export function SignIn ()  {
           <Button
             variant="outlined"
             color="secondary"
-            onClick={navigate('/SignIn')}
+            // onClick={navigate('/SignIn')}
             sx={{
               mt: 2,
               boxShadow: 3,

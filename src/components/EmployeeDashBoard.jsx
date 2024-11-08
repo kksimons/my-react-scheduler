@@ -2,7 +2,7 @@
 import React from 'react';
 import { Container, Typography, Box } from '@mui/material';
 import { styled } from '@mui/system';
-import SignOut from '../userAuth/services/SignOut';
+import SignOut from '@userAuth/services/SignOut';
 
 
 

@@ -12,6 +12,7 @@ export default defineConfig({
       { find: '@userAuth', replacement: '/src/userAuth' },
       { find: '@components', replacement: '/src/components' },
       { find: '@theme', replacement: '/src/theme' },
+      { find: '@schedules', replacement: '/src/schedules' },
     ],
   },
   server: {
