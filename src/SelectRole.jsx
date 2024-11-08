@@ -6,9 +6,11 @@ const SelectRole = () => {
 
   const handleRoleSelection = (role) => {
     if (role === 'Employer') {
-      navigate('/EmployerRegistrationPage'); // Direct to Employer form
+      navigate('/EmployerRegistration'); // Direct to Employer form
+    } else if (role === 'Employee') {
+      navigate('/EmployeeRegistration'); // Direct to Employee form
     } else {
-      navigate('/EmployeeRegistrationPage'); // Direct to Employee form
+      console.error('Invalid role selected');
     }
   };
 

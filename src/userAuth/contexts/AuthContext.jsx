@@ -35,7 +35,7 @@ import { auth } from '../firebase';
 
 const AuthContext = createContext(undefined);
 
-export const AuthProvider = ({ children }) => {
+const AuthProvider = ({ children }) => {
   const [user, loading, error] = useAuthState(auth); // This now connects to Firebase authentication
   const [role, setRole] = useState(null); // New role state for role selection
 
@@ -53,3 +53,6 @@ export const useAuth = () => {
   }
   return context;
 };
+
+
+export default AuthProvider;

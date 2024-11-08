@@ -1,5 +1,3 @@
-// src/userAuth/LogOut.tsx
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
@@ -12,7 +10,7 @@ import LogoutIcon from '@mui/icons-material/Logout'; //log out icon from MUI
 const SignOut = () => {
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
+  const handleSignOut = async () => {
     try {
      //check if current user is auth (login)
       const currentUser = auth.currentUser;
@@ -30,7 +28,7 @@ const SignOut = () => {
 
   return (
     <Button 
-      onClick={handleLogout} 
+      onClick={handleSignOut} 
       variant="contained"
       startIcon={<LogoutIcon />} //Import the LogoutIcon from mui above 
       sx={{ backgroundColor: '#6200ea', '&:hover': { backgroundColor: '#4b00c7' } }}

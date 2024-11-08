@@ -14,7 +14,7 @@ const LandingPage = () => {
       <Typography variant="h1">PowerShift</Typography>
       
         {/* Sign up button */}
-      <Button onClick={() => navigate('/SelectRole')}>
+      <Button onClick={() => navigate('/SignUp')}>
         Get Started 
       </Button>
 
