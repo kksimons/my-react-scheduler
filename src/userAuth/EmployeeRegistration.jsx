@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Box, Button, Container, Typography, FormControl, FormLabel, TextField, Select, MenuItem, FormHelperText, ThemeProvider } from "@mui/material";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import theme from "../theme/theme";
+import theme from "@theme/theme";
 
 const EmployeeRegistration = () => { 
 
@@ -112,7 +112,7 @@ const EmployeeRegistration = () => {
                 sx={{ width: '100%',
                      maxWidth: '500px',
                          mx: 'auto',
-                          p: {6},
+                          p: 6,
                           borderRadius: 5,
                            boxShadow: 5,
                          }}

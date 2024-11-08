@@ -14,7 +14,11 @@ const LandingPage = () => {
       <Typography variant="h1">PowerShift</Typography>
       
         {/* Sign up button */}
-      <Button onClick={() => navigate('/SignUp')}>
+      <Button
+        variant="contained"
+        color="primary"
+        
+        onClick={() => navigate('/SignUp')}>
         Get Started 
       </Button>
 

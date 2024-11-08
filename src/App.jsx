@@ -75,20 +75,17 @@ const App = () => {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<LandingPage />} />
-            {/* <Route path="/SignUp" element={<SignUp />} /> */}
             <Route path="/SignIn" element={<SignIn />} />
-            <Route path="/SelectRole" element={<SelectRole />} />
             <Route path="/SignUp" element={<SignUp />} />
-            <Route path= "/EmployeeRegistration" element={<EmployeeRegistration />} />
-            <Route path="/EmployerRegistration" element={<EmployerRegistration />} />
-            {/* <Route path="/EmployerRegistrationPage" element={<EmployerRegistrationPage />} />  */}
-            {/* <Route path="/EmployeeRegistration" element={<EmployeeRegistration />} /> */}
-            <Route path="/SignOut" element={<SignOut />} />
 
             {/* {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/ManagerDashboard" element={<ManagerDashboard />} />
               <Route path="/EmployeeDashboard" element={<EmployeeDashboard />} />
+              <Route path= "/EmployeeRegistration" element={<EmployeeRegistration />} />
+              <Route path="/EmployerRegistration" element={<EmployerRegistration />} />
+              <Route path="/SignOut" element={<SignOut />} />
+              <Route path="/SelectRole" element={<SelectRole />} />
             </Route>
             
             {/* {/* 404 Not Found Route */}

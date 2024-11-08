@@ -3,19 +3,28 @@ import { Box, Button, Container, Typography } from '@mui/material';
 import { auth } from '../firebase';
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
+import theme from '../../theme/theme';
+import { ThemeProvider } from '@mui/material';
+
 
 export function SignIn ()  {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [formErrors, setFormErrors] = useState({}); //to handle exception when user enter wrong format 
   const navigate = useNavigate();
 
   const handleSignIn = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent form submission
+
+    // Validate form before submitting
+    if (!validateForm()) return;
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
       navigate('/SelectRole'); // Redirect to role selection on successful login
     } catch (error) {
       console.error("Error logging in, please try again:", error);
+      setFormErrors({ general: "Invalid email or password" }); // Set a general error message for invalid credentials
     }
   };
 
@@ -28,51 +37,294 @@ export function SignIn ()  {
     } else {
       // Error occurred during sign-in
       console.error("Sign-In Error:", result.errorMessage);
+      setFormErrors({ general: "Google sign-in failed. Please try again." });
     }
   };
-  
+
+  //Validate form with exception message 
+  const validateForm = () => {
+    const errors = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(formData.email)) {
+        errors.email = "Please enter correct email format: user@example.com ";
+    }
+
+    if (formData.password.length < 6 || !/\d/.test(formData.password) || !/[a-zA-Z]/.test(formData.password)) {
+        errors.password = "Password must be at least 6 characters long, contain both numbers and letters";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0; // Return true if no errors found
+  };
 
   return (
-    <Container maxWidth="xs">
-      <Box
-        component="form"
-        onSubmit={handleSignIn}
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          mt: 8,
-        }}
+    <ThemeProvider theme={theme}>
+      {/* //Main container for sign in form */}
+      <Box 
+        display="flex"
+        alignItems="center"
+        minHeight="100vh"
+        bgcolor="background.default"
+        p="auto"
       >
-        <Typography variant="h5" gutterBottom>
-          Sign In
-        </Typography>
-        {/* Box for input: email and password */}
-        <Box sx={{ mb: 2, width: '100%' }}>
-          <input
-            type="email"
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            required
-            style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-          />
-          <input
-            type="password"
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            required
-            style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-          />
+        {/* //Form container */}
+        <Box
+          component="form"
+          onSubmit={handleSignIn}
+          display="flex"
+          flexDirection="column"
+          gap="8px"
+          backgroundColor="background.third"
+          sx={{
+            width: '100%',
+            maxWidth: '500px',
+            mx: 'auto',
+            p: 6,
+            borderRadius: 5,
+            boxShadow: 5,
+          }}
+        >
+          <Typography variant="h1" align="center">Sign In</Typography>
+
+          <FormControl>
+            <FormLabel>Email:</FormLabel>
+            <TextField
+              name="email"
+              type="email"
+              placeholder="ex. user@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              error={!!formErrors.email}
+              helperText={formErrors.email}
+            />
+          </FormControl>
+
+          <FormControl>
+            <FormLabel>Password:</FormLabel>
+            <TextField
+              name="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              error={!!formErrors.password}
+              helperText={formErrors.password}
+            />
+          </FormControl>
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            sx={{
+              mt: 2,
+              boxShadow: 3,
+              '&:hover': {
+                boxShadow: 6,
+              },
+            }}
+          >
+            Sign In
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={handleGoogleSignIn}
+            sx={{
+              mt: 2,
+              boxShadow: 3,
+              '&:hover': {
+                boxShadow: 6,
+              },
+            }}
+          >
+            Sign In with Google
+          </Button>
+
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={navigate('/SignIn')}
+            sx={{
+              mt: 2,
+              boxShadow: 3,
+              '&:hover': {
+                boxShadow: 6,
+              },
+            }}
+          >
+            Sign In
+          </Button>
         </Box>
-        <Button type="submit" variant="contained" color="primary" sx={{ mb: 2 }}>
-          Sign In
-        </Button>
-        <Button variant="outlined" color="secondary" onClick={handleGoogleSignIn}>
-          Sign In with Google
-        </Button>
       </Box>
-    </Container>
+    </ThemeProvider>
   );
 };
 
 export default SignIn;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

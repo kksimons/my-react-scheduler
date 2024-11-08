@@ -5,7 +5,7 @@ import { FormControl, FormLabel, TextField } from "@mui/material";
 import { useState } from "react";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import theme from "../theme/theme";
+import theme from "@theme/theme";
 import { ThemeProvider } from "@mui/system";
 
 const EmployerRegistration = () => {
