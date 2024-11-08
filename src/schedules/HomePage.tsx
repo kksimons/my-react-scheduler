@@ -396,7 +396,11 @@ export default function HomePage() {
         }}
       >
         {isLoggedIn ? (
-          <><EmployeeManagement /> </>
+          <>
+          <EmployeeManagement /> 
+          
+          </>
+          
         ) : (
           <Paper
             elevation={3}

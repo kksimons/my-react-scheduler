@@ -15,3 +15,53 @@
   font-family: 'Poppins', sans-serif !important;
 
 } 
+
+/* Hide time slots in week view */
+.rbc-time-slot {
+  display: none; 
+}
+
+.rbc-label {
+  display: none;
+}
+
+.rbc-allday-cell {
+  display: none;
+}
+
+.rbc-event {
+  height: 60px !important; /* Make the event fill the entire cell height */
+  width: auto !important; /* Make the event fill the entire cell width */
+}
+
+.rbc-today {
+  background-color: inherit;
+}
+
+.rbc-time-view .rbc-time-gutter {
+  display: flex;
+  flex-direction: column;
+}
+
+.rbc-time-view .rbc-time-gutter .rbc-timeslot-group {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rbc-time-view .rbc-day-slot {
+  display: flex;
+  flex-direction: column;
+}
+
+.rbc-time-view .rbc-day-slot .rbc-timeslot-group {
+  flex: 1;
+  min-height: unset !important;
+}
+
+.rbc-event {
+  position: absolute;
+  z-index: 2;
+}
+

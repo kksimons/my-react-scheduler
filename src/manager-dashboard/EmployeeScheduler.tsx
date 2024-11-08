@@ -1,11 +1,37 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Calendar, momentLocalizer } from 'react-big-calendar';
-import moment from 'moment';
-import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { Box, Paper, Typography, List, ListItem, ListItemText, Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField } from '@mui/material';
-import { collection, addDoc, getDocs, deleteDoc, updateDoc, doc } from 'firebase/firestore';
-import { db } from '../userAuth/firebase';
+import React, { useState, useEffect, useCallback } from "react";
+import { EventInteractionArgs } from "react-big-calendar/lib/addons/dragAndDrop";
+import {
+  Event as CalendarEvent,
+  Calendar,
+  momentLocalizer,
+} from "react-big-calendar";
+import moment from "moment";
+import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import {
+  Box,
+  Paper,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
+  TextField,
+} from "@mui/material";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
+import { db } from "../userAuth/firebase";
+import CustomEvent from "./CustomEvent";
 
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
@@ -17,30 +43,43 @@ interface Employee {
   employee_position: string;
 }
 
-interface Event {
+interface Event extends CalendarEvent {
   id: string;
   title: string;
   start: Date;
   end: Date;
   employeeId: string;
+  description?: string;
 }
 
-const EmployeeScheduler: React.FC<{ employees: Employee[] }> = ({ employees }) => {
+const EmployeeScheduler: React.FC<{ employees: Employee[] }> = ({
+  employees,
+}) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
-  const [selectedSlot, setSelectedSlot] = useState<{ start: Date; end: Date; employeeId?: string }>({ start: new Date(), end: new Date() });
-  const [startTime, setStartTime] = useState<string>('07:00'); // Default start time
-  const [endTime, setEndTime] = useState<string>('19:00'); // Default end time
+  const [selectedSlot, setSelectedSlot] = useState<{
+    start: Date;
+    end: Date;
+    employeeId?: string;
+  }>({ start: new Date(), end: new Date() });
+  const [startTime, setStartTime] = useState<string>("");
+  const [endTime, setEndTime] = useState<string>("");
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(
+    null
+  );
+  const [selectedEmployeeName, setSelectedEmployeeName] = useState<string>("");
+  const [eventDescription, setEventDescription] = useState<string>("");
+
 
   useEffect(() => {
     fetchSchedule();
   }, []);
 
   const fetchSchedule = async () => {
-    const scheduleCollection = collection(db, 'schedules');
+    const scheduleCollection = collection(db, "schedules");
     const scheduleSnapshot = await getDocs(scheduleCollection);
-    const scheduleList = scheduleSnapshot.docs.map(doc => ({
+    const scheduleList = scheduleSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
       start: doc.data().start.toDate(),
@@ -49,106 +88,189 @@ const EmployeeScheduler: React.FC<{ employees: Employee[] }> = ({ employees }) =
     setEvents(scheduleList);
   };
 
-  const addSchedule = async (title: string, start: Date, end: Date, employeeId: string) => {
+  const addSchedule = async (
+    title: string,
+    start: Date,
+    end: Date,
+    employeeId: string,
+    description?: string
+  ) => {
     try {
-      const docRef = await addDoc(collection(db, 'schedules'), {
+      const docRef = await addDoc(collection(db, "schedules"), {
         title,
         start,
         end,
         employeeId,
+        description,
       });
-      console.log('Document written with ID:', docRef.id);
-      return docRef.id; // Return the new document ID
+      console.log("Document written with ID:", docRef.id);
+      return docRef.id;
     } catch (e) {
-      console.error('Error adding document:', e);
+      console.error("Error adding document:", e);
     }
   };
 
   const updateSchedule = async (eventId: string, updatedEvent: Event) => {
     try {
-      await updateDoc(doc(db, 'schedules', eventId), updatedEvent);
-      console.log('Document updated with ID:', eventId);
+      // Create an object with the properties want to update
+      const { title, start, end, employeeId, description } = updatedEvent;
+
+      // Update the document in Firestore
+      await updateDoc(doc(db, "schedules", eventId), {
+        title,
+        start,
+        end,
+        employeeId,
+        description,
+      });
+
+      console.log("Document updated with ID:", eventId);
     } catch (e) {
-      console.error('Error updating document:', e);
+      console.error("Error updating document:", e);
     }
   };
 
+  // Check for overlapping schedules
+  const hasOverlappingSchedule = (
+    employeeId: string,
+    start: Date,
+    end: Date,
+    excludeEventId?: string | null
+  ): boolean => {
+    return events.some(
+      (event) =>
+        event.employeeId === employeeId &&
+        event.id !== excludeEventId && // Exclude the event being updated
+        ((start >= event.start && start < event.end) ||
+          (end > event.start && end <= event.end) ||
+          (start <= event.start && end >= event.end))
+    );
+  };
+
   const handleEventDrop = useCallback(
-    async ({ event, start }) => {
-      const end = new Date(start.getTime() + (event.end.getTime() - event.start.getTime())); // Calculate new end time
-      const updatedEvent = { ...event, start, end };
-      
-      await updateSchedule(event.id, updatedEvent); // Update existing event in Firestore
-      setEvents(prev => prev.map(ev => ev.id === event.id ? updatedEvent : ev));
+    async ({ event, start, end }: EventInteractionArgs<Event>) => {
+      //Create new start and end dates
+      const newStart = new Date(start);
+      const newEnd = new Date(end);
+
+      // Maintain original start and end times
+      newStart.setHours(event.start.getHours(), event.start.getMinutes());
+      newEnd.setHours(event.end.getHours(), event.end.getMinutes());
+
+      const updatedEvent: Event = { ...event, start: newStart, end: newEnd };
+      await updateSchedule(event.id, updatedEvent);
+      setEvents((prev) =>
+        prev.map((ev) => (ev.id === event.id ? updatedEvent : ev))
+      );
     },
-    []
+    [setEvents]
   );
 
   const handleSelectSlot = useCallback(
-    async ({ start }) => {
-      // Open dialog to set working hours for the selected employee
-      const employeeIndex = Math.floor((start.getHours() - 7)); // Assuming shifts are hourly starting at 7 AM
-      if (employeeIndex < 0 || employeeIndex >= employees.length) return; // Check if within bounds
+    ({ start, end }: { start: Date; end: Date }) => {
+      if (!selectedEmployeeId) {
+        alert("Please select an employee first.");
+        return; // Prevent opening dialog if no employee is selected
+      }
 
-      const employee = employees[employeeIndex];
-      if (!employee) return;
+      // Check for overlapping schedules
+      if (hasOverlappingSchedule(selectedEmployeeId, start, end, null)) {
+        alert(
+          "This schedule overlaps with an existing schedule for this employee."
+        );
+        return; // Prevent opening dialog if there is an overlap
+      }
 
-      setSelectedSlot({ start }); // Set selected slot for dialog
-      setOpenDialog(true); // Open dialog
-      setStartTime('09:00'); // Reset default time
-      setEndTime('10:00');   // Reset default time
-      setSelectedEventId(null); // Reset selected event ID for new schedule
+      setSelectedSlot({ start, end });
+      setOpenDialog(true);
+      setStartTime(moment(start).format("HH:mm"));
+      setEndTime(moment(end).format("HH:mm"));
     },
-    [employees]
+    [selectedEmployeeId]
   );
 
   const handleDialogClose = () => {
     setOpenDialog(false);
-    setStartTime('07:00'); // Reset default time
-    setEndTime('9:00');   // Reset default time
-    setSelectedEventId(null); // Reset selected event ID
+    setStartTime("");
+    setEndTime("");
+    setSelectedEventId(null);
+    setEventDescription("");
   };
 
   const handleScheduleSet = async () => {
-    // Parse input times
-    const [startHour] = startTime.split(':').map(Number);
-    const [endHour] = endTime.split(':').map(Number);
+    const [startHour, startMinute] = startTime.split(":").map(Number);
+    const [endHour, endMinute] = endTime.split(":").map(Number);
 
-    // Create new event based on input times
     const newEventStart = new Date(selectedSlot.start);
-    newEventStart.setHours(startHour);
+    newEventStart.setHours(startHour, startMinute);
 
     const newEventEnd = new Date(selectedSlot.start);
-    newEventEnd.setHours(endHour);
+    newEventEnd.setHours(endHour, endMinute);
 
+    // Validate time
     if (newEventEnd <= newEventStart) {
       alert("End time must be after start time.");
       return;
     }
 
-    const title = `${employees[Math.floor((selectedSlot.start.getHours() - 7))].employee_fname} ${employees[Math.floor((selectedSlot.start.getHours() - 7))].employee_lname}`;
+    if (!selectedEmployeeId) {
+      alert("No employee selected.");
+      return;
+    }
+
+    // Check for overlapping schedules for the selected employee
+    if (
+      hasOverlappingSchedule(
+        selectedEmployeeId,
+        newEventStart,
+        newEventEnd,
+        selectedEventId
+      )
+    ) {
+      alert(
+        "This schedule overlaps with an existing schedule for this employee."
+      );
+      return;
+    }
+
+    const employee = employees.find((emp) => emp.id === selectedEmployeeId);
+
+    if (!employee) {
+      alert("Selected employee not found.");
+      return;
+    }
+
+    const title = `${employee.employee_fname} ${employee.employee_lname}`;
 
     const newEvent: Event = {
-      id: '', // Temporary ID until saved in Firestore
+      id: "", // Temporary ID until saved in Firestore
       title,
       start: newEventStart,
       end: newEventEnd,
-      employeeId: employees[Math.floor((selectedSlot.start.getHours() - 7))].id,
+      employeeId: employee.id,
+      description: eventDescription,
     };
 
     if (selectedEventId) {
       await updateSchedule(selectedEventId, {
-        title, start: newEventStart, end: newEventEnd,
-        id: '',
-        employeeId: ''
-      }); // Update existing event if editing
-      setEvents(prev => prev.map(ev => ev.id === selectedEventId ? { ...newEvent, id: selectedEventId } : ev));
+        ...newEvent,
+        id: selectedEventId,
+      });
+      setEvents((prev) =>
+        prev.map((ev) =>
+          ev.id === selectedEventId ? { ...newEvent, id: selectedEventId } : ev
+        )
+      );
     } else {
-      // Add to Firestore and update state for new event
-      const docRefId = await addSchedule(newEvent.title, newEvent.start, newEvent.end, newEvent.employeeId);
-      newEvent.id = docRefId; // Set the ID of the newly created document
-
-      setEvents(prev => [...prev.filter(ev => ev.id !== ''), newEvent]); // Add or update event in state
+      const docRefId = await addSchedule(
+        newEvent.title,
+        newEvent.start,
+        newEvent.end,
+        newEvent.employeeId,
+        newEvent.description
+      );
+      newEvent.id = docRefId!;
+      setEvents((prev) => [...prev, newEvent]);
     }
 
     handleDialogClose();
@@ -156,100 +278,139 @@ const EmployeeScheduler: React.FC<{ employees: Employee[] }> = ({ employees }) =
 
   const handleDeleteSchedule = async () => {
     if (!selectedEventId) return;
-
-    await deleteDoc(doc(db, 'schedules', selectedEventId));
-    
-    setEvents(prev => prev.filter(ev => ev.id !== selectedEventId));
-    
+    await deleteDoc(doc(db, "schedules", selectedEventId));
+    setEvents((prev) => prev.filter((ev) => ev.id !== selectedEventId));
     handleDialogClose();
   };
 
   return (
-    <Box sx={{ display: 'flex', height: '100%' }}>
-      
-    <Paper elevation={3} sx={{ backgroundColor: '#8a2be2', width: '150', overflowY: 'auto', marginRight: 2, padding: 3, paddingTop: 5}}>
-      <Typography variant="h6" gutterBottom>
-        Employees
-      </Typography>
-      <List>
-        {employees.map((employee) => (
-          <ListItem key={employee.id}>
-            <ListItemText
-              primary={`${employee.employee_fname} ${employee.employee_lname}`}
-              secondary={employee.employee_position}
-              sx={{ backgroundColor: '#9b30ff', padding: '8px', borderRadius:'4px', marginBottom:'4px' }} 
-            />
-          </ListItem>
-        ))}
-      </List>
-    </Paper>
+    <Box sx={{ display: "flex", height: "100%" }}>
+      <Paper
+        elevation={3}
+        sx={{
+          backgroundColor: "#8a2be2",
+          width: 200,
+          overflowY: "auto",
+          marginRight: 2,
+          padding: 2,
+        }}
+      >
+        <Typography variant="h6" gutterBottom>
+          Employees
+        </Typography>
+        <List>
+          {employees.map((employee) => (
+            <ListItem
+              key={employee.id}
+              onClick={() => {
+                setSelectedEmployeeId(employee.id);
+                setSelectedEmployeeName(
+                  `${employee.employee_fname} ${employee.employee_lname}`
+                );
+              }}
+              style={{
+                cursor: "pointer",
+                padding: "5px",
+                backgroundColor:
+                  selectedEmployeeId === employee.id ? "#9b30ff" : "#8a2be2",
+              }}
+            >
+              <ListItemText
+                primary={`${employee.employee_fname} ${employee.employee_lname}`}
+                secondary={employee.employee_position}
+                sx={{
+                  backgroundColor: "#9b30ff",
+                  padding: "8px",
+                  borderRadius: "4px",
+                  marginBottom: "4px",
+                }}
+              />
+            </ListItem>
+          ))}
+        </List>
+      </Paper>
 
-     {/* Calendar Component */}
-     <DnDCalendar
-      localizer={localizer}
-      events={events}
-      onEventDrop={handleEventDrop}
-      onSelectSlot={handleSelectSlot}
-      onSelectEvent={(event) => {
-        setSelectedSlot({ start: event.start }); 
-        setStartTime(moment(event.start).format("HH:mm")); 
-        setEndTime(moment(event.end).format("HH:mm"));
-        setSelectedEventId(event.id); 
-        setOpenDialog(true); 
-      }}
-      selectable
-      resizable
-      defaultView="week"
-      views={['day', 'week']}
-      step={60}
-      timeslots={1}
-      min={moment().hours(7).minutes(0).toDate()}
-      max={moment().hours(20).minutes(0).toDate()}
-      style={{ marginLeft: 2, flexGrow: 1 }}
-      // components={{
-      //   timeSlotWrapper() {
-      //     return (
-      //       <div style={{ display: "none" }}>
-      //       </div>
-      //     );
-      //   }
-      // }}
-     />
+      <DnDCalendar
+        localizer={localizer}
+        events={events}
+        components={{
+          event: (props: any) => <CustomEvent {...props} employees={employees} />,
+        }}
+        onEventDrop={handleEventDrop}
+        onSelectSlot={handleSelectSlot}
+        onSelectEvent={(event: Event) => {
+          setSelectedSlot({ start: event.start, end: event.end });
+          setStartTime(moment(event.start).format("HH:mm"));
+          setEndTime(moment(event.end).format("HH:mm"));
+          setSelectedEventId(event.id);
+          setEventDescription(event.description || "");
+          setOpenDialog(true);
+        }}
+        selectable
+        resizable={false}
+        defaultView="week"
+        views={["day", "week"]}
+        step={60}
+        timeslots={1}
+        min={moment().startOf("day").add(7, "hours").toDate()}
+        max={moment().startOf("day").add(20, "hours").toDate()}
+        style={{ flexGrow: 1 }}
+        defaultDate={new Date()}
+        formats={{
+          timeGutterFormat: (date: Date) => moment(date).format("HH:mm"),
+          dayFormat: (date: Date) => moment(date).format("ddd DD/MM"),
+        }}
+      />
 
-     {/* Dialog for setting schedule */}
-     <Dialog open={openDialog} onClose={handleDialogClose}>
-       <DialogTitle>{selectedEventId ? "Update Working Hours" : "Set Working Hours"}</DialogTitle>
-       <DialogContent>
-         <TextField 
-           autoFocus 
-           margin="dense" 
-           label="Start Time (HH:mm)" 
-           type="time" 
-           fullWidth 
-           variant="outlined"
-           value={startTime}
-           onChange={(e) => setStartTime(e.target.value)}
-         />
-         <TextField 
-           margin="dense" 
-           label="End Time (HH:mm)" 
-           type="time" 
-           fullWidth 
-           variant="outlined"
-           value={endTime}
-           onChange={(e) => setEndTime(e.target.value)}
-         />
-       </DialogContent>
-       <DialogActions>
-         {selectedEventId && (
-           <Button color="error" onClick={handleDeleteSchedule}>Delete</Button> 
-         )}
-         <Button onClick={handleDialogClose}>Cancel</Button>
-         <Button onClick={handleScheduleSet}>{selectedEventId ? "Update Schedule" : "Set Schedule"}</Button>
-       </DialogActions>
-     </Dialog>
-
-   </Box>
+      <Dialog open={openDialog} onClose={handleDialogClose}>
+        <DialogTitle>
+          {selectedEventId
+            ? "Update Working Hours"
+            : `Set Working Hours for ${selectedEmployeeName}`}
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Start Time (HH:mm)"
+            type="time"
+            fullWidth
+            variant="outlined"
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)} // Update start time
+          />
+          <TextField
+            margin="dense"
+            label="End Time (HH:mm)"
+            type="time"
+            fullWidth
+            variant="outlined"
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)} // Update end time
+          />
+          <TextField
+            margin="dense"
+            label="Description" // Field for description
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={eventDescription} // Bind to state variable
+            onChange={(e) => setEventDescription(e.target.value)} // Update description state
+          />
+        </DialogContent>
+        <DialogActions>
+          {selectedEventId && (
+            <Button color="error" onClick={handleDeleteSchedule}>
+              Delete
+            </Button>
+          )}
+          <Button onClick={handleDialogClose}>Cancel</Button>
+          <Button onClick={handleScheduleSet}>
+            {selectedEventId ? "Update Schedule" : "Set Schedule"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
 
