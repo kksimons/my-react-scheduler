@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* *,
 *::before,
 *::after {
@@ -15,3 +16,11 @@
   font-family: 'Poppins', sans-serif !important;
 
 } 
+=======
+/* #root {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
+  text-align: center;
+} */
+>>>>>>> 5c3315884a190c34384140881b91bfbb0c01d184
