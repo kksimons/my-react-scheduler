@@ -5,7 +5,7 @@ const auth = getAuth();
 const provider = new GoogleAuthProvider();
 
 // Google Sign-In function //promise based
-export const signInWithGooglePopup = async () => {
+export const SignInWithGooglePopup = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
     // Access the Google API token if needed
@@ -25,4 +25,4 @@ export const signInWithGooglePopup = async () => {
   }
 };
 
-export default auth;
+export default SignInWithGooglePopup;

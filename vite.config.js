@@ -13,6 +13,7 @@ export default defineConfig({
       { find: '@components', replacement: '/src/components' },
       { find: '@theme', replacement: '/src/theme' },
       { find: '@schedules', replacement: '/src/schedules' },
+      { find: '@utils', replacement: '/src/utils' },
     ],
   },
   server: {

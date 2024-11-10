@@ -23,9 +23,7 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 const provider = new GoogleAuthProvider();
 auth.languageCode = 'it';
-provider.setCustomParameters({
-  'login_hint': 'user@example.com'
-});
+
 
 
 export { db, auth, storage, provider };

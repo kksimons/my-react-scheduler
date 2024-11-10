@@ -2,21 +2,24 @@
 import React from 'react';
 import {  Typography, Box } from '@mui/material';
 // import { styled } from '@mui/system';
-import BussersSchedule from @schedules/BussersSchedule;
-
+//import ServersSchedule from '@schedules/ServersSchedule';
+import DashboardLayoutBasic from '@schedules/Dashboard';
 
 import SignOut from '../userAuth/services/SignOut';
 
 
 const ManagerDashBoard = () => { 
     return (
-        <Typography> 
-            Manager DashBoard: 
+        <Box>
+            <Typography> 
+                Manager DashBoard: 
 
                 <SignOut />
-                <BussersSchedule />
+                {/* <ServersSchedule /> */}
                
         </Typography>
+            <DashboardLayoutBasic />
+        </Box>
     );
 }
 export default ManagerDashBoard;

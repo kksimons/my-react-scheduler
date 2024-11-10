@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, Container, Typography, FormControl, FormLabel, TextField, Select, MenuItem, FormHelperText, ThemeProvider } from "@mui/material";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getFirestore, collection, addDoc, updateDoc } from "firebase/firestore";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import theme from "@theme/theme";
 
@@ -10,13 +10,11 @@ const EmployeeRegistration = () => {
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
-        email: "",
         dob: "",
         phoneNumber: "",
         systemSide: "",
         position: "",
         employeeType: "",
-        password: ""
     });
 
     const [formErrors, setFormErrors] = useState({});
@@ -33,19 +31,15 @@ const EmployeeRegistration = () => {
 
     const validateForm = () => {
         const errors = {};
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const phoneRegex = /^\d{3,15}$/;
         const nameRegex = /^[a-zA-Z]+$/;
         const dob = new Date(formData.dob);
         const age = new Date().getFullYear() - dob.getFullYear();
 
-        if (!emailRegex.test(formData.email)) {
-            errors.email = "Please enter correct email format: user@example.com ";
-        }
 
-        if (formData.password.length < 6 || !/\d/.test(formData.password) || !/[a-zA-Z]/.test(formData.password)) {
-            errors.password = "Password must be at least 6 characters long, contain both numbers and letters";
-        }
+        // if (formData.password.length < 6 || !/\d/.test(formData.password) || !/[a-zA-Z]/.test(formData.password)) {
+        //     errors.password = "Password must be at least 6 characters long, contain both numbers and letters";
+        // }
 
         if (age < 13 || age > 120) {
             errors.dob = "Employee must be at least 13 years old and at most 120 years old";
@@ -67,28 +61,33 @@ const EmployeeRegistration = () => {
         return Object.keys(errors).length === 0;
     };
 
+    //handle submit 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         if (!validateForm()) return;
 
-        try {
-            const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-            const user = userCredential.user;
+        //Logic: use UpdateDoc to update the employee's information in the employees table 
+        const user = auth.currentUser; //get the current user ID 
 
-            await addDoc(collection(db, "employees"), {
-                employee_fname: formData.firstName,
-                employee_lname: formData.lastName,
-                employee_email: formData.email,
-                employee_dob: formData.dob,
-                employee_phone_number: formData.phoneNumber,
-                employee_system: formData.systemSide,
-                employee_position: formData.position,
-                employee_type: formData.employeeType
-            });
-
-            navigate("/Availability");
-        } catch (error) {
-            console.error("Error adding document: ", error);
+        //check if the user is created in database
+        if (user) {
+            try {
+                //create a new document in the employees collection with the user ID
+                await updateDoc(doc(db, "employees", user.uid), {
+                    employee_fname: formData.firstName,
+                    employee_lname: formData.lastName,
+                    employee_email: formData.email,
+                    employee_dob: formData.dob,
+                    employee_phone_number: formData.phoneNumber,
+                    employee_system: formData.systemSide,
+                    employee_position: formData.position,
+                    employee_type: formData.employeeType
+                });
+                navigate("/Availability"); //after successful registration, navigate to the availability page
+            } catch (error) {
+                console.error("Error updating document: ", error);
+            }
         }
     };
 
@@ -146,7 +145,7 @@ const EmployeeRegistration = () => {
                     />
                 </FormControl>
                 
-                <FormControl>
+                {/* <FormControl>
                     <FormLabel>Email:</FormLabel>
                     <TextField
                         name="email"
@@ -158,9 +157,9 @@ const EmployeeRegistration = () => {
                         helperText={formErrors.email}
                         required
                     />
-                </FormControl>
+                </FormControl> */}
                 
-                <FormControl>
+                {/* <FormControl>
                     <FormLabel>Password:</FormLabel>
                     <TextField
                         name="password"
@@ -171,7 +170,7 @@ const EmployeeRegistration = () => {
                         helperText={formErrors.password}
                         required
                     />
-                </FormControl>
+                </FormControl> */}
                 
                 <FormControl>
                     <FormLabel>Date of Birth:</FormLabel>

@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
-import { Box, Button, Container, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
+import { FormControl, FormLabel, TextField } from '@mui/material';
 import { auth } from '../firebase';
-import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import theme from '../../theme/theme';
+import theme from '@theme/theme';
 import { ThemeProvider } from '@mui/material';
+import { getDoc, doc } from 'firebase/firestore';
+import { db } from '../firebase';  // Import the Firestore database
 
 
 export function SignIn ()  {
@@ -13,51 +17,151 @@ export function SignIn ()  {
   const [formErrors, setFormErrors] = useState({}); //to handle exception when user enter wrong format 
   const navigate = useNavigate();
 
-  const handleSignIn = async (e) => {
-    e.preventDefault(); // Prevent form submission
+  // const handleSignIn = async (e) => {
+  //   e.preventDefault(); // Prevent form submission
 
-    // Validate form before submitting
-    if (!validateForm()) return;
+  //   // Validate form before submitting
+  //   if (!validateForm()) return;
 
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate('/SelectRole'); // Redirect to role selection on successful login
-    } catch (error) {
-      console.error("Error logging in, please try again:", error);
-      setFormErrors({ general: "Invalid email or password" }); // Set a general error message for invalid credentials
-    }
-  };
-
-  //handle google sign in 
-  const handleGoogleSignIn = async () => {
-    const result = await signInWithGooglePopup();
-    if (result.user) {
-      // Successful sign-in
-      console.log("User signed in:", result.user);
-      navigate('/SelectRole'); // Redirect to role selection on successful login
-    } else {
-      // Error occurred during sign-in
-      console.error("Sign-In Error:", result.errorMessage);
-      setFormErrors({ general: "Google sign-in failed. Please try again." });
-    }
-  };
-
-  //Validate form with exception message 
+  //   //check current user 
+  //   const user = auth.currentUser;
+  //   if (user) {
+  //     try {
+  //       await signInWithEmailAndPassword(auth, email, password);
+  //       navigate('/EmployeeDashBoard'); // Redirect to role selection on successful login
+  //     } catch (error) {
+  //       console.error("Error logging in, please try again:", error);
+  //       setFormErrors({ general: "Invalid email or password" }); // Set a general error message for invalid credentials
+  //     }
+  //   }
+  // };
+  // const handleSignIn = async (e) => {
+  //   e.preventDefault(); // Prevent form submission
+  
+  //   if (!validateForm()) return;
+  
+  //   try {
+  //     const userCredential = await signInWithEmailAndPassword(auth, email, password);
+  //     const user = userCredential.user;
+  //     console.log("Signed-in user UID:", user.uid);
+  
+  //     try {
+  //       // Check in the employees collection
+  //       const employeeDoc = await getDoc(doc(db, "employees", user.uid));
+  //       console.log("Employee document exists:", employeeDoc.exists());
+  
+  //       if (employeeDoc.exists()) {
+  //         navigate('/EmployeeDashBoard');
+  //       } else {
+  //         // If not found, check in the employers collection
+  //         const employerDoc = await getDoc(doc(db, "employers", user.uid));
+  //         console.log("Employer document exists:", employerDoc.exists());
+  
+  //         if (employerDoc.exists()) {
+  //           navigate('/EmployerDashBoard');
+  //         } else {
+  //           console.error("User document not found in employees or employers collections");
+  //           setFormErrors({ general: "User profile not found. Please contact support." });
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching user data from Firestore:", error);
+  //       setFormErrors({ general: "Error fetching user data. Please try again later." });
+  //     }
+  //   } catch (error) {
+  //     console.error("Error logging in:", error);
+  //     setFormErrors({ general: "Invalid email or password" });
+  //   }
+  // };
+    //Validate form with exception message 
   const validateForm = () => {
     const errors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!emailRegex.test(formData.email)) {
+    if (!emailRegex.test(email)) {
         errors.email = "Please enter correct email format: user@example.com ";
     }
 
-    if (formData.password.length < 6 || !/\d/.test(formData.password) || !/[a-zA-Z]/.test(formData.password)) {
+    if (password.length < 6 || !/\d/.test(password) || !/[a-zA-Z]/.test(password)) {
         errors.password = "Password must be at least 6 characters long, contain both numbers and letters";
     }
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0; // Return true if no errors found
   };
+
+  const handleSignIn = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+  
+    try {
+      // Sign in the user
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+  
+      // Correct usage: create DocumentReferences
+      const employeeDocRef = doc(db, "employees", user.uid);
+      const employerDocRef = doc(db, "employers", user.uid);
+  
+      // Fetch DocumentSnapshots
+      const [employeeDocSnap, employerDocSnap] = await Promise.all([
+        getDoc(employeeDocRef),
+        getDoc(employerDocRef),
+      ]);
+  
+      // Check if documents exist
+      if (employeeDocSnap.exists()) {
+        navigate("/EmployeeDashBoard");
+      } else if (employerDocSnap.exists()) {
+        navigate("/EmployerDashBoard");
+      } else {
+        console.error("User role document not found in employees or employers collections");
+        setFormErrors({ general: "User profile not found. Please contact support." });
+      }
+    } catch (error) {
+      console.error("Error logging in:", error);
+      setFormErrors({ general: "Invalid email or password" });
+    }
+  };
+  
+
+
+
+  //handle google sign in 
+  const handleGoogleSignIn = async () => {
+    const provider = new GoogleAuthProvider(); 
+
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user; 
+
+      // Create DocumentReferences check if user's doc exist for both emp and employer 
+      const employeeDocRef = doc(db, "employees", user.uid);
+      const employerDocRef = doc(db, "employers", user.uid);
+
+      //fetch DocumentSnapshots, use Promise.all to fetch both employee and employer docs 
+      const [employeeDocSnap, employerDocSnap] = await Promise.all([
+        getDoc(employeeDocRef),
+        getDoc(employerDocRef),
+      ]);
+
+      // Check if doc exist 
+      if (employeeDocSnap.exists()) {
+        navigate("/EmployeeDashBoard");
+      } else if (employerDocSnap.exists()) {
+        navigate("/EmployerDashBoard");
+      } else {
+        // console.error("User role document not found in employees or employers collections");
+        // setFormErrors({ general: "User profile not found. Please contact support." });
+        // User does not have a role yet, navigate to role selection
+        navigate('/SelectRole', { state: { uid: user.uid, email: user.email } });
+      } 
+    } catch (error) {
+      console.error("Error logging in with Google, please try again:", error);
+    }
+  };
+
+
 
   return (
     <ThemeProvider theme={theme}>
@@ -93,7 +197,7 @@ export function SignIn ()  {
             <TextField
               name="email"
               type="email"
-              placeholder="ex. user@example.com"
+              placeholder="user@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -115,10 +219,12 @@ export function SignIn ()  {
             />
           </FormControl>
 
+          {/* //sign in button */}
           <Button
             type="submit"
             variant="contained"
             color="primary"
+            // onClick={handleSignIn}
             sx={{
               mt: 2,
               boxShadow: 3,
@@ -129,6 +235,8 @@ export function SignIn ()  {
           >
             Sign In
           </Button>
+
+          {/* //Google sign in button */}
           <Button
             variant="outlined"
             color="secondary"
@@ -144,10 +252,11 @@ export function SignIn ()  {
             Sign In with Google
           </Button>
 
+          {/* //create new account button  */}
           <Button
             variant="outlined"
             color="secondary"
-            // onClick={navigate('/SignIn')}
+            onClick={() => navigate('/SignUp')} 
             sx={{
               mt: 2,
               boxShadow: 3,
@@ -156,7 +265,7 @@ export function SignIn ()  {
               },
             }}
           >
-            Sign In
+            Create new account
           </Button>
         </Box>
       </Box>

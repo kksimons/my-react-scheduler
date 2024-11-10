@@ -19,7 +19,7 @@ const SignOut = () => {
         // it will Log the user out from Firebase Auth
         await signOut(auth);
         // After the user is logged out, they will be redirected to the landing page (LandingPage.tsx) 
-        navigate('services/SignIn');
+        navigate('/SignIn');
       }
     } catch (error) {
       console.error('Error during sign out:', error);

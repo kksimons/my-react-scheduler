@@ -11,131 +11,47 @@ import FormLabel  from '@mui/material/FormLabel';
 import { ThemeProvider } from '@mui/system';
 import theme from '@theme/theme';
 
-// const SignUp = () => {
-//   const [email, setEmail] = useState('');
-//   const [password, setPassword] = useState('');
-//   const navigate = useNavigate();
-
-//   const handleSignUp = async (e) => {
-//     e.preventDefault();
-//     try {
-//       await createUserWithEmailAndPassword(auth, email, password);
-//       navigate('/SignIn'); // Direct to login after successful sign-up
-//     } catch (error) {
-//       console.error("Error signing up:", error);
-//     }
-//   };
-
-//   //handle google sign in 
-//   const handleGoogleSignIn = async () => {
-//     const provider = new GoogleAuthProvider();
-//     try {
-//       await signInWithPopup(auth, provider);
-//       navigate('/SelectRole'); // Redirect to role selection on successful login
-//     }
-//     catch (error) {
-//       console.error("Error logging in with Google:", error);
-//     }
-//     if (result.user) {
-//       // Successful sign-in
-//       console.log("User signed in:", result.user);
-//     } else {
-//       // Error occurred during sign-in
-//       console.error("Sign-In Error:", result.errorMessage);
-//     }
-//   };
-
-
-
-
-//   return (
-//     <Box 
-//       component="form"
-//       onSubmit={handleSignUp}
-//       sx={{
-//         display: 'flex',
-//         flexDirection: 'column',
-//         alignItems: 'center',
-//         mt: 8,
-//       }}
-//     >
-//       <TextField
-//         type="email"
-//         onChange={(e) => setEmail(e.target.value)}
-//         label="Email"
-//         variant="outlined"
-//         required
-//         fullWidth
-//         margin="normal"
-//       />
-//       <TextField
-//         type="password"
-//         onChange={(e) => setPassword(e.target.value)}
-//         label="Password"
-//         variant="outlined"
-//         required
-//         fullWidth
-//         margin="normal"
-//       />
-//       <Button type="submit" variant="contained" color="primary" fullWidth>
-//         Sign Up
-//       </Button>
-
-//       {/* Sign up with google button */}
-//       <Button
-//         onClick={handleGoogleSignIn}
-//         variant="contained"
-//         color="secondary"
-//         fullWidth
-//       >
-//         Sign Up with Google
-//       </Button>
-      
-//       {/* Already has an account ? */}
-//       <Typography>Already has an account ?</Typography> 
-
-//       <Button
-//         onClick={() => navigate('/SignIn')}
-//         variant="contained"
-//         color="primary"
-//         fullWidth
-//       >
-//         Sign In 
-//       </Button>
-
-//     </Box>
-//   );
-// };
-
-// export default SignUp;
-
-// import { ThemeProvider } from "@mui/system";
-// import theme from "@theme/theme";
-
 const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
+  //handle sign up 
+  // Logic: 
+    // First, create the user, then navigate to the SelectRole component.
+    // Next Pass the uid and email to the SelectRole component.
   const handleSignUp = async (e) => {
     e.preventDefault();
+
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      navigate('/SignIn'); // Direct to login after successful sign-up
+      //create a new user with email and password
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Navigate to role selection, passing user ID if needed for role selection
+      navigate('/SelectRole', { state: { uid: user.uid , email: user.email} });
     } catch (error) {
       console.error("Error signing up:", error);
     }
+
+    //   await createUserWithEmailAndPassword(auth, email, password);
+    //   navigate('/SelectRole'); // Direct to login after successful sign-up
+    // } catch (error) {
+    //   console.error("Error signing up:", error);
+    // }
   };
 
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
-      navigate('/SelectRole'); // Redirect to role selection on successful login
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      navigate('/SelectRole', { state: { uid: user.uid, email: user.email } });
     } catch (error) {
       console.error("Error logging in with Google:", error);
     }
   };
+  
 
   return (
     <ThemeProvider theme={theme}>
@@ -162,9 +78,12 @@ const SignUp = () => {
             boxShadow: 5,
           }}
         >
+          
           <Typography variant="h5" component="h6" gutterBottom>
             Sign Up
           </Typography>
+
+          {/* // Form for user to enter email and password */}
           <FormControl>
             <FormLabel>Email:</FormLabel>
             <TextField
@@ -172,6 +91,7 @@ const SignUp = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              placeholder='user@example.com'
               required
             />
           </FormControl>
@@ -185,10 +105,13 @@ const SignUp = () => {
               required
             />
           </FormControl>
+
+          {/* // Submit button */}
           <Button
             type="submit"
             variant="contained"
             color="primary"
+            // onClick={}
             sx={{
               mt: 2,
               boxShadow: 3,
@@ -199,20 +122,7 @@ const SignUp = () => {
           >
             Sign Up
           </Button>
-          <Button
-            onClick={handleGoogleSignIn}
-            variant="contained"
-            color="secondary"
-            sx={{
-              mt: 2,
-              boxShadow: 3,
-              '&:hover': {
-                boxShadow: 6,
-              },
-            }}
-          >
-            Sign Up with Google
-          </Button>
+
           <Typography>Already have an account?</Typography>
           <Button
             onClick={() => navigate('/SignIn')}
@@ -227,6 +137,20 @@ const SignUp = () => {
             }}
           >
             Sign In
+          </Button>
+          <Button
+            onClick={handleGoogleSignIn}
+            variant="contained"
+            color="secondary"
+            sx={{
+              mt: 2,
+              boxShadow: 3,
+              '&:hover': {
+                boxShadow: 6,
+              },
+            }}
+          >
+            Sign Ip with Google
           </Button>
         </Box>
       </Box>

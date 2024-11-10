@@ -39,13 +39,13 @@ const Availability = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            await addDoc(collection(db, "availability"), availability);
+            await addDoc(collection(db, "employees"), availability);
             alert("Employee account has created");
             setTimeout(() => {
-                alert("You will be redirect to Employee Dashboard in a few second");
+                alert("You account has been created");
                 setLoading(false);
                 // Redirect to Employee Dashboard
-                window.location.href = "/EmployeeDashBoard"; //Returns the Location object's URL. Can be set, to navigate to the given URL.
+                window.location.href = "/SignIn"; //Returns the Location object's URL. Can be set, to navigate to the given URL.
             }, 2000);
         } catch (error) {
             console.error("Error saving availability: ", error);
@@ -82,7 +82,11 @@ const Availability = () => {
                         </FormGroup>
                     </FormControl>
                 ))}
-                <Button type="submit" variant="contained" fullWidth>
+                <Button
+                 type="submit" 
+                 variant="contained"
+                 onClick={handleSubmit} 
+                 fullWidth>
                     Submit
                 </Button>
             </form>

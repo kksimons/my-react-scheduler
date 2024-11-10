@@ -1,5 +1,7 @@
 // Assuming EmployeeLogOut is a button
 import React from 'react';
+import Scheduler from '@aldabil/react-scheduler';
+import ServersSchedule from '@schedules/ServersSchedule';
 import { Container, Typography, Box } from '@mui/material';
 import { styled } from '@mui/system';
 import SignOut from '@userAuth/services/SignOut';
@@ -15,6 +17,7 @@ const EmployeeDashboard = () => {
             <Box mt={2}>
 
                 <SignOut/>
+                <ServersSchedule/>
                 
             </Box>
         </Container>

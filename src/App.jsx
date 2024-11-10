@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './LandingPage';
 
-import ManagerDashboard from '@components/ManagerDashBoard';
+import EmployerDashboard from '@components/EmployerDashBoard';
 import EmployeeDashboard from '@components/EmployeeDashBoard';
 import ProtectedRoute from '@userAuth/contexts/ProtectedRoute';
 import SelectRole from './SelectRole';
@@ -14,7 +14,9 @@ import SignOut from '@userAuth/services/SignOut';
 import EmployeeRegistration from '@userAuth/EmployeeRegistration';
 import EmployerRegistration from '@userAuth/EmployerRegistration';
 // import EmployeeRegistration from '@userAuth/EmployeeRegistration/EmployeeRegistration';
+import ServersSchedule from '@schedules/ServersSchedule';
 import BussersSchedule from '@schedules/BussersSchedule';
+import CooksSchedule from '@schedules/CooksSchedule';
 
 const App = () => {
   return (
@@ -28,13 +30,15 @@ const App = () => {
 
             {/* {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
-              <Route path="/ManagerDashboard" element={<ManagerDashboard />} />
+              <Route path="/EmployerDashboard" element={<EmployerDashboard />} />
               <Route path="/EmployeeDashboard" element={<EmployeeDashboard />} />
               <Route path= "/EmployeeRegistration" element={<EmployeeRegistration />} />
               <Route path="/EmployerRegistration" element={<EmployerRegistration />} />
               <Route path="/SignOut" element={<SignOut />} />
               <Route path="/SelectRole" element={<SelectRole />} />
+              <Route path="/ServersSchedule" element={<ServersSchedule />} />
               <Route path="/BussersSchedule" element={<BussersSchedule />} />
+              <Route path="/CooksSchedule" element={<CooksSchedule />} />
             </Route>
             
             {/* {/* 404 Not Found Route */}
