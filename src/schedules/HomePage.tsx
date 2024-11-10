@@ -38,8 +38,8 @@ import {
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../userAuth/firebase";
 import { useUserStore } from "../stores/useUserStore";
-import EmployeeList from "../manager-dashboard/EmployeeManagement";
-import EmployeeManagement from "../manager-dashboard/EmployeeManagement";
+import EmployeeList from "../employer-dashboard/EmployeeManagement";
+import EmployeeManagement from "../employer-dashboard/EmployeeManagement";
 import { ThemeProvider } from "@emotion/react";
 import { padding, typography } from '@mui/system';
 import Typography from '@mui/material/Typography';
@@ -84,6 +84,7 @@ export default function HomePage() {
   const {
     setCurrentTab,
     isLoggedIn,
+    role,
     setIsLoggedIn,
     setRole,
     setProfilePic: setStoreProfilePic,
@@ -395,7 +396,7 @@ export default function HomePage() {
           // width: "full",
         }}
       >
-        {isLoggedIn ? (
+        {isLoggedIn && role === 'employer' ? (
           <>
           <EmployeeManagement /> 
           

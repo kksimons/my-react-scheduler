@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import Box from '@mui/material/Box';
-import Tab from '@mui/material/Tab';
-import Tabs from '@mui/material/Tabs';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
+import Box from "@mui/material/Box";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
 import ServersSchedule from "./schedules/ServersSchedule";
 import BussersSchedule from "./schedules/BussersSchedule";
 import CooksSchedule from "./schedules/CooksSchedule";
@@ -128,7 +128,7 @@ export default function App() {
         onChange={(_, newValue) => handleTabChange(newValue)}
         aria-label="schedule tabs"
       >
-        <Tab label="Landing Page" sx={{display: 'none'}}/>
+        <Tab label="Landing Page" sx={{ display: "none" }} />
         <Tab label="Home" />
         {role === "employer" && [
           <Tab label="Servers Schedule" key="servers-tab" />,
@@ -141,7 +141,6 @@ export default function App() {
       </Tabs>
     );
   };
-
 
   const renderTabContent = () => {
     switch (mapCurrentTab()) {
@@ -174,7 +173,6 @@ export default function App() {
         return null;
     }
   };
-  
 
   return (
     <>
@@ -184,11 +182,11 @@ export default function App() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          background: 'linear-gradient(97deg, rgba(233,104,255,1) 0%, rgba(69,91,235,1) 37%, rgba(34,24,167,1) 79%)'
+          background:
+            "linear-gradient(97deg, rgba(233,104,255,1) 0%, rgba(69,91,235,1) 37%, rgba(34,24,167,1) 79%)",
           // borderColor: "divider",
         }}
       >
-
         {isLoggedIn && (
           <>
             {/* Render the tabs based on role */}
