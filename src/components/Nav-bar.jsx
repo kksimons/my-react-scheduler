@@ -1,12 +1,12 @@
-import { AppBar, Toolbar } from "@mui/material";
+import { AppBar, Button, Toolbar, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const Navigation = () => {
   const navigate = useNavigate();
 
   return (
-    <AppBar>
-      <Toolbar>
+    <AppBar position="fixed">
+      <Toolbar variant="h6" sx={{display: "flex", justifyContent: "space-between"}}>
         <Typography>PowerShift</Typography>
         <Button
           variant="contained"
