@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { extendTheme, styled } from '@mui/material/styles';
-import DashboardIcon from '@mui/icons-material/Dashboard';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
@@ -12,7 +11,7 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
-import ServersSchedule from '@schedules/ServersSchedule'; 
+
 const NAVIGATION = [
   {
     kind: 'header',
@@ -116,7 +115,6 @@ export function DashboardLayoutBasic(props) {
       window={demoWindow}
     >
       <DashboardLayout>
-        <ServersSchedule />
 
       </DashboardLayout>
     </AppProvider>

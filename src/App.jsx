@@ -13,10 +13,7 @@ import SignIn from '@userAuth/services/SignIn';
 import SignOut from '@userAuth/services/SignOut';
 import EmployeeRegistration from '@userAuth/EmployeeRegistration';
 import EmployerRegistration from '@userAuth/EmployerRegistration';
-// import EmployeeRegistration from '@userAuth/EmployeeRegistration/EmployeeRegistration';
-import ServersSchedule from '@schedules/ServersSchedule';
-import BussersSchedule from '@schedules/BussersSchedule';
-import CooksSchedule from '@schedules/CooksSchedule';
+import Availability from '@userAuth/Availability';
 
 const App = () => {
   return (
@@ -36,9 +33,7 @@ const App = () => {
               <Route path="/EmployerRegistration" element={<EmployerRegistration />} />
               <Route path="/SignOut" element={<SignOut />} />
               <Route path="/SelectRole" element={<SelectRole />} />
-              <Route path="/ServersSchedule" element={<ServersSchedule />} />
-              <Route path="/BussersSchedule" element={<BussersSchedule />} />
-              <Route path="/CooksSchedule" element={<CooksSchedule />} />
+              <Route path="/Availability" element={<Availability />} />
             </Route>
             
             {/* {/* 404 Not Found Route */}

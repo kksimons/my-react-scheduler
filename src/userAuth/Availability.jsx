@@ -1,8 +1,15 @@
 import React, { useState } from "react";
-import { Container, Typography, FormControl, FormLabel, FormGroup, FormControlLabel, Checkbox, Button } from "@mui/material";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { Box, Typography, FormControl, FormLabel, FormGroup, FormControlLabel, Checkbox, Button } from "@mui/material";
+import { getFirestore, setDoc, doc, updateDoc } from "firebase/firestore";
+import { auth } from "./firebase";
+import { useNavigate } from "react-router-dom";
 
 const Availability = () => {
+
+    
+    const navigate = useNavigate();
+    
+
     const [availability, setAvailability] = useState({
         Monday: [],
         Tuesday: [],
@@ -34,30 +41,35 @@ const Availability = () => {
             }
         });
     };
-
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        try {
-            await addDoc(collection(db, "employees"), availability);
-            alert("Employee account has created");
-            setTimeout(() => {
-                alert("You account has been created");
-                setLoading(false);
-                // Redirect to Employee Dashboard
-                window.location.href = "/SignIn"; //Returns the Location object's URL. Can be set, to navigate to the given URL.
-            }, 2000);
-        } catch (error) {
-            console.error("Error saving availability: ", error);
-            setLoading(false);
+        e.preventDefault;
+        const user = auth.currentUser;
+    
+        if (user) {
+            try {
+                await updateDoc(doc(db, "employees", user.uid), { availability });
+                alert("Availability has been saved");
+                navigate("/EmployeeDashBoard");
+            } catch (error) {
+                console.error("Error saving availability: ", error);
+            }
+        } else {
+            console.error("No user is signed in");
+            navigate("/SignIn");
         }
     };
+    
 
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
     const options = ["Opening", "Closing", "Evening", "Anytime"];
 
     return (
-        <Container maxWidth="sm">
+        <Box 
+            maxWidth="sm"
+            sx={{ 
+                onclick: { handleSubmit }
+            }} 
+            >
             <Typography variant="h4" gutterBottom align="center">
                 Set Your Availability
             </Typography>
@@ -85,12 +97,11 @@ const Availability = () => {
                 <Button
                  type="submit" 
                  variant="contained"
-                 onClick={handleSubmit} 
                  fullWidth>
                     Submit
                 </Button>
             </form>
-        </Container>
+        </Box>
     );
 };
 
