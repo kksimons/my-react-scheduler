@@ -104,14 +104,13 @@ function DashboardLayoutBasic(props) {
 
   const router = useDemoRouter('/dashboard');
 
-  // Remove this const when copying and pasting into your project.
   const demoWindow = window ? window() : undefined;
 
   return (
     <AppProvider
       navigation={NAVIGATION}
       router={router}
-      theme={demoTheme} // Now 'demoTheme' is defined
+      theme={demoTheme} 
       window={demoWindow}
     >
       <DashboardLayout>
