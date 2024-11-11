@@ -14,7 +14,10 @@ import SignOut from '@userAuth/services/SignOut';
 import EmployeeRegistration from '@userAuth/EmployeeRegistration';
 import EmployerRegistration from '@userAuth/EmployerRegistration';
 import Availability from '@userAuth/Availability';
-import ForgotPassword from './userAuth/services/ForgotPassword';
+import ForgotPassword from '@userAuth/services/ForgotPassword';
+import DashboardLayoutBasic from '@schedules/Dashboard';
+
+
 
 const App = () => {
   return (
@@ -36,6 +39,8 @@ const App = () => {
               <Route path="/SignOut" element={<SignOut />} />
               <Route path="/SelectRole" element={<SelectRole />} />
               <Route path="/Availability" element={<Availability />} />
+              <Route path="/ForgotPassword" element={<ForgotPassword />} /> 
+              <Route path="/Dashboard" element={<DashboardLayoutBasic />} />
               
             </Route>
             

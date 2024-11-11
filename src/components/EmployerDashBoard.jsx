@@ -1,8 +1,8 @@
 
 import React from 'react';
 import {  Typography, Box } from '@mui/material';
-import SignOut from '../userAuth/services/SignOut';
-import Dashboard from '../schedules/Dashboard';
+import SignOut from '@userAuth/services/SignOut';
+import DashboardLayoutBasic from '@schedules/DashboardLayoutBasic';
 
 
 const EmployerDashBoard = () => { 
@@ -14,7 +14,7 @@ const EmployerDashBoard = () => {
                 <SignOut />
                
         </Typography>
-            <Dashboard />
+            <DashboardLayoutBasic />
         </Box>
     );
 }
