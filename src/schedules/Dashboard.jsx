@@ -1,18 +1,17 @@
+// DashboardLayoutBasic.js
+
 import * as React from 'react';
-import { extendTheme, styled } from '@mui/material/styles';
-import DashboardIcon from '@mui/icons-material/Dashboard';
+import { extendTheme } from '@mui/material/styles';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 
-import Grid from '@mui/material/Grid2';
 import ContactsIcon from '@mui/icons-material/Contacts';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
-import ServersSchedule from '@schedules/ServersSchedule'; 
 const NAVIGATION = [
   {
     kind: 'header',
@@ -71,6 +70,7 @@ const NAVIGATION = [
   },
 ];
 
+// Corrected theme object name
 const demoTheme = extendTheme({
   colorSchemes: { light: true, dark: true },
   colorSchemeSelector: 'class',
@@ -78,7 +78,7 @@ const demoTheme = extendTheme({
     values: {
       xs: 0,
       sm: 600,
-      md: 600,
+      md: 900,
       lg: 1200,
       xl: 1536,
     },
@@ -99,27 +99,25 @@ function useDemoRouter(initialPath) {
   return router;
 }
 
-
-export function DashboardLayoutBasic(props) {
+function DashboardLayoutBasic(props) {
   const { window } = props;
 
   const router = useDemoRouter('/dashboard');
 
-  // Remove this const when copying and pasting into your project.
   const demoWindow = window ? window() : undefined;
 
   return (
     <AppProvider
       navigation={NAVIGATION}
       router={router}
-      theme={demoTheme}
+      theme={demoTheme} 
       window={demoWindow}
     >
       <DashboardLayout>
-        <ServersSchedule />
-
+        {/* Your dashboard content */}
       </DashboardLayout>
     </AppProvider>
   );
 }
+
 export default DashboardLayoutBasic;

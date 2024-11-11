@@ -33,7 +33,7 @@ import React, { createContext, useContext, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../firebase';
 
-const AuthContext = createContext(undefined);
+const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, loading, error] = useAuthState(auth); // This now connects to Firebase authentication

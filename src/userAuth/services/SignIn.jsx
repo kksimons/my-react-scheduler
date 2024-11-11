@@ -17,62 +17,7 @@ export function SignIn ()  {
   const [formErrors, setFormErrors] = useState({}); //to handle exception when user enter wrong format 
   const navigate = useNavigate();
 
-  // const handleSignIn = async (e) => {
-  //   e.preventDefault(); // Prevent form submission
 
-  //   // Validate form before submitting
-  //   if (!validateForm()) return;
-
-  //   //check current user 
-  //   const user = auth.currentUser;
-  //   if (user) {
-  //     try {
-  //       await signInWithEmailAndPassword(auth, email, password);
-  //       navigate('/EmployeeDashBoard'); // Redirect to role selection on successful login
-  //     } catch (error) {
-  //       console.error("Error logging in, please try again:", error);
-  //       setFormErrors({ general: "Invalid email or password" }); // Set a general error message for invalid credentials
-  //     }
-  //   }
-  // };
-  // const handleSignIn = async (e) => {
-  //   e.preventDefault(); // Prevent form submission
-  
-  //   if (!validateForm()) return;
-  
-  //   try {
-  //     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-  //     const user = userCredential.user;
-  //     console.log("Signed-in user UID:", user.uid);
-  
-  //     try {
-  //       // Check in the employees collection
-  //       const employeeDoc = await getDoc(doc(db, "employees", user.uid));
-  //       console.log("Employee document exists:", employeeDoc.exists());
-  
-  //       if (employeeDoc.exists()) {
-  //         navigate('/EmployeeDashBoard');
-  //       } else {
-  //         // If not found, check in the employers collection
-  //         const employerDoc = await getDoc(doc(db, "employers", user.uid));
-  //         console.log("Employer document exists:", employerDoc.exists());
-  
-  //         if (employerDoc.exists()) {
-  //           navigate('/EmployerDashBoard');
-  //         } else {
-  //           console.error("User document not found in employees or employers collections");
-  //           setFormErrors({ general: "User profile not found. Please contact support." });
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching user data from Firestore:", error);
-  //       setFormErrors({ general: "Error fetching user data. Please try again later." });
-  //     }
-  //   } catch (error) {
-  //     console.error("Error logging in:", error);
-  //     setFormErrors({ general: "Invalid email or password" });
-  //   }
-  // };
     //Validate form with exception message 
   const validateForm = () => {
     const errors = {};
@@ -111,9 +56,9 @@ export function SignIn ()  {
   
       // Check if documents exist
       if (employeeDocSnap.exists()) {
-        navigate("/EmployeeDashBoard");
+        navigate("/EmployeeDashboard");
       } else if (employerDocSnap.exists()) {
-        navigate("/EmployerDashBoard");
+        navigate("/EmployerDashboard");
       } else {
         console.error("User role document not found in employees or employers collections");
         setFormErrors({ general: "User profile not found. Please contact support." });
@@ -266,6 +211,22 @@ export function SignIn ()  {
             }}
           >
             Create new account
+          </Button>
+
+          {/* //create new account button  */}
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => navigate('/ForgotPassword')} 
+            sx={{
+              mt: 2,
+              boxShadow: 3,
+              '&:hover': {
+                boxShadow: 6,
+              },
+            }}
+          >
+            Forget Password ?
           </Button>
         </Box>
       </Box>

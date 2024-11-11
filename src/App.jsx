@@ -2,8 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './LandingPage';
 
-import EmployerDashboard from '@components/EmployerDashBoard';
-import EmployeeDashboard from '@components/EmployeeDashBoard';
+import EmployerDashboard from '@components/EmployerDashboard';
+import EmployeeDashboard from '@components/EmployeeDashboard';
 import ProtectedRoute from '@userAuth/contexts/ProtectedRoute';
 import SelectRole from './SelectRole';
 import AuthProvider from '@userAuth/contexts/AuthContext';
@@ -13,10 +13,11 @@ import SignIn from '@userAuth/services/SignIn';
 import SignOut from '@userAuth/services/SignOut';
 import EmployeeRegistration from '@userAuth/EmployeeRegistration';
 import EmployerRegistration from '@userAuth/EmployerRegistration';
-// import EmployeeRegistration from '@userAuth/EmployeeRegistration/EmployeeRegistration';
-import ServersSchedule from '@schedules/ServersSchedule';
-import BussersSchedule from '@schedules/BussersSchedule';
-import CooksSchedule from '@schedules/CooksSchedule';
+import Availability from '@userAuth/Availability';
+import ForgotPassword from '@userAuth/services/ForgotPassword';
+import DashboardLayoutBasic from '@schedules/Dashboard';
+
+
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
             <Route path="/" element={<LandingPage />} />
             <Route path="/SignIn" element={<SignIn />} />
             <Route path="/SignUp" element={<SignUp />} />
+            <Route path="/ForgotPassword" element={<ForgotPassword />} />
 
             {/* {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
@@ -36,9 +38,10 @@ const App = () => {
               <Route path="/EmployerRegistration" element={<EmployerRegistration />} />
               <Route path="/SignOut" element={<SignOut />} />
               <Route path="/SelectRole" element={<SelectRole />} />
-              <Route path="/ServersSchedule" element={<ServersSchedule />} />
-              <Route path="/BussersSchedule" element={<BussersSchedule />} />
-              <Route path="/CooksSchedule" element={<CooksSchedule />} />
+              <Route path="/Availability" element={<Availability />} />
+              <Route path="/ForgotPassword" element={<ForgotPassword />} /> 
+              <Route path="/Dashboard" element={<DashboardLayoutBasic />} />
+              
             </Route>
             
             {/* {/* 404 Not Found Route */}

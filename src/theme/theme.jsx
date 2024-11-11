@@ -33,15 +33,19 @@ let theme = createTheme({
     // },
   },
 
-  // Color palette for the application
+  // Light theme color palette for the application
   palette: {
     primary: {
-      main: '#5340ff',         // Primary color for buttons, etc.
+      main: '#3D2FC0',         // purple, Primary color for buttons, etc.
       contrastText: '#ffffff', // Contrast text color for primary
     },
     secondary: {
       main: '#3532db',         // Secondary color
     },
+    // third: {
+    //   main: "ffffff",             // Third color
+    // },
+
     text: {
       primary: '#2a2a2a',      // Default text color
       secondary: '#3d3d3d',    // Secondary text color
@@ -54,6 +58,34 @@ let theme = createTheme({
       third: 'white',          // Background for main content area
       alternative: '#dfe0e6',  // Background for input fields, etc.
       accent: '#f0f2ff',       // Accent background for focus areas
+    },
+  },
+
+  // Dark theme color palette
+  darkPalette: {
+    primary: {
+      main: '#5B4CD6',         // Dark theme primary color
+      contrastText: '#ffffff', // Contrast text color for primary
+    },
+    secondary: {
+      main: '#3532db',         // Secondary color
+    },
+    third: {
+      main: '#ffffff',         // Third color
+    },
+
+    text: {
+      primary: '#e0e0e0',      // Default text color for dark theme
+      secondary: '#b0b0b0',    // Secondary text color for dark theme
+      accent: '#a0a0a0',       // Accent color for specific text
+      link: '#9999ff',         // Link color
+    },
+    background: {
+      primary: '#303030',      // Main background color for dark theme
+      secondary: '#424242',    // Background for sections like cards
+      third: '#484848',        // Background for main content area
+      alternative: '#505050',  // Background for input fields, etc.
+      accent: '#5B4CD6',       // Accent background for focus areas
     },
   },
 
@@ -134,27 +166,27 @@ let theme = createTheme({
       },
     },
 
-    // Style overrides for buttons
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          color: 'white', // White text color
-          backgroundColor: '#5340ff', // Primary button color
-          fontSize: '18px', // Standardize button text size
-          textTransform: 'none', // Prevent uppercase transformation
-          padding: '0.6rem 0.8rem', // Standard padding for buttons
-          borderRadius: '1rem', // Rounded corners
-          boxShadow: 'none', // Remove default shadow if desired
-          '&:hover': {
-            padding: '0.7rem 0.8rem', // Standard padding for buttons
-            borderRadius: '1rem', // Rounded corners
-            backgroundColor: '#3532db', // Hover color
-            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)', // Add a subtle shadow on hover
-          },
-        },
-      },
+    // // Style overrides for buttons
+    // MuiButton: {
+    //   styleOverrides: {
+    //     root: {
+    //       // color: 'white', // White text color
+    //       // backgroundColor: '#5340ff', // Primary button color
+    //       // fontSize: '18px', // Standardize button text size
+    //       textTransform: 'none', // Prevent uppercase transformation
+    //       padding: '0.6rem 0.8rem', // Standard padding for buttons
+    //       borderRadius: '1rem', // Rounded corners
+    //       boxShadow: 'none', // Remove default shadow if desired
+    //       '&:hover': {
+    //         padding: '0.7rem 0.8rem', // Standard padding for buttons
+    //         borderRadius: '1rem', // Rounded corners
+    //         backgroundColor: '#3532db', // Hover color
+    //         boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)', // Add a subtle shadow on hover
+    //       },
+    //     },
+    //   },
       
-    },
+    // },
     
   },
 });
