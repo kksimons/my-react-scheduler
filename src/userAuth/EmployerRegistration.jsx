@@ -327,13 +327,13 @@ const EmployerRegistration = () => {
         if (user) {
             try {
                 await setDoc(doc(db, "employers", user.uid), {
-                    employee_fname: formData.firstName,
-                    employee_lname: formData.lastName,
-                    // employee_email: formData.email,
-                    employee_dob: formData.dob,
-                    employee_phone_number: formData.phoneNumber,
-                    employee_system: formData.systemSide,
-                    employee_position: formData.position,
+                    employer_fname: formData.firstName,
+                    employer_lname: formData.lastName,
+                    // employer_email: formData.email,
+                    employer_dob: formData.dob,
+                    employer_phone_number: formData.phoneNumber,
+                    employer_system: formData.systemSide,
+                    employer_position: formData.position,
                 });
 
                 navigate("/SignIn");
@@ -380,7 +380,7 @@ const EmployerRegistration = () => {
                         onChange={handleChange}
                         error={!!formErrors.firstName}
                         helperText={formErrors.firstName}
-                        placeholder="ex. John"
+                        placeholder="John"
                         required
                     />
                 </FormControl>
@@ -393,7 +393,7 @@ const EmployerRegistration = () => {
                         onChange={handleChange}
                         error={!!formErrors.lastName}
                         helperText={formErrors.lastName}
-                        placeholder="ex. Doe"
+                        placeholder="Doe"
                         required
                     />
                 </FormControl>
