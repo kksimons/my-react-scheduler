@@ -1,23 +1,21 @@
 
 import React from 'react';
 import {  Typography, Box } from '@mui/material';
-// import { styled } from '@mui/system';
-import DashboardLayoutBasic from '@schedules/Dashboard';
-
 import SignOut from '../userAuth/services/SignOut';
+import Dashboard from '../schedules/Dashboard';
 
 
-const ManagerDashBoard = () => { 
+const EmployerDashBoard = () => { 
     return (
         <Box>
             <Typography> 
-                Manager DashBoard: 
+                Admin DashBoard: 
 
                 <SignOut />
                
         </Typography>
-            <DashboardLayoutBasic />
+            <Dashboard />
         </Box>
     );
 }
-export default ManagerDashBoard;
+export default EmployerDashBoard;

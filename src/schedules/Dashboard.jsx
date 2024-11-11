@@ -70,7 +70,7 @@ const NAVIGATION = [
   },
 ];
 
-const demoTheme = extendTheme({
+const Dashboard = extendTheme({
   colorSchemes: { light: true, dark: true },
   colorSchemeSelector: 'class',
   breakpoints: {
@@ -120,4 +120,4 @@ export function DashboardLayoutBasic(props) {
     </AppProvider>
   );
 }
-export default DashboardLayoutBasic;
+export default Dashboard;

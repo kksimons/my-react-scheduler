@@ -358,7 +358,10 @@ const EmployeeRegistration = () => {
         }
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            [e.target.name]: e.target.value, 
+
+            //Clear position when systemSide changes to prevent leftover values
+            ...(e.target.name === "systemSide" && {position: ""}),
         });
     };
 
@@ -547,34 +550,34 @@ const EmployeeRegistration = () => {
                         )}
                     </FormControl>
 
-                    {/* Position Field */}
-                    {formData.systemSide && (
-                        <FormControl error={!!formErrors.position}>
-                            <FormLabel>Position</FormLabel>
-                            <Select
-                                labelId="position-label"
-                                id="position-select"
-                                name="position"
-                                value={formData.position}
-                                required
-                                disabled={formData.systemSide === "Kitchen Side"} // Conditionally disable
-                                onChange={handleChange} // Allow changes when not disabled
-                            >
-                                {formData.systemSide === "Kitchen Side" && (
-                                    <MenuItem value="Cook">Cook</MenuItem>
-                                )}
-                                {formData.systemSide === "Dining Side" && (
-                                    <>
-                                        <MenuItem value="Server">Server</MenuItem>
-                                        <MenuItem value="Busser">Busser</MenuItem>
-                                    </>
-                                )}
-                            </Select>
-                            {formErrors.position && (
-                                <FormHelperText>{formErrors.position}</FormHelperText>
-                            )}
-                        </FormControl>
+                {/* Position Field */}
+                <FormControl error={!!formErrors.position}>
+                    <FormLabel>Position</FormLabel>
+                    <Select
+                        labelId="position-label"
+                        id="position-select"
+                        name="position"
+                        value={formData.position}
+                        required
+                        onChange={handleChange}
+                        displayEmpty
+                    >
+                        <MenuItem value="" disabled>
+                            Select Position
+                        </MenuItem>
+                        {formData.systemSide === "Kitchen Side" && (
+                            <MenuItem value="Cook">Cook</MenuItem>
+                        )}
+                        {formData.systemSide === "Dining Side" && [
+                            <MenuItem value="Server" key="server">Server</MenuItem>,
+                            <MenuItem value="Busser" key="busser">Busser</MenuItem>
+                        ]}
+                    </Select>
+                    {formErrors.position && (
+                        <FormHelperText>{formErrors.position}</FormHelperText>
                     )}
+                </FormControl>
+
                     
                     {/* Employee Type */}
                     <FormControl error={!!formErrors.employeeType}>

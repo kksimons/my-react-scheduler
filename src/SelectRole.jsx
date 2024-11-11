@@ -23,7 +23,9 @@ const SelectRole = () => {
         if (loading) return;
         if (!user) {
             console.error("User is not authenticated.");
-            navigate('/SignIn');
+            // navigate('/SignUp');
+            //display message to user
+            return(error); 
         }
     }, [user, loading, navigate]);
 
@@ -119,7 +121,7 @@ const SelectRole = () => {
                             startIcon={<KeyboardBackspaceIcon />}
                             onClick={() => {
                                 console.log("Back button clicked");
-                                navigate('/SignUp', { state: { fromSelectRole: true } }); // Pass state
+                                navigate('/', { state: { fromSelectRole: true } }); // Pass state
                             }}
                             sx={{
                                 boxShadow: 3,
@@ -155,7 +157,7 @@ const SelectRole = () => {
                                             Employer
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary" align="center">
-                                            Manage your job postings and review applicants.
+                                            Manage your schedule and employees.
                                         </Typography>
                                     </CardContent>
                                 </Box>
@@ -172,7 +174,7 @@ const SelectRole = () => {
                                             Employee
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary" align="center">
-                                            Browse job opportunities and apply to your desired roles.
+                                            View schedule and stay on the same page with your team.
                                         </Typography>
                                     </CardContent>
                                 </Box>
