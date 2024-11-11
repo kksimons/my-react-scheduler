@@ -212,6 +212,22 @@ export function SignIn ()  {
           >
             Create new account
           </Button>
+
+          {/* //create new account button  */}
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => navigate('/ForgotPassword')} 
+            sx={{
+              mt: 2,
+              boxShadow: 3,
+              '&:hover': {
+                boxShadow: 6,
+              },
+            }}
+          >
+            Forget Password ?
+          </Button>
         </Box>
       </Box>
     </ThemeProvider>

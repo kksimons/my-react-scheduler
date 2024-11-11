@@ -14,6 +14,7 @@ import SignOut from '@userAuth/services/SignOut';
 import EmployeeRegistration from '@userAuth/EmployeeRegistration';
 import EmployerRegistration from '@userAuth/EmployerRegistration';
 import Availability from '@userAuth/Availability';
+import ForgotPassword from './userAuth/services/ForgotPassword';
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
             <Route path="/" element={<LandingPage />} />
             <Route path="/SignIn" element={<SignIn />} />
             <Route path="/SignUp" element={<SignUp />} />
+            <Route path="/ForgotPassword" element={<ForgotPassword />} />
 
             {/* {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
@@ -34,6 +36,7 @@ const App = () => {
               <Route path="/SignOut" element={<SignOut />} />
               <Route path="/SelectRole" element={<SelectRole />} />
               <Route path="/Availability" element={<Availability />} />
+              
             </Route>
             
             {/* {/* 404 Not Found Route */}
