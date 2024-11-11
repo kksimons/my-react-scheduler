@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './LandingPage';
 
-import EmployerDashboard from '@components/EmployerDashboard';
+import EmployerDashboard from '@components/employer-dashboard/EmployerDashboard';
 import EmployeeDashboard from '@components/EmployeeDashboard';
 import ProtectedRoute from '@userAuth/contexts/ProtectedRoute';
 import SelectRole from './SelectRole';
@@ -15,7 +15,6 @@ import EmployeeRegistration from '@userAuth/EmployeeRegistration';
 import EmployerRegistration from '@userAuth/EmployerRegistration';
 import Availability from '@userAuth/Availability';
 import ForgotPassword from '@userAuth/services/ForgotPassword';
-import DashboardLayoutBasic from '@schedules/Dashboard';
 
 
 
@@ -34,13 +33,12 @@ const App = () => {
             <Route element={<ProtectedRoute />}>
               <Route path="/EmployerDashboard" element={<EmployerDashboard />} />
               <Route path="/EmployeeDashboard" element={<EmployeeDashboard />} />
-              <Route path= "/EmployeeRegistration" element={<EmployeeRegistration />} />
+              <Route path="/EmployeeRegistration" element={<EmployeeRegistration />} />
               <Route path="/EmployerRegistration" element={<EmployerRegistration />} />
               <Route path="/SignOut" element={<SignOut />} />
               <Route path="/SelectRole" element={<SelectRole />} />
               <Route path="/Availability" element={<Availability />} />
               <Route path="/ForgotPassword" element={<ForgotPassword />} /> 
-              <Route path="/Dashboard" element={<DashboardLayoutBasic />} />
               
             </Route>
             

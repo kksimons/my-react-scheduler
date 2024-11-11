@@ -14,6 +14,7 @@ export default defineConfig({
       { find: '@theme', replacement: '/src/theme' },
       { find: '@schedules', replacement: '/src/schedules' },
       { find: '@utils', replacement: '/src/utils' },
+      { find: '@employer', replacement: '/src/components/employer' },
     ],
   },
   server: {
