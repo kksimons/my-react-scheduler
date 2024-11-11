@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Typography, Button, Box } from '@mui/material';
 import SelectRole from './SelectRole';
+import Navigation from './components/Nav-bar';
 
 // Landing page starts here 
 const LandingPage = () => {
@@ -11,9 +12,11 @@ const LandingPage = () => {
   return (
     <Container>
       {/* Welcome Line */}
-      <Typography variant="h1">PowerShift</Typography>
+      {/* <Typography variant="h1">PowerShift</Typography> */}
       
         {/* Sign up button */}
+
+        <Navigation />
       <Button
         variant="contained"
         color="primary"
