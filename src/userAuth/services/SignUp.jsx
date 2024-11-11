@@ -42,15 +42,15 @@ const SignUp = () => {
   // Authentication state
   const [user, loadingAuthState] = useAuthState(auth);
 
-  // Effect to redirect authenticated users unless coming from SelectRole
-  useEffect(() => {
-    if (user && !loadingAuthState) {
-      // Check if navigation state indicates to stay on SignUp
-      if (!(location.state && location.state.fromSelectRole)) {
-        navigate('/SelectRole'); // Redirect to SelectRole if already authenticated and not navigating back
-      }
-    }
-  }, [user, loadingAuthState, navigate, location.state]);
+  // // Effect to redirect authenticated users unless coming from SelectRole
+  // useEffect(() => {
+  //   if (user && !loadingAuthState) {
+  //     // Check if navigation state indicates to stay on SignUp
+  //     //if (!(location.state && location.state.fromSelectRole)) {
+  //       navigate('/SelectRole'); // Redirect to SelectRole if already authenticated and not navigating back
+  //     //}
+  //   }
+  // }, [user, loadingAuthState, navigate]);
 
   // Regular expression for email validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

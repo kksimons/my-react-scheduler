@@ -7,6 +7,17 @@ const LandingPage = () => {
   const navigate = useNavigate();
   //const { role } = useAuth(); // Get the role from the AuthContext
 
+  const handleGetStarted = async () => {
+    try {
+      await signOut(auth);
+      console.log('User signed out');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+    navigate('/SignUp');
+  };
+
+
   return (
     <Container>
 
@@ -15,7 +26,9 @@ const LandingPage = () => {
         variant="contained"
         color="primary"
         
-        onClick={() => navigate('/SignUp')}>
+        // onClick={() => navigate('/SignUp')}>
+        onClick={handleGetStarted} 
+        >
         Get Started 
       </Button>
 
