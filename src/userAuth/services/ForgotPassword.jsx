@@ -7,21 +7,6 @@
 //After entering the new password, the user will click on the submit button and the password will be updated in the system. 
 //The user can now sign in with the new password.
 // -------------- THE END ^_^ --------------- 
-
-// import { getAuth, updatePassword } from "firebase/auth";
-
-// const auth = getAuth();
-
-// const user = auth.currentUser;
-// const newPassword = getASecureRandomPassword();
-
-// updatePassword(user, newPassword).then(() => {
-//   // Update successful.
-// }).catch((error) => {
-//   // An error ocurred
-//   // ...
-// });
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -29,7 +14,6 @@ import {
   TextField,
   Typography,
   Link,
-  SvgIcon,
   Stack,
   Divider,
 } from '@mui/material';
@@ -38,28 +22,34 @@ import { blue, grey } from '@mui/material/colors';
 import { auth } from '../firebase'; // Adjust the import path as needed
 import { sendPasswordResetEmail } from 'firebase/auth';
 
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; 
+
 function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const navigate = useNavigate();
 
   // Handler for form submission
-  const handleSubmit = async (event) => {
+  const handlePasswordReset = async (event) => {
     event.preventDefault();
+
     // Validate email
     if (!email) {
-      setEmailError('Email is required.');
+      toast.error('Please enter your email.');
     } else if (!validateEmail(email)) {
-      setEmailError('Please enter a valid email address.');
+      toast.error('Please enter a valid email address eg. user@example.com');
     } else {
-      setEmailError('');
       try {
         await sendPasswordResetEmail(auth, email);
-        // Show success message or redirect
-        alert('Password reset email sent.');
+        // alert  success message or redirect
+        alert('Password reset email sent, please check your email.');
+        // Redirect to login page after sending password reset email
+        navigate('/SignIn');
       } catch (error) {
         console.error('Error sending password reset email:', error);
-        setEmailError('Failed to send password reset email.');
+        toast.error('Failed to send password reset email, please try again.');
       }
     }
   };
@@ -74,6 +64,7 @@ function ForgotPassword() {
 
   return (
     <Box
+    
       component="main"
       role="main"
       sx={{
@@ -93,6 +84,7 @@ function ForgotPassword() {
           borderColor: blue[300],
         }}
       >
+        <ToastContainer/>
         <Box sx={{ p: { xs: 4, sm: 7 } }}>
           <Box sx={{ textAlign: 'center' }}>
 
@@ -128,7 +120,7 @@ function ForgotPassword() {
           </Box>
 
           <Box sx={{ mt: 5 }}>
-            <Box component="form" onSubmit={handleSubmit}>
+            <Box component="form" onSubmit={handlePasswordReset}>
               <Box sx={{ display: 'grid', gap: 2 }}>
                 <Box>
                   <Typography
@@ -213,46 +205,6 @@ function ForgotPassword() {
       >
         <Link
           href="#"
-          target="_blank"
-          sx={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 1,
-            fontSize: '0.875rem',
-            color: grey[600],
-            textDecorationThickness: '2px',
-            '&:hover': {
-              color: blue[600],
-              textDecoration: 'underline',
-            },
-          }}
-        >
-          {/* GitHub Icon */}
-          <SvgIcon
-            sx={{ width: 14, height: 14 }}
-            viewBox="0 0 16 16"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-          >
-            <path
-              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 
-            2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 
-            0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 
-            1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 
-            0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 
-            0 0 .67-.21 2.2.82.64-.18 1.32-.27 
-            2-.27.68 0 1.36.09 2 .27 1.53-1.04 
-            2.2-.82 2.2-.82.44 1.1.16 1.92.08 
-            2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 
-            3.75-3.65 3.95.29.25.54.73.54 1.48 
-            0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 
-            8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"
-            />
-          </SvgIcon>
-          View Github
-        </Link>
-        <Link
-          href="#"
           sx={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -270,6 +222,7 @@ function ForgotPassword() {
         </Link>
       </Stack>
     </Box>
+    
   );
 }
 
