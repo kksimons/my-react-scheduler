@@ -20,7 +20,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import SellIcon from '@mui/icons-material/Sell'; 
 import logo from '../assets/logo-transparent.png';
 
-
+//This is the component for the Nav Bar on the top ONLY 
 const Navbar = () => {
 
     const [openMenu, setOpenMenu] = useState(false);

@@ -4,16 +4,19 @@ import {  Typography, Box } from '@mui/material';
 import SignOut from '@userAuth/services/SignOut';
 import EmployerDashboardLayout from './EmployerDashboardLayout';
 
+
+//// This is the components to displayed everything on the employer view, you will import all the component here ! 
 const EmployerDashBoard = () => { 
     return (
         <Box>
-            <Typography> 
-                Admin DashBoard: 
-                <SignOut />
-                <EmployerDashboardLayout /> 
-               
-        </Typography>
+        
+        <EmployerDashboardLayout />  
+        <Typography> 
 
+        Admin DashBoard: 
+
+        </Typography>
+        <SignOut />
         </Box>
     );
 }

@@ -10,7 +10,7 @@ import theme from '@theme/theme';
 import AddEmployee from './AddEmployee';
 
 
-
+//This component is the layout for employer dashboard including (Navigation side bar, and Routes for other pages )
 const EmployerDashboardLayout = () => {
   return (
     // <ThemeProvider theme={theme}>

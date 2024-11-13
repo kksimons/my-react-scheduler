@@ -5,6 +5,7 @@ import Navbar from './Navbar';
 import BannerImage from '../assets/banner-red.png';
 import TrustedBy from './TrustedBy';
 
+//This component folder src/components will be the component for everything on the landing page 
 
 // Landing page starts here 
 const LandingPage = () => {

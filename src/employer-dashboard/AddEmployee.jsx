@@ -1,4 +1,6 @@
 
+
+//This is the component for Adding employee only 
 import React from "react";
 
 const AddEmployee = () => {

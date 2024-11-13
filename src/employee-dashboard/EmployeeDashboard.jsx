@@ -7,6 +7,7 @@ import SignOut from '@userAuth/services/SignOut';
 
 
 
+// This is the components to displayed everything on the employee view, you will import all the component here ! 
 
 const EmployeeDashboard = () => {
     return (

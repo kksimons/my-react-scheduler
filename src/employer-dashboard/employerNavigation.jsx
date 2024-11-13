@@ -7,6 +7,8 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
+//This is only for navigation side bar title and icons, it does not have any functionality 
+//Please import it in the EmployerDashboardLayout.jsx
 const NAVIGATION = [
   {
     kind: 'header',

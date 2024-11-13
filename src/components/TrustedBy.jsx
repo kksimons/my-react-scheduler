@@ -12,6 +12,7 @@ import logo6 from '../assets/mc-logo.jpg';
 import logo7 from '../assets/cloudhome-logo.jpg';
 import logo8 from '../assets/education-logo.jpg';
 
+//this will be the component for the Trusted by brands only 
 const TrustedBy = () => {
 
   const settings = {
