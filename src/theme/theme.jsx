@@ -51,7 +51,7 @@ let theme = createTheme({
       link: '#6666ff',         // Link color
     },
     background: {
-      primary: '#f4f4f8',      // Main background color
+      primary: '#4314ff',      // Main background color
       secondary: '#eaeaf2',    // Background for sections like cards
       third: 'white',          // Background for main content area
       alternative: '#dfe0e6',  // Background for input fields, etc.
