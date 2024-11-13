@@ -121,7 +121,8 @@ const SelectRole = () => {
                             startIcon={<KeyboardBackspaceIcon />}
                             onClick={() => {
                                 console.log("Back button clicked");
-                                navigate('/', { state: { fromSelectRole: true } }); // Pass state
+                                
+                                navigate(-1, { state: { fromSelectRole: true } }); // Pass state
                             }}
                             sx={{
                                 boxShadow: 3,

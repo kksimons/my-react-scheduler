@@ -75,7 +75,7 @@ const EmployerRegistration = () => {
         const nameRegex = /^[a-zA-Z]+$/;
         const dob = new Date(formData.dob);
         const today = new Date();
-        const age = today.getFullYear() - dob.getFullYear(); //calculate age
+        let age = today.getFullYear() - dob.getFullYear(); //calculate age //i use let because it is changeable
         const monthDifference = today.getMonth() - dob.getMonth(); //calculate month difference
 
 

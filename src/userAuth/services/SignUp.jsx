@@ -1,34 +1,33 @@
 
-import React, { useState, useEffect } from 'react'; 
+import React, { useState } from 'react'; 
 import { auth } from '../firebase';
 import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { useNavigate, useLocation } from 'react-router-dom'; // Import useLocation
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Box, 
   TextField, 
   Button, 
   Typography, 
-  FormControl, 
-  FormHelperText, 
-  ThemeProvider 
+  ThemeProvider,
+  Divider, 
+  Link,
 } from '@mui/material';
-import theme from '@theme/theme';
+import theme from '@theme/theme'; // Ensure the correct path
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 
-import { useAuthState } from 'react-firebase-hooks/auth'; // Import useAuthState
-import zxcvbn from 'zxcvbn'; // Import zxcvbn for password strength
+import { useAuthState } from 'react-firebase-hooks/auth';
+import zxcvbn from 'zxcvbn';
+
+import Logo from '../../assets/logo-transparent.png'; 
+import GoogleIcon from '@mui/icons-material/Google';
 
 const SignUp = () => {
   // Form input states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  // Error states
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [generalError, setGeneralError] = useState('');
 
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
@@ -42,72 +41,42 @@ const SignUp = () => {
   // Authentication state
   const [user, loadingAuthState] = useAuthState(auth);
 
-  // // Effect to redirect authenticated users unless coming from SelectRole
-  // useEffect(() => {
-  //   if (user && !loadingAuthState) {
-  //     // Check if navigation state indicates to stay on SignUp
-  //     //if (!(location.state && location.state.fromSelectRole)) {
-  //       navigate('/SelectRole'); // Redirect to SelectRole if already authenticated and not navigating back
-  //     //}
-  //   }
-  // }, [user, loadingAuthState, navigate]);
-
   // Regular expression for email validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   // Handle email input change with real-time validation
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
-    if (!emailRegex.test(e.target.value)) {
-      setEmailError('Please enter a valid email address (e.g., user@example.com).');
-    } else {
-      setEmailError('');
-    }
   };
 
   // Handle password input change with real-time validation and strength scoring
   const handlePasswordChange = (e) => {
     const pwd = e.target.value;
     setPassword(pwd);
-    if (pwd.length < 6) {
-      setPasswordError('Password must be at least 6 characters long.');
-    } else {
-      setPasswordError('');
-    }
     const score = zxcvbn(pwd).score;
-    setPasswordScore(score);
+    setPasswordScore(score); //i want to get rid if the password strength showing on the page omg 
   };
 
   // Handle Sign Up
   const handleSignUp = async (e) => {
     e.preventDefault();
 
-    // Reset error messages each time the user attempts to sign up
-    setEmailError('');
-    setPasswordError('');
-    setGeneralError('');
-
-    let isValid = true; // Assume the form is valid
-
-    // Email validation
+    // Validate inputs before attempting to sign up
     if (!email) {
-      setEmailError('Please enter your email.');
-      isValid = false;
+      toast.error('Please enter your email.');
+      return;
     } else if (!emailRegex.test(email)) {
-      setEmailError('Please enter a valid email address (e.g., user@example.com).');
-      isValid = false;
+      toast.error('Please enter a valid email address (e.g., user@example.com).');
+      return;
     }
 
-    // Password validation
     if (!password) {
-      setPasswordError('Please enter your password.');
-      isValid = false;
+      toast.error('Please enter your password.');
+      return;
     } else if (password.length < 6) {
-      setPasswordError('Password must be at least 6 characters long.');
-      isValid = false;
+      toast.error('Password must be at least 6 characters long.');
+      return;
     }
-
-    if (!isValid) return; // Exit the function if the form is invalid
 
     setIsLoading(true); // Show loading spinner while creating user
 
@@ -121,19 +90,19 @@ const SignUp = () => {
     } catch (error) {
       console.error("Error signing up:", error); // Log error to console
 
-      // Handle Firebase Auth errors
+      // Handle Firebase Auth errors with toast notifications
       switch (error.code) {
         case 'auth/email-already-in-use':
-          setEmailError('This email is already in use. Please use a different email.');
+          toast.error('This email is already in use. Please use a different email.');
           break;
         case 'auth/invalid-email':
-          setEmailError('Invalid email address. Please enter a valid email (e.g., user@example.com).');
+          toast.error('Invalid email address. Please enter a valid email (e.g., user@example.com).');
           break;
         case 'auth/weak-password':
-          setPasswordError('Password is too weak. Please choose a stronger password.');
+          toast.error('Password is too weak. Please choose a stronger password.');
           break;
         default:
-          setGeneralError('An unexpected error occurred. Please try again later.');
+          toast.error('An unexpected error occurred. Please try again later.');
       }
     } finally {
       setIsLoading(false); // Reset loading state regardless of outcome
@@ -143,9 +112,6 @@ const SignUp = () => {
   // Handle Google Sign-In
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
-    setGeneralError('');
-    setEmailError('');
-    setPasswordError('');
     setIsLoading(true);
     try {
       const result = await signInWithPopup(auth, provider);
@@ -153,7 +119,7 @@ const SignUp = () => {
       navigate('/SelectRole', { state: { uid: user.uid, email: user.email } });
     } catch (error) {
       console.error("Error logging in with Google:", error);
-      setGeneralError('Failed to sign in with Google. Please try again.');
+      toast.error('Failed to sign in with Google. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -162,12 +128,22 @@ const SignUp = () => {
   return (
     <ThemeProvider theme={theme}>
       {/* Toast Container for notifications */}
-      <ToastContainer />
+      {/* <ToastContainer 
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      /> */}
 
       <Box
         display="flex"
         alignItems="center"
-        justifyContent="center" // Center the form horizontally
+        justifyContent="center"
         minHeight="100vh"
         bgcolor="background.default"
         p={2}
@@ -177,8 +153,8 @@ const SignUp = () => {
           onSubmit={handleSignUp}
           display="flex"
           flexDirection="column"
-          gap={2} // Use number for spacing instead of string
-          backgroundColor="background.third"
+          gap={2}
+          bgcolor="background.third"
           sx={{
             width: '100%',
             maxWidth: '500px',
@@ -188,43 +164,33 @@ const SignUp = () => {
             boxShadow: 5,
           }}
         >
-          <Typography variant="h5" component="h1" gutterBottom>
+          <img src={Logo} alt="" width={170} />
+          <Typography variant="h4" component="h1" sx={{fontWeight:"bold"}} gutterBottom>
             Sign Up
           </Typography>
 
-          {/* Display General Errors */}
-          {generalError && (
-            <Typography color="error" variant="body2">
-              {generalError}
-            </Typography>
-          )}
-
           {/* Email Field */}
-          <FormControl error={Boolean(emailError)} fullWidth>
-            <TextField
-              label="Email"
-              name="email"
-              type="email"
-              value={email}
-              onChange={handleEmailChange}
-              placeholder="user@example.com"
-              required
-              helperText={emailError}
-            />
-          </FormControl>
+          <TextField
+            label="Email"
+            name="email"
+            type="email"
+            value={email}
+            onChange={handleEmailChange}
+            placeholder="user@example.com"
+            required
+            fullWidth
+          />
 
           {/* Password Field */}
-          <FormControl error={Boolean(passwordError)} fullWidth>
-            <TextField
-              label="Password"
-              name="password"
-              type="password"
-              value={password}
-              onChange={handlePasswordChange}
-              required
-              helperText={passwordError}
-            />
-          </FormControl>
+          <TextField
+            label="Password"
+            name="password"
+            type="password"
+            value={password}
+            onChange={handlePasswordChange}
+            required
+            fullWidth
+          />
 
           {/* Display Password Strength */}
           <Typography variant="body2">
@@ -248,29 +214,14 @@ const SignUp = () => {
             {isLoading ? 'Signing Up...' : 'Sign Up'}
           </Button>
 
-          <Typography align="center">Already have an account?</Typography>
-
-          {/* Sign In Button */}
-          <Button
-            onClick={() => navigate('/SignIn')}
-            variant="outlined"
-            color="primary"
-            sx={{
-              boxShadow: 3,
-              '&:hover': {
-                boxShadow: 6,
-              },
-            }}
-          >
-            Sign In
-          </Button>
-
+          <Divider>or</Divider>
           {/* Google Sign-In Button */}
           <Button
             onClick={handleGoogleSignIn}
             variant="contained"
             color="secondary"
             disabled={isLoading}
+            startIcon={<GoogleIcon />}
             sx={{
               mt: 2,
               boxShadow: 3,
@@ -281,10 +232,39 @@ const SignUp = () => {
           >
             {isLoading ? 'Signing In...' : 'Sign In with Google'}
           </Button>
+          
+          {/* Already have an account ? sign in */}
+          <Typography variant="body2" sx={{ textAlign: 'center' }}>
+              Already have an account?{' '}
+              <Link
+                onClick={() => navigate('/SignIn')}
+                sx={{ alignSelf: 'center', cursor: 'pointer', color: 'primary.main' }}
+              >
+                Sign in
+              </Link>
+          </Typography>
         </Box>
+        <Button 
+          variant="outlined"
+          color="primary"
+          startIcon={<KeyboardBackspaceIcon />}
+          onClick={() => {
+              console.log("Back button clicked");
+              
+              navigate(-1); // Pass state
+          }}
+          sx={{
+              boxShadow: 3,
+              '&:hover': {
+                  boxShadow: 6,
+              },
+          }}
+      > 
+          Back
+      </Button>
       </Box>
     </ThemeProvider>
   );
 };
 
-export default SignUp; 
+export default SignUp;

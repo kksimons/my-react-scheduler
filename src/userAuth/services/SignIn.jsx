@@ -8,71 +8,72 @@ import { useNavigate } from 'react-router-dom';
 import theme from '@theme/theme';
 import { ThemeProvider } from '@mui/material';
 import { getDoc, doc } from 'firebase/firestore';
-import { db } from '../firebase';  // Import the Firestore database
+import { db } from '../firebase'; // Import the Firestore database
 
+// Import toast notification
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; 
 
-export function SignIn ()  {
+export function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [formErrors, setFormErrors] = useState({}); //to handle exception when user enter wrong format 
   const navigate = useNavigate();
 
-
-    //Validate form with exception message 
+  // Validate form with exception message 
   const validateForm = () => {
-    const errors = {};
+    let isValid = true;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+    // Validate Email
     if (!emailRegex.test(email)) {
-        errors.email = "Please enter correct email format: user@example.com ";
+      toast.error("Please enter a valid email format: user@example.com");
+      isValid = false;
     }
 
+    // Validate Password
     if (password.length < 6 || !/\d/.test(password) || !/[a-zA-Z]/.test(password)) {
-        errors.password = "Password must be at least 6 characters long, contain both numbers and letters";
+      toast.error("Password must be at least 6 characters long and contain both numbers and letters");
+      isValid = false;
     }
 
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0; // Return true if no errors found
+    return isValid;
   };
 
   const handleSignIn = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-  
+
     try {
       // Sign in the user
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-  
-      // Correct usage: create DocumentReferences
+
+      // Create DocumentReferences
       const employeeDocRef = doc(db, "employees", user.uid);
       const employerDocRef = doc(db, "employers", user.uid);
-  
+
       // Fetch DocumentSnapshots
       const [employeeDocSnap, employerDocSnap] = await Promise.all([
         getDoc(employeeDocRef),
         getDoc(employerDocRef),
       ]);
-  
-      // Check if documents exist
+
+      // Check if documents exist and navigate accordingly
       if (employeeDocSnap.exists()) {
         navigate("/EmployeeDashboard");
       } else if (employerDocSnap.exists()) {
         navigate("/EmployerDashboard");
       } else {
         console.error("User role document not found in employees or employers collections");
-        setFormErrors({ general: "User profile not found. Please contact support." });
+        toast.error("User profile not found. Please contact support.");
       }
     } catch (error) {
       console.error("Error logging in:", error);
-      setFormErrors({ general: "Invalid email or password" });
+      toast.error("Invalid email or password");
     }
   };
-  
 
-
-
-  //handle google sign in 
+  // Handle Google Sign-In 
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider(); 
 
@@ -80,52 +81,63 @@ export function SignIn ()  {
       const result = await signInWithPopup(auth, provider);
       const user = result.user; 
 
-      // Create DocumentReferences check if user's doc exist for both emp and employer 
+      // Create DocumentReferences
       const employeeDocRef = doc(db, "employees", user.uid);
       const employerDocRef = doc(db, "employers", user.uid);
 
-      //fetch DocumentSnapshots, use Promise.all to fetch both employee and employer docs 
+      // Fetch DocumentSnapshots
       const [employeeDocSnap, employerDocSnap] = await Promise.all([
         getDoc(employeeDocRef),
         getDoc(employerDocRef),
       ]);
 
-      // Check if doc exist 
+      // Check if documents exist and navigate accordingly
       if (employeeDocSnap.exists()) {
-        navigate("/EmployeeDashBoard");
+        navigate("/EmployeeDashboard");
       } else if (employerDocSnap.exists()) {
-        navigate("/EmployerDashBoard");
+        navigate("/EmployerDashboard");
       } else {
-        // console.error("User role document not found in employees or employers collections");
-        // setFormErrors({ general: "User profile not found. Please contact support." });
         // User does not have a role yet, navigate to role selection
         navigate('/SelectRole', { state: { uid: user.uid, email: user.email } });
       } 
     } catch (error) {
       console.error("Error logging in with Google, please try again:", error);
+      toast.error("Error logging in with Google. Please try again.");
     }
   };
 
-
-
   return (
     <ThemeProvider theme={theme}>
-      {/* //Main container for sign in form */}
+      {/* ToastContainer to display toast notifications */}
+      {/* <ToastContainer 
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      /> */}
+
+      {/* Main container for sign-in form */}
       <Box 
         display="flex"
         alignItems="center"
+        justifyContent="center"
         minHeight="100vh"
         bgcolor="background.default"
-        p="auto"
+        p={2}
       >
-        {/* //Form container */}
+        {/* Form container */}
         <Box
           component="form"
           onSubmit={handleSignIn}
           display="flex"
           flexDirection="column"
-          gap="8px"
-          backgroundColor="background.third"
+          gap={2}
+          bgcolor="background.paper"
           sx={{
             width: '100%',
             maxWidth: '500px',
@@ -135,9 +147,12 @@ export function SignIn ()  {
             boxShadow: 5,
           }}
         >
-          <Typography variant="h1" align="center">Sign In</Typography>
+          <Typography variant="h4" align="center" gutterBottom>
+            Sign In
+          </Typography>
 
-          <FormControl>
+          {/* Email Field */}
+          <FormControl fullWidth>
             <FormLabel>Email:</FormLabel>
             <TextField
               name="email"
@@ -146,12 +161,12 @@ export function SignIn ()  {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              error={!!formErrors.email}
-              helperText={formErrors.email}
+              variant="outlined"
             />
           </FormControl>
 
-          <FormControl>
+          {/* Password Field */}
+          <FormControl fullWidth>
             <FormLabel>Password:</FormLabel>
             <TextField
               name="password"
@@ -159,17 +174,16 @@ export function SignIn ()  {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              error={!!formErrors.password}
-              helperText={formErrors.password}
+              variant="outlined"
             />
           </FormControl>
 
-          {/* //sign in button */}
+          {/* Sign In Button */}
           <Button
             type="submit"
             variant="contained"
             color="primary"
-            // onClick={handleSignIn}
+            fullWidth
             sx={{
               mt: 2,
               boxShadow: 3,
@@ -181,13 +195,14 @@ export function SignIn ()  {
             Sign In
           </Button>
 
-          {/* //Google sign in button */}
+          {/* Google Sign-In Button */}
           <Button
             variant="outlined"
             color="secondary"
             onClick={handleGoogleSignIn}
+            fullWidth
             sx={{
-              mt: 2,
+              mt: 1,
               boxShadow: 3,
               '&:hover': {
                 boxShadow: 6,
@@ -197,205 +212,43 @@ export function SignIn ()  {
             Sign In with Google
           </Button>
 
-          {/* //create new account button  */}
+          {/* Create New Account Button */}
           <Button
             variant="outlined"
             color="secondary"
             onClick={() => navigate('/SignUp')} 
+            fullWidth
             sx={{
-              mt: 2,
+              mt: 1,
               boxShadow: 3,
               '&:hover': {
                 boxShadow: 6,
               },
             }}
           >
-            Create new account
+            Create New Account
           </Button>
 
-          {/* //create new account button  */}
+          {/* Forgot Password Button */}
           <Button
             variant="outlined"
             color="secondary"
             onClick={() => navigate('/ForgotPassword')} 
+            fullWidth
             sx={{
-              mt: 2,
+              mt: 1,
               boxShadow: 3,
               '&:hover': {
                 boxShadow: 6,
               },
             }}
           >
-            Forget Password ?
+            Forgot Password?
           </Button>
         </Box>
       </Box>
     </ThemeProvider>
   );
-};
+}
 
 export default SignIn;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

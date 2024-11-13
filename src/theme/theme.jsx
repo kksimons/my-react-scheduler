@@ -36,20 +36,18 @@ let theme = createTheme({
   // Light theme color palette for the application
   palette: {
     primary: {
-      main: '#3D2FC0',         // purple, Primary color for buttons, etc.
-      contrastText: '#ffffff', // Contrast text color for primary
+      main: '#4314ff',         // purple, Primary color for buttons, etc. 
+      contrastText: '#f8f8f8', // Contrast text color for primary
     },
     secondary: {
-      main: '#3532db',         // Secondary color
+      main: '#ee6f59', // Secondary color
+      //secondary: '#f7a441', // Secondary color darker tomato red 
     },
-    // third: {
-    //   main: "ffffff",             // Third color
-    // },
 
     text: {
       primary: '#2a2a2a',      // Default text color
       secondary: '#3d3d3d',    // Secondary text color
-      accent: '#575757',       // Accent color for specific text
+      accent: '#f7a441',       // Accent color for specific text
       link: '#6666ff',         // Link color
     },
     background: {
@@ -108,6 +106,23 @@ let theme = createTheme({
         fontSize: '36px',
       },
     },
+
+    // h4: {
+    //   fontSize: '18px',
+    //   fontWeight: 600,
+    //   [`@media (min-width:600px)`]: {
+    //     fontSize: '18px',
+    //   },
+    //   [`@media (min-width:905px)`]: {
+    //     fontSize: '18px',
+    //   },
+    //   [`@media (min-width:1240px)`]: {
+    //     fontSize: '18px',
+    //   },
+    //   [`@media (min-width:1440px)`]: {
+    //     fontSize: '18px',
+    //   },
+    // },
 
     // Body1 typography (default text style, starts at 18px)
     body1: {
