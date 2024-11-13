@@ -19,11 +19,11 @@ const CustomEvent = ({ event, employees }) => {
   return (
     <div style={eventStyle}>
       {/* <strong>{`${startTime} - ${endTime}`}</strong>    */}
-      <strong>
+      <div>
         {employee
           ? `${employee.employee_fname} ${employee.employee_lname}`
           : event.title}
-      </strong>
+      </div>
       <div>{event.description}</div>
     </div>
   );

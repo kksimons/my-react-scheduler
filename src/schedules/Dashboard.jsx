@@ -164,9 +164,9 @@ function DashboardLayoutBasic(props) {
   return (
     <AppProvider
       navigation={NAVIGATION}
-      router={router}
+      // router={router}
       theme={demoTheme} 
-      window={demoWindow}
+      // window={demoWindow}
     >
       <DashboardLayout>
         {renderContent()}

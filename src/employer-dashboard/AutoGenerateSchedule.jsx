@@ -87,7 +87,7 @@ const AutoGenerateSchedule = ({ employees, addSchedule, hasOverlappingSchedule, 
 
   return (
     <>
-      <Button onClick={handleGenerateClick} variant="contained" color="primary">
+      <Button onClick={handleGenerateClick} variant="contained" size='small' color="primary">
         Generate Auto Schedule
       </Button>
       <Dialog open={openDialog} onClose={handleDialogClose}>
