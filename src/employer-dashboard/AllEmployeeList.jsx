@@ -2,27 +2,23 @@ import { CssBaseline, IconButton, Paper, Table, TableBody, TableCell, TableConta
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import React from "react"
-import CustomTheme from "../customtheme";
-interface EmployeeListProps {
-    employees: any[];
-    onDelete: (id: string) => void;
-    onUpdate: (id: string) => void;
-}
+// import CustomEvent from "./CustomeEvent";
+import theme from "../theme/theme";
 
 // EmployeeList component to display all employees
-const EmployeeList: React.FC<EmployeeListProps> = ({ employees, onDelete, onUpdate }) => {
+const EmployeeList = ({ employees, onDelete, onUpdate }) => {
     if (employees.length === 0) {
       return <div>No employees found.</div>;
     }
     return (
-        <ThemeProvider theme={CustomTheme}>
+        <ThemeProvider theme={theme}>
             <CssBaseline /> {/* To apply global background */}
             <div className="employee-list-container">
             <Typography variant="h6" color="primary.dark" gutterBottom>All Employees</Typography>
             <TableContainer component={Paper} >
                 <Table>
                     <TableHead>
-                        <TableRow sx={{ backgroundColor: CustomTheme.palette.secondary.light }}>
+                        <TableRow sx={{ backgroundColor: theme.palette.secondary.light }}>
                             <TableCell>First Name</TableCell>
                             <TableCell>Last Name</TableCell>
                             <TableCell>Date of Birth</TableCell>
@@ -30,23 +26,24 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees, onDelete, onUpda
                             <TableCell>Position</TableCell>
                             <TableCell>Employee Type</TableCell>
                             <TableCell>Available Shifts</TableCell>
+                            <TableCell></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {employees.map((employees, index) => (
+                        {employees.map((employee, index) => (
                             <TableRow key={index}>
-                                <TableCell>{employees.employee_fname}</TableCell>
-                                <TableCell>{employees.employee_lname}</TableCell>
-                                <TableCell>{employees.employee_dob}</TableCell>
-                                <TableCell>{employees.employee_phone_number}</TableCell>
-                                <TableCell>{employees.employee_position}</TableCell>
-                                <TableCell>{employees.employee_type}</TableCell>
-                                <TableCell>{employees.employee_availability}</TableCell>
+                                <TableCell>{employee.employee_fname}</TableCell>
+                                <TableCell>{employee.employee_lname}</TableCell>
+                                <TableCell>{employee.employee_dob}</TableCell>
+                                <TableCell>{employee.employee_phone_number}</TableCell>
+                                <TableCell>{employee.employee_position}</TableCell>
+                                <TableCell>{employee.employee_type}</TableCell>
+                                <TableCell>{employee.employee_availability}</TableCell>
                                 <TableCell>
-                                    <IconButton onClick={() => onUpdate(employees)}>
+                                    <IconButton onClick={() => onUpdate(employee)}>
                                         <EditIcon />
                                     </IconButton>
-                                    <IconButton onClick={() => onDelete(employees.id)}>
+                                    <IconButton onClick={() => onDelete(employee.id)}>
                                         <DeleteIcon />
                                     </IconButton>
                                 </TableCell>

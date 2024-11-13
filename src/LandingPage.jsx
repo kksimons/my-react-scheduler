@@ -20,9 +20,8 @@ const LandingPage = () => {
 
   return (
     <Container>
-        {/* Sign up button */}
 
-        <Navigation />
+        {/* Sign up button */}
       <Button
         variant="contained"
         color="primary"

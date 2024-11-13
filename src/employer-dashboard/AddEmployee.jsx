@@ -4,32 +4,11 @@ import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import { Button, Box, CssBaseline, Paper, Typography, ThemeProvider } from "@mui/material";
-import CustomTheme from "../customtheme";
+import theme from "../theme/theme";
+// import { theme } from "@theme/theme";
 
-// Define the props interface for the component
-interface AddEmployeeProps {
-  onEmployeeAdded: (newEmployee: any) => void;
-  onEmployeeUpdated: (updatedEmployee: any) => void;
-  initialData?: any;
-}
-
-// Define the form values interface
-interface FormValues {
-  firstName: string;
-  lastName: string;
-  dob: string;
-  phone: string;
-  employeeType: string;
-  position: string;
-  availableShift: string;
-}
-
-const AddEmployee: React.FC<AddEmployeeProps> = ({
-  onEmployeeAdded,
-  onEmployeeUpdated,
-  initialData,
-}) => {
-  const [values, setValues] = useState<FormValues>({
+const AddEmployee = ({ onEmployeeAdded, onEmployeeUpdated, initialData }) => {
+  const [values, setValues] = useState({
     firstName: initialData?.employee_fname || "",
     lastName: initialData?.employee_lname || "",
     dob: initialData?.employee_dob || "",
@@ -39,27 +18,27 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({
     availableShift: initialData?.employee_availability || "",
   });
 
-  const employeesCollectionRef = collection(db, "employees"); 
+  const employeesCollectionRef = collection(db, "employees");
 
-  const handleChanges = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChanges = (e) => {
     const { name, value } = e.target;
     setValues((prevValues) => ({ ...prevValues, [name]: value }));
   };
 
-  const handleMultiSelectChange = (selectedOptions: any) => {
+  const handleMultiSelectChange = (selectedOptions) => {
     setValues((prevValues) => ({
       ...prevValues,
       availableShift: selectedOptions
-        ? selectedOptions.map((option: any) => option.value).join(", ")
+        ? selectedOptions.map((option) => option.value).join(", ")
         : "",
     }));
   };
 
-  const capitalize = (str: string) => {
+  const capitalize = (str) => {
     return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const employeeData = {
       employee_fname: capitalize(values.firstName),
@@ -74,7 +53,7 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({
 
     try {
       if (initialData) {
-        await updateDoc(doc(db, "employee-info", initialData.id), employeeData);
+        await updateDoc(doc(db, "employees", initialData.id), employeeData);
         onEmployeeUpdated({ id: initialData.id, ...employeeData });
         window.alert(`Employee ${employeeData.employee_fname} ${employeeData.employee_lname} has been updated.`);
       } else {
@@ -110,7 +89,7 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({
   ];
 
   return (
-    <ThemeProvider theme={CustomTheme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
         <Paper elevation={3} sx={{ maxWidth: 600, p: 4, borderRadius: 2 }}>
@@ -169,14 +148,7 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({
 };
 
 // Helper component for form fields
-const FormField: React.FC<{
-  label: string;
-  name: string;
-  type?: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  required?: boolean;
-}> = ({ label, name, type = "text", value, onChange, required }) => (
+const FormField = ({ label, name, type = "text", value, onChange, required }) => (
   <Box sx={{ mt: 2 }}>
     <Typography variant="body1" sx={{ mb: 1 }}>{label}</Typography>
     <input
