@@ -31,7 +31,14 @@ const SignOut = () => {
       onClick={handleSignOut} 
       variant="contained"
       startIcon={<LogoutIcon />} //Import the LogoutIcon from mui above 
-      sx={{ backgroundColor: '#6200ea', '&:hover': { backgroundColor: '#4b00c7' } }}
+      sx={{ 
+        marginTop: "15px",
+        marginBottom: "20px",
+        marginLeft: "15px",
+
+        backgroundColor: '#6200ea',
+         '&:hover': { backgroundColor: '#4b00c7' } 
+        }}
     >
       Sign Out
     </Button>
