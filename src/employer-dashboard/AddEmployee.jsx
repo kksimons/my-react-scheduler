@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { db } from "../userAuth/firebase";
+import { db } from "@userAuth/firebase";
 import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import { Button, Box, CssBaseline, Paper, Typography, ThemeProvider } from "@mui/material";
-import theme from "../theme/theme";
-// import { theme } from "@theme/theme";
+import theme from "@theme/theme";
 
 const AddEmployee = ({ onEmployeeAdded, onEmployeeUpdated, initialData }) => {
   const [values, setValues] = useState({
