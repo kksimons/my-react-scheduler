@@ -28,6 +28,7 @@ import {
 import { db } from "../userAuth/firebase";
 import CustomEvent from "./CustomeEvent";
 import AutoGenerateSchedule from "./AutoGenerateSchedule";
+import { jsPDF } from "jspdf";  // Import jsPDF
 
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
@@ -224,7 +225,35 @@ const EmployeeScheduler = ({ employees }) => {
     setEvents((prev) => prev.filter((ev) => ev.id !== selectedEventId));
     handleDialogClose();
   };
-  
+
+  const exportToPDF = () => {
+    const startOfWeek = moment().startOf("week");
+    const endOfWeek = moment().endOf("week");
+
+    const weekRange = `Week of ${startOfWeek.format("MMMM D, YYYY")} - ${endOfWeek.format("MMMM D, YYYY")}`;
+
+    const filteredEvents = events.filter((event) => {
+      const eventStart = moment(event.start);
+      return eventStart.isBetween(startOfWeek, endOfWeek, "days", "[]");
+    });
+
+    const doc = new jsPDF();
+    doc.setFontSize(12);
+    doc.text(weekRange, 14, 10);
+    doc.line(14, 15, 200, 15);
+
+    filteredEvents.forEach((event, index) => {
+      const employee = employees.find((emp) => emp.id === event.employeeId);
+      const dayOfWeek = moment(event.start).format("dddd");
+      const startTime = moment(event.start).format("HH:mm");
+      const endTime = moment(event.end).format("HH:mm");
+      const text = `${dayOfWeek}: ${employee.employee_fname} ${employee.employee_lname} - ${startTime} - ${endTime} (${event.description})`;
+      doc.text(text, 14, 20 + index * 10);
+    });
+
+    doc.save("employee_schedule.pdf");
+  };
+
   return (
     <Box sx={{ display: "flex", height: "100%" }}>
       <Paper
@@ -237,6 +266,9 @@ const EmployeeScheduler = ({ employees }) => {
           marginRight: "5px",
         }}
       >
+
+
+        
         <Typography variant="h6" textAlign="center">
           Employees
         </Typography>
@@ -279,12 +311,31 @@ const EmployeeScheduler = ({ employees }) => {
         </List>
       </Paper>
 
-      {/* Button to generate auto schedule
-      <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-        <Button variant="contained" color="primary" onClick={AutoGenerateSchedule}>
-          Generate Auto Schedule
+      {/* Add Export Button */}
+        <Button 
+          variant="contained" 
+          color="primary"  
+          size="small"
+          onClick={exportToPDF} 
+          sx={{
+            marginTop: '60px',    // Adds space above the button
+          marginBottom: '6px', // Adds space below the button
+          marginLeft: '0px',   //Adds space to the left of the button
+          marginRight: '6px',
+          height: '94%',       // Adjust button height
+          width: '175px',       // Adjust button width
+          border: '3px solid #6200ea',  // Add border (purple color, adjust as needed)
+          borderRadius: '5px',     // Rounded corners (optional)
+          padding: '10px 20px',    // Optional padding for extra spacing inside the button 
+          backgroundColor: "primary",
+          '&:hover': {
+            backgroundColor: '#4b00c7',
+            borderColor: '#4b00c7',
+          }
+          }} >
+            Export Schedule to PDF
         </Button>
-      </Box> */}
+      
 
       <DnDCalendar
         localizer={localizer}
@@ -317,6 +368,7 @@ const EmployeeScheduler = ({ employees }) => {
           dayFormat: (date) => moment(date).format("ddd DD/MM"),
         }}
       />
+
       <Dialog open={openDialog} onClose={handleDialogClose}>
         <DialogTitle>
           {selectedEventId
@@ -365,7 +417,12 @@ const EmployeeScheduler = ({ employees }) => {
           </Button>
         </DialogActions>
       </Dialog>
-      <AutoGenerateSchedule employees={employees} addSchedule={addSchedule} hasOverlappingSchedule={hasOverlappingSchedule} setEvents={setEvents} />
+      <AutoGenerateSchedule
+        employees={employees}
+        addSchedule={addSchedule}
+        hasOverlappingSchedule={hasOverlappingSchedule}
+        setEvents={setEvents}
+      />
     </Box>
   );
 };

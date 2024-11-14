@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import moment from 'moment';
+import EmployeeScheduler from './EmployeeScheduler';
 
 const positions = ['Server', 'Busser', 'Cook', 'Host'];
 
@@ -156,14 +157,14 @@ const AutoGenerateSchedule = ({ employees, addSchedule, hasOverlappingSchedule, 
       <Button 
       onClick={handleGenerateClick} 
       variant="contained" 
-      // size="small" 
+      size="small" 
       color="primary"
       sx={{
-        marginTop: '300px',    // Adds space above the button
-        marginBottom: '16px', // Adds space below the button
-        marginLeft: '16px',   //Adds space to the left of the button
-        height: '150px',       // Adjust button height
-        width: '250px',       // Adjust button width
+        marginTop: '60px',    // Adds space above the button
+        marginBottom: '6px', // Adds space below the button
+        marginLeft: '6px',   //Adds space to the left of the button
+        height: '94%',       // Adjust button height
+        width: '175px',       // Adjust button width
         border: '3px solid #6200ea',  // Add border (purple color, adjust as needed)
         borderRadius: '5px',     // Rounded corners (optional)
         padding: '10px 20px',    // Optional padding for extra spacing inside the button 
@@ -176,6 +177,9 @@ const AutoGenerateSchedule = ({ employees, addSchedule, hasOverlappingSchedule, 
       >
         Generate Auto Schedule
       </Button>
+
+      
+
       <Dialog open={openDialog} onClose={handleDialogClose}>
         <DialogTitle>Auto Generate Schedule</DialogTitle>
         <DialogContent>
