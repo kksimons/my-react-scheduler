@@ -1,11 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LandingPage from './LandingPage';
+import LandingPage from '@components/LandingPage';
 
-import EmployerDashboard from '@components/EmployerDashboard';
-import EmployeeDashboard from '@components/EmployeeDashboard';
+import EmployerDashboard from '@employer-dashboard/EmployerDashboard';
+import EmployeeDashboard from '@employee-dashboard/EmployeeDashboard';
 import ProtectedRoute from '@userAuth/contexts/ProtectedRoute';
-import SelectRole from './SelectRole';
+import SelectRole from '@userAuth/SelectRole';
 import AuthProvider from '@userAuth/contexts/AuthContext';
 import { Typography, Box } from '@mui/material';
 import SignUp from '@userAuth/services/SignUp';
@@ -15,14 +15,28 @@ import EmployeeRegistration from '@userAuth/EmployeeRegistration';
 import EmployerRegistration from '@userAuth/EmployerRegistration';
 import Availability from '@userAuth/Availability';
 import ForgotPassword from '@userAuth/services/ForgotPassword';
-import DashboardLayoutBasic from '@schedules/Dashboard';
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
+import './App.css';
 
 const App = () => {
   return (
       <AuthProvider>
         <Router>
+                    {/* Global ToastContainer */}
+          {/* I implement the toast component here to make sure it is accessibile in all other pages without import the it over again */}
+          <ToastContainer
+            position="top-center"
+            autoClose={5000}
+            hideProgressBar={false}
+            closeOnClick
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<LandingPage />} />
@@ -34,13 +48,12 @@ const App = () => {
             <Route element={<ProtectedRoute />}>
               <Route path="/EmployerDashboard" element={<EmployerDashboard />} />
               <Route path="/EmployeeDashboard" element={<EmployeeDashboard />} />
-              <Route path= "/EmployeeRegistration" element={<EmployeeRegistration />} />
+              <Route path="/EmployeeRegistration" element={<EmployeeRegistration />} />
               <Route path="/EmployerRegistration" element={<EmployerRegistration />} />
               <Route path="/SignOut" element={<SignOut />} />
               <Route path="/SelectRole" element={<SelectRole />} />
               <Route path="/Availability" element={<Availability />} />
               <Route path="/ForgotPassword" element={<ForgotPassword />} /> 
-              <Route path="/Dashboard" element={<DashboardLayoutBasic />} />
               
             </Route>
             

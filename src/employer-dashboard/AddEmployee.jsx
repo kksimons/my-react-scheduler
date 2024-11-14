@@ -163,4 +163,12 @@ const FormField = ({ label, name, type = "text", value, onChange, required }) =>
   </Box>
 );
 
+
+//This is the component for Adding employee only 
+// import React from "react";
+
+// const AddEmployee = () => {
+//     return <div>Add Employee</div>;
+// }
+
 export default AddEmployee;

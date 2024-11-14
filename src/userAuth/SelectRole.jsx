@@ -121,7 +121,8 @@ const SelectRole = () => {
                             startIcon={<KeyboardBackspaceIcon />}
                             onClick={() => {
                                 console.log("Back button clicked");
-                                navigate('/', { state: { fromSelectRole: true } }); // Pass state
+                                
+                                navigate(-1, { state: { fromSelectRole: true } }); // Pass state
                             }}
                             sx={{
                                 boxShadow: 3,
@@ -134,53 +135,62 @@ const SelectRole = () => {
                         </Button>
                     </Box>
 
-                    <Typography variant="h4" align="center" gutterBottom>
-                        Select Your Role
-                    </Typography>
-
-                    {/* Role Selection Cards */}
-                    <Box
-                        display="flex"
-                        flexDirection={{ xs: 'column', sm: 'row' }}
-                        justifyContent="center"
-                        alignItems="center"
-                        gap={4}
-                        sx={{ mt: 4 }}
+                    {/* Box cor Select Role container with button  */}
+                    <Box 
+                        component="main"
+                        sx={{
+                            width: '100%',
+                            // backgroundColor: '#4314ff',
+                        }}
                     >
-                        {/* Employer Card */}
-                        <Card sx={{ width: 250 }}>
-                            <CardActionArea onClick={() => handleRoleSelection('employer')}>
-                                <Box display="flex" flexDirection="column" alignItems="center" p={4}>
-                                    <ManageAccountsIcon sx={{ fontSize: 60, color: 'primary.main' }} />
-                                    <CardContent>
-                                        <Typography variant="h5" component="div" align="center">
-                                            Employer
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary" align="center">
-                                            Manage your schedule and employees.
-                                        </Typography>
-                                    </CardContent>
-                                </Box>
-                            </CardActionArea>
-                        </Card>
+                        <Typography variant="h4" align="center" gutterBottom>
+                            Select Your Role
+                        </Typography>
 
-                        {/* Employee Card */}
-                        <Card sx={{ width: 250 }}>
-                            <CardActionArea onClick={() => handleRoleSelection('employee')}>
-                                <Box display="flex" flexDirection="column" alignItems="center" p={4}>
-                                    <Diversity1Icon sx={{ fontSize: 60, color: 'secondary.main' }} />
-                                    <CardContent>
-                                        <Typography variant="h5" component="div" align="center">
-                                            Employee
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary" align="center">
-                                            View schedule and stay on the same page with your team.
-                                        </Typography>
-                                    </CardContent>
-                                </Box>
-                            </CardActionArea>
-                        </Card>
-                    </Box>
+                        {/* Role Selection Cards */}
+                        <Box
+                            display="flex"
+                            flexDirection={{ xs: 'column', sm: 'row' }}
+                            justifyContent="center"
+                            alignItems="center"
+                            gap={4}
+                            sx={{ mt: 4 }}
+                        >
+                            {/* Employer Card */}
+                            <Card sx={{ width: 250 }}>
+                                <CardActionArea onClick={() => handleRoleSelection('employer')}>
+                                    <Box display="flex" flexDirection="column" alignItems="center" p={4}>
+                                        <ManageAccountsIcon sx={{ fontSize: 60, color: 'primary.main' }} />
+                                        <CardContent>
+                                            <Typography variant="h5" component="div" align="center">
+                                                Employer
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary" align="center">
+                                                Manage your schedule and employees.
+                                            </Typography>
+                                        </CardContent>
+                                    </Box>
+                                </CardActionArea>
+                            </Card>
+
+                            {/* Employee Card */}
+                            <Card sx={{ width: 250 }}>
+                                <CardActionArea onClick={() => handleRoleSelection('employee')}>
+                                    <Box display="flex" flexDirection="column" alignItems="center" p={4}>
+                                        <Diversity1Icon sx={{ fontSize: 60, color: 'secondary.main' }} />
+                                        <CardContent>
+                                            <Typography variant="h5" component="div" align="center">
+                                                Employee
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary" align="center">
+                                                View schedule and stay on the same page with your team.
+                                            </Typography>
+                                        </CardContent>
+                                    </Box>
+                                </CardActionArea>
+                            </Card>
+                        </Box>
+                </Box>
                 </Box>
             </ThemeProvider>
         );
