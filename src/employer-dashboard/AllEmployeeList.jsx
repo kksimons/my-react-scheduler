@@ -6,7 +6,7 @@ import React from "react"
 import theme from "../theme/theme";
 
 // EmployeeList component to display all employees
-const EmployeeList = ({ employees, onDelete, onUpdate }) => {
+const AllEmployeeList = ({ employees, onDelete, onUpdate }) => {
     if (employees.length === 0) {
       return <div>No employees found.</div>;
     }
@@ -59,4 +59,4 @@ const EmployeeList = ({ employees, onDelete, onUpdate }) => {
       );
     }
 
-export default EmployeeList;
+export default AllEmployeeList;

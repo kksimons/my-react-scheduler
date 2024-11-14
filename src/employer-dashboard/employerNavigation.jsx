@@ -189,37 +189,9 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 //Please import it in the EmployerDashboardLayout.jsx
 const NAVIGATION = [
   {
-    kind: 'header',
-    title: 'Schedule Management',
-  },
-  {
     segment: 'schedule',
     title: 'Schedule',
     icon: <CalendarMonthIcon />,
-    children: [
-      // {
-      //   segment: 'serversSchedule',
-      //   title: 'Server Schedule',
-      //   icon: <FiberManualRecordIcon />,
-      // },
-      // {
-      //   segment: 'bussersSchedule',
-      //   title: 'Busser Schedule',
-      //   icon: <FiberManualRecordIcon />,
-      // },
-      // {
-      //   segment: 'cooksSchedule',
-      //   title: 'Cook Schedule',
-      //   icon: <FiberManualRecordIcon />,
-      // },
-    ],
-  },
-  {
-    kind: 'divider',
-  },
-  {
-    kind: 'header',
-    title: 'Employee Management',
   },
   {
     segment: 'employeeManagement',
