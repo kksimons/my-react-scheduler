@@ -456,3 +456,8 @@ nav {
     display: none;
   }
 }
+
+.rbc-event {
+  /* display: none; */
+  background-color: Red;
+}

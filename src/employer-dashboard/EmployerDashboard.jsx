@@ -1,6 +1,6 @@
 
 import React from 'react';
-import {  Typography, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import SignOut from '@userAuth/services/SignOut';
 import EmployerDashboardLayout from './EmployerDashboardLayout';
 
@@ -9,15 +9,10 @@ import EmployerDashboardLayout from './EmployerDashboardLayout';
 const EmployerDashBoard = () => { 
     return (
         <Box>
-        
-        <EmployerDashboardLayout />  
-        <Typography> 
-
-        Admin DashBoard: 
-
-        </Typography>
-        <SignOut />
+            <EmployerDashboardLayout />
+            <SignOut />
         </Box>
     );
 }
+
 export default EmployerDashBoard;

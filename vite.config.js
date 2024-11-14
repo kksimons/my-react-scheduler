@@ -20,9 +20,8 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      // Proxying API requests to avoid CORS issues
       '/api': {
-        target: 'http://localhost:80', // API server address
+        target: 'http://localhost:80',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, '')
