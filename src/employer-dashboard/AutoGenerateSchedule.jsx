@@ -153,7 +153,27 @@ const AutoGenerateSchedule = ({ employees, addSchedule, hasOverlappingSchedule, 
 
   return (
     <>
-      <Button onClick={handleGenerateClick} variant="contained" size='small' color="primary">
+      <Button 
+      onClick={handleGenerateClick} 
+      variant="contained" 
+      // size="small" 
+      color="primary"
+      sx={{
+        marginTop: '300px',    // Adds space above the button
+        marginBottom: '16px', // Adds space below the button
+        marginLeft: '16px',   //Adds space to the left of the button
+        height: '150px',       // Adjust button height
+        width: '250px',       // Adjust button width
+        border: '3px solid #6200ea',  // Add border (purple color, adjust as needed)
+        borderRadius: '5px',     // Rounded corners (optional)
+        padding: '10px 20px',    // Optional padding for extra spacing inside the button 
+        backgroundColor: "primary", 
+        '&:hover': {
+          backgroundColor: '#4b00c7', // Darker purple on hover
+          borderColor: '#4b00c7',     // Darker border color on hover
+        } 
+      }}
+      >
         Generate Auto Schedule
       </Button>
       <Dialog open={openDialog} onClose={handleDialogClose}>
