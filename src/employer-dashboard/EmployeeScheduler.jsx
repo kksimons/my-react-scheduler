@@ -230,10 +230,11 @@ const EmployeeScheduler = ({ employees }) => {
       <Paper
         elevation={3}
         sx={{
-          backgroundColor: "#8a2be2",
+          backgroundColor: "LightSlateGrey",
           width: 200,
           padding: 1,
           marginTop: "5px",
+          marginRight: "5px",
         }}
       >
         <Typography variant="h6" textAlign="center">
@@ -256,7 +257,7 @@ const EmployeeScheduler = ({ employees }) => {
                   selectedEmployeeId === employee.id
                     ? "2px solid black"
                     : "none",
-                borderRadius: "3px",
+                borderRadius: "5px",
                 backgroundColor:
                   selectedEmployeeId === employee.id
                     ? "#8a2be2"
@@ -268,9 +269,9 @@ const EmployeeScheduler = ({ employees }) => {
                 primary={`${employee.employee_fname} ${employee.employee_lname}`}
                 secondary={employee.employee_position}
                 sx={{
-                  backgroundColor: "#9b30ff",
-                  padding: "5px",
-                  borderRadius: "4px",
+                  backgroundColor: "#B0C4DE",
+                  padding: "9px",
+                  borderRadius: "2px",
                 }}
               />
             </ListItem>
