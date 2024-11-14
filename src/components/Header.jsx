@@ -4,11 +4,12 @@ import { Container, Typography, Button, Box } from '@mui/material';
 import Navbar from './Navbar';
 import BannerImage from '../assets/banner-red.png';
 import TrustedBy from './TrustedBy';
+import About from './About';
 
 //This component folder src/components will be the component for everything on the landing page 
 
 // Landing page starts here 
-const LandingPage = () => {
+const Header = () => {
   const navigate = useNavigate();
   //const { role } = useAuth(); // Get the role from the AuthContext
 
@@ -25,6 +26,7 @@ const LandingPage = () => {
 
   return (
     <div className='home-container'>
+      
       <Navbar />
       <div className='home-banner-container'>
         <div className='home-text-section'>
@@ -66,4 +68,4 @@ const LandingPage = () => {
   );
 };
 
-export default LandingPage;
+export default Header;
