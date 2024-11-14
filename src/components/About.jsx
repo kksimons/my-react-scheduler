@@ -10,7 +10,7 @@ const About = () => {
         <div className="about-section-text-container">
           <p className="primary-subheading">About</p>
           <h2>
-            Food Is An Important Part Of A Balanced Diet
+            PowerShift About Us Here
           </h2>
           <p className="primary-text">
             Lorem ipsum dolor sit amet consectetur. Non tincidunt magna non et
