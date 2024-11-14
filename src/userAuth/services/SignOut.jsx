@@ -32,6 +32,9 @@ const SignOut = () => {
       variant="contained"
       startIcon={<LogoutIcon />} //Import the LogoutIcon from mui above 
       sx={{ 
+        position: 'absolute',  // Positioning it absolutely relative to the parent container
+        top: '55px',           // Space from the top of the screen
+        right: '20px',
         marginTop: "15px",
         marginBottom: "20px",
         marginLeft: "15px",
