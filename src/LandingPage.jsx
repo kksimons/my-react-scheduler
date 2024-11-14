@@ -34,6 +34,7 @@ const LandingPage = () => {
         sx={{
           fontWeight: 'bold',
           color: '#333', // Dark text color
+          textTransform: 'uppercase', // Makes the title uppercase for emphasis
           marginBottom: 2,
         }}
       >
