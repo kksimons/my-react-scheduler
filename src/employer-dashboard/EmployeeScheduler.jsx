@@ -279,13 +279,6 @@ const EmployeeScheduler = ({ employees }) => {
         </List>
       </Paper>
 
-      {/* Button to generate auto schedule
-      <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-        <Button variant="contained" color="primary" onClick={AutoGenerateSchedule}>
-          Generate Auto Schedule
-        </Button>
-      </Box> */}
-
       <DnDCalendar
         localizer={localizer}
         events={events}
