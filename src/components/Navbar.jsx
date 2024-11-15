@@ -11,6 +11,7 @@ import {
     ListItemButton, 
     ListItemIcon, 
     ListItemText, 
+    Link,
 } from "@mui/material"; 
 
 import HomeIcon from '@mui/icons-material/Home';
@@ -55,10 +56,14 @@ const Navbar = () => {
             </div>
 
             <div className="navbar-links-container">
-                <a href="">Home</a>
+                <a href="/">Home</a>
                 <a href="">Our Customers</a>
                 <a href="">Contact Us</a>
-                <a href="">Pricing</a>
+                <a href="/PricingPage">Pricing</a>
+                {/* <a><Link to='/Home' >Home</Link></a>
+                <a><Link to='#' >Our Customer</Link></a>
+                <a><Link to='/#' >Contact Us</Link></a>
+                <a><Link to=' /PricingPage' >Pricing</Link></a> */}
             </div>
 
             {/* outline bar */}
