@@ -90,31 +90,32 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
 
   const eventStyleGetter = (event) => {
     let backgroundColor;
+    let textColor = '#262626'; 
 
     switch (event.position) {
-      case "Server":
-        backgroundColor = "Red"; // Color for Server
-        break;
-      case "Busser":
-        backgroundColor = "green"; // Color for Busser
-        break;
-      case "Cook":
-        backgroundColor = "orange"; // Color for Cook
-        break;
-      case "Host":
-        backgroundColor = "purple"; // Color for Host
-        break;
+      case 'Server':
+          backgroundColor = '#AC9AFF'; // light purple color for Server
+          break;
+      case 'Busser':
+          backgroundColor = '#EE9D8F'; // light tomato color for Busser
+          break;
+      case 'Cook':
+          backgroundColor = '#E9B5D6'; //  light pink color for Cook
+          break;
+      case 'Host':
+          backgroundColor = '#A4AFE'; // light blue for host 
+          break;
       default:
-        backgroundColor = "gray"; // Fallback color
-    }
+          backgroundColor = 'gray'; // Fallback color
+  }
 
-    return {
+  return {
       style: {
-        backgroundColor,
-        color: "white", // Optional text color for better contrast
+          backgroundColor,
+          color: textColor, // Optional text color for better contrast
       },
-    };
   };
+  }
 
   // function for worked hour
   const getEmployeeHours = (employeeType) => {
@@ -258,31 +259,31 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
     newEventEnd.setHours(endHour, endMinute);
 
     if (newEventEnd <= newEventStart) {
-        alert("End time must be after start time.");
-        return;
+      alert("End time must be after start time.");
+      return;
     }
     if (!selectedEmployeeId) {
-        alert("No employee selected.");
-        return;
+      alert("No employee selected.");
+      return;
     }
     if (
-        hasOverlappingSchedule(
-            selectedEmployeeId,
-            newEventStart,
-            newEventEnd,
-            selectedEventId
-        )
+      hasOverlappingSchedule(
+        selectedEmployeeId,
+        newEventStart,
+        newEventEnd,
+        selectedEventId
+      )
     ) {
-        alert(
-            "This schedule overlaps with an existing schedule for this employee."
-        );
-        return;
+      alert(
+        "This schedule overlaps with an existing schedule for this employee."
+      );
+      return;
     }
 
     const employee = employees.find((emp) => emp.id === selectedEmployeeId);
     if (!employee) {
-        alert("Selected employee not found.");
-        return;
+      alert("Selected employee not found.");
+      return;
     }
 
     const title = `${employee.employee_fname} ${employee.employee_lname}`;
@@ -303,7 +304,7 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
       await updateSchedule(selectedEventId, {
         ...newEvent,
         id: selectedEventId,
-        scheduleType,
+        scheduleType: isKitchen ? 'Kitchen Side' : 'Dining Side',
       });
       setEvents((prev) =>
         prev.map((ev) =>
@@ -328,7 +329,7 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
     }
 
     handleDialogClose();
-};
+  };
 
   const handleDeleteSchedule = async () => {
     if (!selectedEventId) return;
@@ -347,10 +348,7 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
         sx={{
           backgroundColor: "LightSlateGrey",
           width: 200,
-          height: "100%",
           padding: 1,
-          marginTop: "5px",
-          marginRight: "5px",
           marginTop: "5px",
           marginRight: "5px",
         }}
@@ -378,7 +376,6 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
                 borderRadius: "5px",
                 backgroundColor:
                   selectedEmployeeId === employee.id
-                    ? "#8a2be2"
                     ? "#8a2be2"
                     : "transparent",
                 height: "72px",
@@ -424,7 +421,6 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
         localizer={localizer}
         events={events}
         eventPropGetter={eventStyleGetter}
-        eventPropGetter={eventStyleGetter}
         components={{
           event: (props) => <CustomEvent {...props} employees={employees} />,
         }}
@@ -445,7 +441,6 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
         step={60}
         timeslots={1}
         min={moment().startOf("day").add(7, "hours").toDate()}
-        max={moment().startOf("day").add(23, "hours").toDate()}
         max={moment().startOf("day").add(23, "hours").toDate()}
         style={{ flexGrow: 1 }}
         defaultDate={new Date()}
