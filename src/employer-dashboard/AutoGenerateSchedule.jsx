@@ -159,7 +159,7 @@ const AutoGenerateSchedule = ({ employees, addSchedule, hasOverlappingSchedule, 
       // size="small" 
       color="primary"
       sx={{
-        // marginTop: '300px',    // Adds space above the button
+        marginTop: '57px',    // Adds space above the button
         marginBottom: '16px', // Adds space below the button
         marginLeft: '16px',   //Adds space to the left of the button
         height: '50px',       // Adjust button height
