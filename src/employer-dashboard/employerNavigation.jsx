@@ -87,12 +87,12 @@ function useDemoRouter(initialPath) {
   return router;
 }
 
-function EmployerNavigation(props) {
+function EmployerNavigation() {
   const [employees, setEmployees] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const router = useDemoRouter('/dashboard');
+  const router = useDemoRouter('/schedules');
 
   useEffect(() => {
     const fetchEmployees = async () => {

@@ -26,13 +26,14 @@ import {
   doc,
 } from "firebase/firestore";
 import { db } from "../userAuth/firebase";
-import CustomEvent from "./CustomeEvent";
+import CustomEvent from "./CustomEvent";
 import AutoGenerateSchedule from "./AutoGenerateSchedule";
 
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
 
 const EmployeeScheduler = ({ employees }) => {
+  // const [employees, setEmployees] = useState(initialEmployees);
   const [events, setEvents] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState(null);
@@ -45,10 +46,12 @@ const EmployeeScheduler = ({ employees }) => {
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
   const [selectedEmployeeName, setSelectedEmployeeName] = useState("");
   const [eventDescription, setEventDescription] = useState("");
+  const [employeeRemainingHours, setEmployeeRemainingHours] = useState({});
 
   useEffect(() => {
     fetchSchedule();
-  }, []);
+    initializeEmployeeHours();
+  }, [employees]);
 
   const fetchSchedule = async () => {
     const scheduleCollection = collection(db, "schedules");
@@ -62,12 +65,25 @@ const EmployeeScheduler = ({ employees }) => {
         ...doc.data(),
         start: doc.data().start.toDate(),
         end: doc.data().end.toDate(),
-        position: employees.find(emp => emp.id === data.employeeId)?.employee_position || 'Unknown',
+        position: employee?.employee_position || 'Unknown',
       }
 
     });
     setEvents(scheduleList);
   };
+
+  const initializeEmployeeHours = () => {
+    const initialHours = employees.reduce((acc, employee) => {
+      acc[employee.id] = getMaxHours(employee.employee_type);
+      return acc;
+    }, {});
+    setEmployeeRemainingHours(initialHours);
+  };
+
+  const getMaxHours = (employeeType) => {
+    return employeeType === 'Full-Time' ? 40 : 24;
+  };
+
 
 
   const eventStyleGetter = (event) => {
@@ -135,14 +151,11 @@ const EmployeeScheduler = ({ employees }) => {
     }
   };
 
-  const updateEmployeeHours = useCallback((employeeId, remainingHours) => {
-    setEmployees((prevEmployees) =>
-      prevEmployees.map((employee) =>
-        employee.id === employeeId
-          ? { ...employee, remainingHours: remainingHours }
-          : employee
-      )
-    );
+  const updateEmployeeHours = useCallback((employeeId, hoursWorked) => {
+    setEmployeeRemainingHours(prevHours => ({
+      ...prevHours,
+      [employeeId]: Math.max(0, (prevHours[employeeId] || 0) - hoursWorked)
+    }));
   }, []);
 
   const hasOverlappingSchedule = (employeeId, start, end, excludeEventId) => {
@@ -283,6 +296,9 @@ const EmployeeScheduler = ({ employees }) => {
     setEvents((prev) => prev.filter((ev) => ev.id !== selectedEventId));
     handleDialogClose();
   };
+  useEffect(() => {
+    console.log("Events to be displayed:", events);
+  }, [events]); // This will log whenever events change
 
   return (
     <Box sx={{ display: "flex", height: "100%" }}>
@@ -358,6 +374,7 @@ const EmployeeScheduler = ({ employees }) => {
           ))}
         </List>
       </Paper>
+
 
       <DnDCalendar
         localizer={localizer}
@@ -446,6 +463,7 @@ const EmployeeScheduler = ({ employees }) => {
           hasOverlappingSchedule={hasOverlappingSchedule}
           setEvents={setEvents}
           updateEmployeeHours={updateEmployeeHours}
+          employeeRemainingHours={employeeRemainingHours}
         />
       </Box>
     </Box>
