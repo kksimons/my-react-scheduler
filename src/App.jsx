@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, BrowserRouter, createBrowserRouter, RouterProvider } from 'react-router-dom';
-import LandingPage from '@components/LandingPage';
+import LandingPage from './LandingPage';
 
 import EmployerDashboard from '@employer-dashboard/EmployerDashboard';
 import EmployeeDashboard from '@employee-dashboard/EmployeeDashboard';
