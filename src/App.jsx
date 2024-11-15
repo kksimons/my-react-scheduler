@@ -15,9 +15,12 @@ import EmployeeRegistration from '@userAuth/EmployeeRegistration';
 import EmployerRegistration from '@userAuth/EmployerRegistration';
 import Availability from '@userAuth/Availability';
 import ForgotPassword from '@userAuth/services/ForgotPassword';
+import PricingPage from './PricingPage';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+
 
 import './App.css';
 
@@ -44,6 +47,7 @@ const App = () => {
             <Route path="/SignIn" element={<SignIn />} />
             <Route path="/SignUp" element={<SignUp />} />
             <Route path="/ForgotPassword" element={<ForgotPassword />} />
+            <Route path="/PricingPage" element={<PricingPage />} />
 
             {/* {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>

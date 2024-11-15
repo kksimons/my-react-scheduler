@@ -402,11 +402,133 @@ nav {
 
 
 
+/* PRICING  */
+/* General Section Styling */
+.pricing-section {
+  padding: 2rem 1rem;
+  background-color: #fff;
+}
 
+.pricing-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
 
+/* Header Styling */
+.pricing-header-container .pricing-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #000;
+}
 
+.pricing-header-container .pricing-subtitle {
+  font-size: 1rem;
+  color: #6b7280;
+  margin-top: 1rem;
+}
 
+/* Pricing Grid Styling */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
 
+/* Plan Card Styling */
+.plan-card {
+  background: #f9fafb;
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.plan-card.popular {
+  background: #1f2937;
+  color: #fff;
+  border: none;
+}
+
+.plan-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Plan Name */
+.plan-name {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: inherit;
+}
+
+/* Plan Price */
+.plan-price {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 1rem 0;
+  color: inherit;
+}
+
+/* Plan Duration */
+.plan-duration {
+  font-size: 0.875rem;
+  color: inherit;
+}
+
+/* Plan Features */
+.plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+  color: inherit;
+}
+
+.plan-features li {
+  margin-bottom: 0.5rem;
+}
+
+/* Plan Button */
+.plan-button {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.plan-card.popular .plan-button {
+  background: #ff9800;
+}
+
+.plan-button:hover {
+  background: #1e40af;
+}
+
+.plan-card.popular .plan-button:hover {
+  background: #ff7300;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .header .title {
+    font-size: 2rem;
+  }
+
+  .header .subtitle {
+    font-size: 0.875rem;
+  }
+
+  .plan-price {
+    font-size: 1.75rem;
+  }
+}
 
 
 
