@@ -258,31 +258,31 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
     newEventEnd.setHours(endHour, endMinute);
 
     if (newEventEnd <= newEventStart) {
-      alert("End time must be after start time.");
-      return;
+        alert("End time must be after start time.");
+        return;
     }
     if (!selectedEmployeeId) {
-      alert("No employee selected.");
-      return;
+        alert("No employee selected.");
+        return;
     }
     if (
-      hasOverlappingSchedule(
-        selectedEmployeeId,
-        newEventStart,
-        newEventEnd,
-        selectedEventId
-      )
+        hasOverlappingSchedule(
+            selectedEmployeeId,
+            newEventStart,
+            newEventEnd,
+            selectedEventId
+        )
     ) {
-      alert(
-        "This schedule overlaps with an existing schedule for this employee."
-      );
-      return;
+        alert(
+            "This schedule overlaps with an existing schedule for this employee."
+        );
+        return;
     }
 
     const employee = employees.find((emp) => emp.id === selectedEmployeeId);
     if (!employee) {
-      alert("Selected employee not found.");
-      return;
+        alert("Selected employee not found.");
+        return;
     }
 
     const title = `${employee.employee_fname} ${employee.employee_lname}`;
@@ -328,7 +328,7 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
     }
 
     handleDialogClose();
-  };
+};
 
   const handleDeleteSchedule = async () => {
     if (!selectedEventId) return;
@@ -347,7 +347,10 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
         sx={{
           backgroundColor: "LightSlateGrey",
           width: 200,
+          height: "100%",
           padding: 1,
+          marginTop: "5px",
+          marginRight: "5px",
           marginTop: "5px",
           marginRight: "5px",
         }}
@@ -375,6 +378,7 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
                 borderRadius: "5px",
                 backgroundColor:
                   selectedEmployeeId === employee.id
+                    ? "#8a2be2"
                     ? "#8a2be2"
                     : "transparent",
                 height: "72px",
@@ -420,6 +424,7 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
         localizer={localizer}
         events={events}
         eventPropGetter={eventStyleGetter}
+        eventPropGetter={eventStyleGetter}
         components={{
           event: (props) => <CustomEvent {...props} employees={employees} />,
         }}
@@ -440,6 +445,7 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
         step={60}
         timeslots={1}
         min={moment().startOf("day").add(7, "hours").toDate()}
+        max={moment().startOf("day").add(23, "hours").toDate()}
         max={moment().startOf("day").add(23, "hours").toDate()}
         style={{ flexGrow: 1 }}
         defaultDate={new Date()}

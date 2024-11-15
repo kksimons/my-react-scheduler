@@ -40,9 +40,6 @@ const Header = () => {
       </div>
 
       {/* container for trusted by ... */}
-      <div>
-        <TrustedBy />
-      </div>
 
     </div>
 
