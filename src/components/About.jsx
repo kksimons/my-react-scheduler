@@ -4,10 +4,6 @@ import AboutBackgroundImage from "@assets/about-image.png";
 const About = () => {
     return (
       <div className="about-section-container">
-          <div className="about-space-container">
-            <div className="about-space-bg"></div>
-          </div>
-
         <div className="about-section-text-container">
           <h1 className="about-primary-heading">
             PowerShift Makes Scheduling so
