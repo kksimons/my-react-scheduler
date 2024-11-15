@@ -286,14 +286,15 @@ const EmployeeScheduler = ({ employees }) => {
 
   return (
     <Box sx={{ display: "flex", height: "100%" }}>
-      <Paper
+      <Box
         elevation={3}
         sx={{
-          backgroundColor: "LightSlateGrey",
+          backgroundColor: "white",
           width: 200,
           padding: 1,
-          marginTop: "5px",
-          marginRight: "5px",
+          // marginTop: "5px",
+          // marginRight: "5px",
+          margin: 0,
         }}
       >
         <Typography variant="h6" textAlign="center">
@@ -319,7 +320,7 @@ const EmployeeScheduler = ({ employees }) => {
                 borderRadius: "5px",
                 backgroundColor:
                   selectedEmployeeId === employee.id
-                    ? "#8a2be2"
+                    ? "#F1EEFF"
                     : "transparent",
                 height: "72px",
               }}
@@ -349,7 +350,7 @@ const EmployeeScheduler = ({ employees }) => {
                   </Box>
                 }
                 sx={{
-                  backgroundColor: "#B0C4DE",
+                  backgroundColor: "#CCC1FF", //new purple 
                   padding: "9px",
                   borderRadius: "2px",
                 }}
@@ -357,7 +358,7 @@ const EmployeeScheduler = ({ employees }) => {
             </ListItem>
           ))}
         </List>
-      </Paper>
+      </Box>
 
       {/* Button to generate auto schedule
       <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>

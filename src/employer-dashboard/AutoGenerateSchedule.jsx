@@ -5,10 +5,10 @@ import moment from 'moment';
 const positions = ['Server', 'Busser', 'Cook', 'Host'];
 
 const positionColors = {
-  Server: '#FF5733', // Red
-  Busser: '#33FF57', // Green
-  Cook: '#3357FF', // Blue
-  Host: '#F1C40F', // Yellow
+  Server: '#EFB1A7', // Red
+  Busser: '#8090ff', // Green
+  Cook: '#f7a441', // Blue
+  Host: '#f8f8f8', // Yellow
 };
 
 const AutoGenerateSchedule = ({ employees, addSchedule, hasOverlappingSchedule, setEvents, updateEmployeeHours }) => {
