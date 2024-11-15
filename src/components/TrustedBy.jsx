@@ -43,7 +43,7 @@ const TrustedBy = () => {
       <Slider {...settings}>
         {brands.map((brand, index) => (
           <div className='trusted-logo-container' key={index}>
-            <img src={brand.logo} alt={brand.name} style={{ width: '70%', margin: '0 auto' }} />
+            <img src={brand.logo} alt={brand.name} style={{ width: '50%', margin: '1rem auto' }} />
           </div>
         ))}
       </Slider>

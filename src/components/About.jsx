@@ -1,27 +1,28 @@
 
 
-import AboutBackgroundImage from "../assets/auto-generate-background.png";
+import AboutBackgroundImage from "@assets/about-image.png";
 const About = () => {
     return (
       <div className="about-section-container">
-        {/* <div className="about-background-image-container">
-          <img src={AboutBackground} alt="" />
-        </div> */}
+          <div className="about-space-container">
+            <div className="about-space-bg"></div>
+          </div>
+
         <div className="about-section-text-container">
-          <p className="primary-subheading">About</p>
-          <h2>
-            Food Is An Important Part Of A Balanced Diet
+          <h1 className="about-primary-heading">
+            PowerShift Makes Scheduling so
+          </h1>
+          <h2 className="about-secondary-heading">
+            EFFORTLESSSS
           </h2>
-          <p className="primary-text">
-            Lorem ipsum dolor sit amet consectetur. Non tincidunt magna non et
-            elit. Dolor turpis molestie dui magnis facilisis at fringilla quam.
+          <p className="about-primary-text">
+            At PowerShift, we are committed to simplifying workforce management. Our platform leverages smart automation to auto-generate schedules, freeing up time for managers to focus on what matters most. By analyzing team needs and availability, we create schedules that work seamlessly for everyone.
           </p>
-          <p className="primary-text">
-            Non tincidunt magna non et elit. Dolor turpis molestie dui magnis
-            facilisis at fringilla quam.
+          <p className="about-primary-text">
+            With PowerShift, employees have the freedom to create and manage their own accounts. Team members can set their availability, update personal details, and receive instant updates on scheduling changes, all within our platform. We keep everyone connected, informed, and empowered to manage their time effectively.
           </p>
           <div className="about-buttons-container">
-            <button className="secondary-button">Learn More</button>
+            <button className="about-secondary-button">Learn More</button>
           </div>
         </div>
         <div className="about-section-image-container">

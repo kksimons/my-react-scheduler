@@ -35,7 +35,8 @@ nav {
   align-items: center;
   justify-content: space-between;
   min-height: 90px;
-  background-color: rgb(241, 238, 255);
+  /* background-color: rgb(241, 238, 255); */
+  background-color: #cdbfff;
   padding: 0rem 2rem;
 }
 .navbar-menu-container {
@@ -71,6 +72,8 @@ nav {
   font-size: 1.5rem;
   cursor: pointer;
 }
+
+/* HOME BANNER */
 .home-container {
   /* padding: 3rem; */
 }
@@ -96,23 +99,27 @@ nav {
   justify-content: center;
   align-items: flex-start;
 }
+
+/* Primary heading and text */
 .primary-heading {
   font-size: clamp(2rem, 5vw, 5rem);
-  background-image: linear-gradient(to right top, #4314ff, #3e14fd, #3a13fb, #3513f8, #2f13f6, #3226f8, #3634f9, #3b3ffa, #4b56fd, #5c6aff, #6e7dff, #8090ff);
-  background-clip: text;
-  -webkit-background-clip: text; /* For Safari compatibility */
   color: transparent;
   /* line-height: 5rem; */
   max-width: 600px;
+  background: #2F00ED;
+  background: linear-gradient(to right, #2F00ED 0%, #5500FF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .primary-text {
   font-size: clamp(1rem, 3vw, 1.3rem);
-  max-width: 600px;
+  max-width: 700px;
   color: #2b2b2b;;
   margin: 1.5rem 0rem;
   /* font-style: italic; */
 }
 
+/* TRUSTED BY SECTION */
 .trustedby-heading {
   text-align: center;
   font-size: 2.5rem;
@@ -120,7 +127,7 @@ nav {
   /* margin-top: 1rem; */
   padding-top: 1rem;
   color: #2b2b2b;
-  margin-bottom: 2rem;
+  /* margin-bottom: 2rem; */
   /* background: #1F1F1F;
   background: linear-gradient(to top, #1F1F1F 36%, #CDCDCD 100%, #4C4C4C 44%);
   -webkit-background-clip: text;
@@ -128,9 +135,12 @@ nav {
 }
 
 .trusted-by-section {
-  margin-top: 1rem;
-  padding: 1.5rem 0rem;
-  background-color: rgb(241, 238, 255);
+  /* margin-top: 1rem; */
+  padding: 1rem 0rem;
+  padding-bottom: 2.5rem;
+  /* background-color: rgb(241, 238, 255); */
+  /* background-color: #9fe1ff; */
+  background-color: #c4c4ff;
 }
 
 .trusted-logo-container {
@@ -162,28 +172,97 @@ nav {
   box-shadow: 0px 0px 44px 0px rgba(247, 129, 65, 0.541);
 }
 
+/* About Section */
 .about-section-container {
-  margin-top: 20rem;
-  position: relative;
+  /* margin-top: 5rem; */
   display: flex;
+  padding: 3rem;
   align-items: center;
-  justify-content: space-between;
+  /* background-color: #AC9AFF; */
+  background-color: #ee6f59 ;
+  width: 100%;
 }
-.about-background-image-container {
-  position: absolute;
-  left: -150px;
-  z-index: -2;
+
+.about-space-container {
+  /* background-color: #2613f3;
+  width: 200px;
+  height: 100px; */
 }
+.about-space-bg {
+
+}
+
 .about-section-image-container {
-  flex: 0.9;
-  margin-right: 1rem;
+  flex: 1;
+  max-width: 40%;
+  margin-left: 5rem;
+  background-color: #fdfff5;
+  padding: 2rem;
+  border-radius: 2rem;
+  position: relative;
+
+
 }
+.about-section-image-container img {
+  width: 100%;
+  height: auto;
+  transition: transform 0.3s ease;
+  box-shadow: 0 15px 25px rgba(238, 111, 89, 0.4);
+  animation: float 3s ease-in-out infinite;
+  transform-style: preserve-3d; 
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotateX(0deg) rotateY(0deg); /* Starting position */
+  }
+  50% {
+    transform: translateY(-10px) rotateX(10deg) rotateY(5deg); /* Moves up and tilts */
+  }
+}
+
 .about-section-text-container {
   flex: 1;
-  justify-content: center;
+  font-size: clamp(1rem, 3vw, 1.3rem);
+  color: #2b2b2b;;
+  /* justify-content: center; */
   display: flex;
   flex-direction: column;
+  /* margin-right: 2rem; */
+  max-width: 60%;
+  margin-bottom: 2rem;
 }
+
+.about-primary-heading {
+  font-size: 4rem;
+  color: #ffed67;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.about-secondary-heading {
+  /* font-size: 6rem;
+  color: #ffa8d7;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  margin-left: 2rem; */
+  font-size: 6rem;
+  font-weight: 700;
+  color:#ffd8fe;
+
+}
+
+
+.about-primary-text {
+  font-size: 20px;
+  color: #262626; ;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  max-width: 90%;
+  /* margin: 10rem; */
+}
+
+
 .primary-subheading {
   font-weight: 700;
   color: #fe9e0d;
@@ -192,6 +271,28 @@ nav {
 .about-buttons-container {
   margin-top: 2rem;
   display: flex;
+}
+
+.about-secondary-button {
+  padding: 1rem 2.5rem;
+  background-color: #ffed67;
+  outline: none;
+  border: none;
+  border-radius: 5rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+  font-weight: 700;
+  color: #262626;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.about-secondary-button:hover {
+  background-color: #ffd8fe;
+  -webkit-box-shadow:0px 0px 44px 0px rgba(247,165,65,0.73);
+  -moz-box-shadow: 0px 0px 44px 0px rgba(247,165,65,0.73);
+  box-shadow: 0px 0px 44px 0px rgba(247, 129, 65, 0.541);
 }
 
 .contact-page-wrapper h1 {
