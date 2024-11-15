@@ -7,6 +7,7 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  Grid2,
   Button
 } from "@mui/material";
 import {
@@ -154,66 +155,100 @@ const Availability = () => {
   };
 
   return (
-    <Box
-      // maxWidth="sm"
-      sx={{ padding: 2 }} 
+    <Grid2
+      container
+      justifyContent="center"
+      alignItems="center"
+      sx={{ minHeight: "100vh", backgroundColor: "#f5f5f5", padding: 2, backgroundColor: "#c4c4ff" }}
     >
-      <Typography variant="h4" gutterBottom align="center">
-        Set Your Availability
-      </Typography>
-      <Typography>
-        Please select your availability and preferable shift timings for each
-        day of the week.
-      </Typography>
-      <br />
-      <form onSubmit={handleSubmit}>
-        {days.map((day) => (
-          <FormControl
-            component="fieldset"
-            key={day}
-            sx={{ marginBottom: 2 }} 
-          >
-            <FormLabel component="legend" required>
-              {day}
-            </FormLabel>
-            <FormGroup>
-              {options.map((option) => (
-                <FormControlLabel
-                  key={option}
-                  control={
-                    <Checkbox
-                      checked={availability[day].includes(option)}
-                      onChange={() => handleChange(day, option)}
-                      name={option}
-                    />
-                  }
-                  label={option}
-                />
-              ))}
-            </FormGroup>
-          </FormControl>
-        ))}
-        <Button
-          type="submit"
-          variant="contained"
-          fullWidth
-          sx={{ marginTop: 2 }} 
+      <Grid2 item xs={12} sm={10} md={8} lg={6}>
+        <Box
+          sx={{
+            backgroundColor: "#ffffff",
+            padding: 4,
+            borderRadius: 2,
+            boxShadow: 3,
+          }}
         >
-          Submit
-        </Button>
-      </form>
-      {/* <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      /> */}
-    </Box>
+          <Box sx={{ marginBottom: 3, textAlign: "center" }}>
+            <Typography variant="h4" gutterBottom sx={{color:"#2b2b2b"}}>
+              Set Your Availability
+            </Typography>
+            {/* //use hex for later pls im ded  */}
+            <Typography variant="body1" color="textSecondary"> 
+              Please select your availability and preferable shift timings for each
+              day of the week.
+            </Typography>
+          </Box>
+          <form onSubmit={handleSubmit}>
+            <Grid2 container spacing={3}>
+              {days.map((day) => (
+                <Grid2 item xs={12} sm={6} key={day}>
+                  <FormControl
+                    component="fieldset"
+                    sx={{
+                      width: "100%",
+                      padding: 2,
+                      border: "1px solid #4314ff",
+                      borderRadius: 1,
+                      backgroundColor: "#fafafa",
+                    }}
+                  >
+                    <FormLabel
+                      component="legend"
+                      required
+                      sx={{ mb: 1, fontWeight: "bold", color: "#2b2b2b" }}
+                    >
+                      {day}
+                    </FormLabel>
+                    <FormGroup>
+                      {options.map((option) => (
+                        <FormControlLabel
+                          key={option}
+                          control={
+                            <Checkbox
+                              checked={availability[day].includes(option)}
+                              onChange={() => handleChange(day, option)}
+                              name={option}
+                              sx={{
+                                color: "#4314ff",
+                                "&.Mui-checked": {
+                                  color: "#4314ff",
+                                },
+                              }}
+                            />
+                          }
+                          label={option}
+                        />
+                      ))}
+                    </FormGroup>
+                  </FormControl>
+                </Grid2>
+              ))}
+            </Grid2>
+            <Button
+              type="submit"
+              variant="contained"
+              width="500" //doesnt work 
+              sx={{
+                marginTop: 4,
+                padding: 1.5,
+                backgroundColor: "#4314ff",
+                color: "white" ,
+                fontSize: "16px",
+                fontWeight: "bold",
+                "&:hover": {
+                  backgroundColor: "#2613f3",
+                },
+                boxShadow: 2,
+              }}
+            >
+              Submit
+            </Button>
+          </form>
+        </Box>
+      </Grid2>
+    </Grid2>
   );
 };
 
