@@ -165,7 +165,7 @@ const SignUp = () => {
           }}
         >
           <img src={Logo} alt="" width={170} />
-          <Typography variant="h4" component="h1" sx={{fontWeight:"bold"}} gutterBottom>
+          <Typography variant="h4" component="h1" align="center" sx={{fontWeight:"bold"}} gutterBottom>
             Sign Up
           </Typography>
 

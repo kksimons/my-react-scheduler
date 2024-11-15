@@ -39,7 +39,7 @@ const TrustedBy = () => {
 
   return (
     <div className="trusted-by-section">
-      <h2 className='trustedby-heading'>Our Smart Solution Are Trusted By</h2>
+      <h3 className='trustedby-heading'>Our Smart Solution Are Trusted By</h3>
       <Slider {...settings}>
         {brands.map((brand, index) => (
           <div className='trusted-logo-container' key={index}>

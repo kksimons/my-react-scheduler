@@ -6,13 +6,17 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import theme from '@theme/theme';
-import { ThemeProvider } from '@mui/material';
+import { ThemeProvider, Link } from '@mui/material';
 import { getDoc, doc } from 'firebase/firestore';
 import { db } from '../firebase'; // Import the Firestore database
+import Logo from '../../assets/logo-transparent.png';
+import GoogleIcon from '@mui/icons-material/Google';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 
 // Import toast notification
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
+import { Divider } from 'antd';
 
 export function SignIn() {
   const [email, setEmail] = useState('');
@@ -147,36 +151,35 @@ export function SignIn() {
             boxShadow: 5,
           }}
         >
-          <Typography variant="h4" align="center" gutterBottom>
-            Sign In
+          <img src={Logo} alt="" width={170} />
+          <Typography variant="h4" component="h1" align="center" sx={{fontWeight:"bold"}} gutterBottom >
+            Sign In 
           </Typography>
 
           {/* Email Field */}
-          <FormControl fullWidth>
-            <FormLabel>Email:</FormLabel>
+     
             <TextField
+              label="Email"
               name="email"
               type="email"
               placeholder="user@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              variant="outlined"
+              fullWidth
             />
-          </FormControl>
 
           {/* Password Field */}
-          <FormControl fullWidth>
-            <FormLabel>Password:</FormLabel>
+
             <TextField
+            label="Password"
               name="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              variant="outlined"
+              fullWidth
             />
-          </FormControl>
 
           {/* Sign In Button */}
           <Button
@@ -195,44 +198,11 @@ export function SignIn() {
             Sign In
           </Button>
 
-          {/* Google Sign-In Button */}
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={handleGoogleSignIn}
-            fullWidth
-            sx={{
-              mt: 1,
-              boxShadow: 3,
-              '&:hover': {
-                boxShadow: 6,
-              },
-            }}
-          >
-            Sign In with Google
-          </Button>
-
-          {/* Create New Account Button */}
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={() => navigate('/SignUp')} 
-            fullWidth
-            sx={{
-              mt: 1,
-              boxShadow: 3,
-              '&:hover': {
-                boxShadow: 6,
-              },
-            }}
-          >
-            Create New Account
-          </Button>
-
           {/* Forgot Password Button */}
           <Button
-            variant="outlined"
+            variant="contained"
             color="secondary"
+            Text
             onClick={() => navigate('/ForgotPassword')} 
             fullWidth
             sx={{
@@ -245,7 +215,58 @@ export function SignIn() {
           >
             Forgot Password?
           </Button>
+
+          <Divider>or</Divider>
+
+          {/* Google Sign-In Button */}
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleGoogleSignIn}
+            startIcon={<GoogleIcon/>}
+            fullWidth
+            sx={{
+              mt: 1,
+              boxShadow: 3,
+              '&:hover': {
+                boxShadow: 6,
+              },
+            }}
+          >
+            Sign In with Google
+          </Button>
+
+          {/* Dont have an account ? sign up */}
+          <Typography variant="body2" sx={{ textAlign: 'center' }}>
+              Don't have an account?{' '}
+              <Link
+                onClick={() => navigate('/SignUp')}
+                sx={{ alignSelf: 'center', cursor: 'pointer', color: 'primary.main' }}
+              >
+                Sign up
+              </Link>
+          </Typography>
         </Box>
+
+        <Button 
+          variant="outlined"
+          color="primary"
+          startIcon={<KeyboardBackspaceIcon />}
+          onClick={() => {
+              console.log("Back button clicked");
+              
+              navigate(-1); // Pass state
+          }}
+          sx={{
+              boxShadow: 3,
+              '&:hover': {
+                  boxShadow: 6,
+              },
+          }}
+      > 
+          Back
+      </Button>
+
       </Box>
     </ThemeProvider>
   );

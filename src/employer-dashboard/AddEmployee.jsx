@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { db } from "../userAuth/firebase";
+import { db } from "@userAuth/firebase";
 import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
-import { Button, Box, CssBaseline, Paper, Typography, ThemeProvider } from "@mui/material";
-import theme from "../theme/theme";
-// import { theme } from "@theme/theme";
+import { Button, Box, CssBaseline, Paper, Typography, ThemeProvider,TextField } from "@mui/material";
+import theme from "@theme/theme";
 
 const AddEmployee = ({ onEmployeeAdded, onEmployeeUpdated, initialData }) => {
   const [values, setValues] = useState({
@@ -91,17 +90,76 @@ const AddEmployee = ({ onEmployeeAdded, onEmployeeUpdated, initialData }) => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
-        <Paper elevation={3} sx={{ maxWidth: 600, p: 4, borderRadius: 2 }}>
+
+      {/* Main container for add employee form */}
+      <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}> 
+        <Paper elevation={3} sx={{ maxWidth: 600, p: 4, borderRadius: 2, backgroundColor: 'rgb(241, 238, 255)' }}>
           <Typography variant="h5" color="primary.dark" gutterBottom>
             {initialData ? "Edit Employee" : "Add New Employee"}
           </Typography>
-          <form onSubmit={handleSubmit}>
+
+          {/* Form Container */}
+          <Box onSubmit={handleSubmit}>
             {/* Form fields */}
-            <FormField label="First Name" name="firstName" value={values.firstName} onChange={handleChanges} required />
-            <FormField label="Last Name" name="lastName" value={values.lastName} onChange={handleChanges} required />
-            <FormField label="Date of Birth" name="dob" type="date" value={values.dob} onChange={handleChanges} required />
-            <FormField label="Phone Number" name="phone" type="tel" value={values.phone} onChange={handleChanges} required />
+
+            <TextField 
+            label="First Name" 
+            name="firstName" 
+            type="email"
+            value={values.firstName} onChange={handleChanges} 
+            required 
+            fullWidth
+            size="small"
+            sx={{
+              backgroundColor: 'white',  // Setting the background color to white
+              mb: 2,
+            }}
+            />
+            
+            <TextField 
+            label="Last Name" 
+            name="lastName" 
+            type="lastname"
+            value={values.lastName} 
+            onChange={handleChanges} 
+            required
+            fullWidth 
+            size="small"
+            sx={{
+              backgroundColor: 'white',  // Setting the background color to white
+              mb: 2,
+            }}
+            />
+
+
+            <TextField 
+            label="Phone Number" 
+            name="phone" 
+            type="tel" 
+            value={values.phone} 
+            onChange={handleChanges} 
+            required 
+            fullWidth
+            size="small"
+            marginTop="10px"
+            sx={{
+              backgroundColor: 'white',  // Setting the background color to white
+            }}
+            />
+
+            <FormField 
+              label="Date of Birth" 
+              name="dob" 
+              type="date" 
+              value={values.dob} 
+              onChange={handleChanges} 
+              required 
+              sx={{
+                height: '400px',  // You can adjust this value as needed
+              }}
+            />
+
+            
 
             <Box sx={{ mt: 2 }}>
               <Typography variant="body1" sx={{ mb: 1 }}>Employee Type</Typography>
@@ -140,7 +198,7 @@ const AddEmployee = ({ onEmployeeAdded, onEmployeeUpdated, initialData }) => {
             <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 3 }}>
               {initialData ? "Update Employee" : "Add Employee"}
             </Button>
-          </form>
+          </Box>
         </Paper>
       </Box>
     </ThemeProvider>
