@@ -6,10 +6,10 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import EmployeeScheduler from '../employer-dashboard/EmployeeScheduler';
-import AddEmployee from '../employer-dashboard/AddEmployee';
-import EmployeeList from '../employer-dashboard/AllEmployeeList';
-import EmployeeManagement from '../employer-dashboard/EmployeeManagement';
+import EmployeeScheduler from './EmployeeScheduler';
+import AddEmployee from './AddEmployee';
+import EmployeeList from './AllEmployeeList';
+import EmployeeManagement from './EmployeeManagement';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../userAuth/firebase';
 import { AppProvider, DashboardLayout } from '@toolpad/core';
@@ -125,7 +125,14 @@ function EmployerNavigation() {
   
     switch(mainSegment) {
       case 'schedule':
-        return <EmployeeManagement employees={employees} setEmployees={setEmployees} defaultView="scheduler" />;
+        switch(subSegment) {
+          case 'diningSchedule':
+            return <EmployeeScheduler employees={employees.filter(emp => emp.employee_system === 'Dining Side')} isKitchen={false} />
+          case 'kitchenSchedule' :
+            return <EmployeeScheduler employees={employees.filter(emp => emp.employee_system === 'Kitchen Side')} isKitchen={true} />;
+            default:
+        }
+        // return <EmployeeManagement employees={employees} setEmployees={setEmployees} defaultView="scheduler" />;
       case 'employeeManagement':
         switch(subSegment) {
           case 'addEmployee':

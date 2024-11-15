@@ -2,37 +2,26 @@ import React, { useState, useCallback } from 'react';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import moment from 'moment';
 
-const positions = ['Server', 'Busser', 'Cook', 'Host'];
+const AutoGenerateSchedule = ({ employees, addSchedule, hasOverlappingSchedule, setEvents, updateEmployeeHours, isKitchen }) => {
+  const positions = isKitchen ? ['Cook'] : ['Server', 'Busser', 'Host'];
 
-const positionColors = {
-  Server: '#EFB1A7', // Red
-  Busser: '#8090ff', // Green
-  Cook: '#f7a441', // Blue
-  Host: '#f8f8f8', // Yellow
-};
+  const initializeEmployeesPerDay = () => {
+    const initial = {};
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-const AutoGenerateSchedule = ({ employees, addSchedule, hasOverlappingSchedule, setEvents, updateEmployeeHours }) => {
+    days.forEach(day => {
+      initial[day] = {};
+      positions.forEach(position => {
+        initial[day][position] = 0;
+      });
+    });
+    return initial;
+  };
+
   const [openDialog, setOpenDialog] = useState(false);
   const [params, setParams] = useState({
     numberOfWeeks: 1,
-    employeesPerDay: {
-      Monday: {},
-      Tuesday: {},
-      Wednesday: {},
-      Thursday: {},
-      Friday: {},
-      Saturday: {},
-      Sunday: {}
-    }
-  });
-
-  // Initialize employee counts for each position
-  positions.forEach(position => {
-    Object.keys(params.employeesPerDay).forEach(day => {
-      if (!params.employeesPerDay[day][position]) {
-        params.employeesPerDay[day][position] = 0; // Default to 0 if not already set
-      }
-    });
+    employeesPerDay: initializeEmployeesPerDay(),
   });
 
   const handleGenerateClick = () => {
@@ -50,130 +39,189 @@ const AutoGenerateSchedule = ({ employees, addSchedule, hasOverlappingSchedule, 
         ...prev.employeesPerDay,
         [day]: {
           ...prev.employeesPerDay[day],
-          [position]: parseInt(value) || 0 // Ensure it defaults to 0 if not a valid number
-        }
-      }
+          [position]: parseInt(value) || 0, // Ensure it defaults to 0 if not a valid number
+        },
+      },
     }));
   };
 
-  const getMaxHours = (employeeType) => {
+  const getMaxHours = employeeType => {
     return employeeType === 'Full-Time' ? 40 : 24;
   };
 
   const autoGenerateSchedule = useCallback(async () => {
-    const scheduleStartDate = moment().startOf("week").add(1, "weeks");
-    const scheduleEndDate = moment(scheduleStartDate).add(params.numberOfWeeks, "weeks");
+    try {
+    console.log("autoGenerateSchedule function called.")
+    const scheduleStartDate = moment().startOf('week').add(1, 'weeks');
+    const scheduleEndDate = moment(scheduleStartDate).add(params.numberOfWeeks, 'weeks');
     const newEvents = [];
 
-    const shifts = [
-      { type: "Morning", start: { hour: 7, minute: 0 }, end: { hour: 13, minute: 0 } },
-      { type: "Evening", start: { hour: 13, minute: 0 }, end: { hour: 19, minute: 0 } },
-      { type: "Closing", start: { hour: 16, minute: 0 }, end: { hour: 22, minute: 0 } }
-    ];
+    // Define shifts based on schedule type
+    const shifts = isKitchen
+      ? [
+          { type: 'Morning', start: { hour: 7, minute: 0 }, end: { hour: 13, minute: 0 } },
+          { type: 'Evening', start: { hour: 13, minute: 0 }, end: { hour: 19, minute: 0 } },
+          { type: 'Closing', start: { hour: 18, minute: 0 }, end: { hour: 22, minute: 0 } },
+        ]
+      : [
+          { type: 'Morning', start: { hour: 8, minute: 0 }, end: { hour: 14, minute: 0 } },
+          { type: 'Evening', start: { hour: 14, minute: 0 }, end: { hour: 20, minute: 0 } },
+          { type: 'Closing', start: { hour: 18, minute: 0 }, end: { hour: 22, minute: 0 } },
+        ];
 
     // Initialize employee hours for the week
     const employeeHours = employees.reduce((acc, employee) => {
       acc[employee.id] = {
         maxHours: getMaxHours(employee.employee_type),
-        scheduledHours: 0
+        scheduledHours: 0,
       };
       return acc;
     }, {});
 
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+       
+
     while (scheduleStartDate.isBefore(scheduleEndDate)) {
       const dayName = scheduleStartDate.format('dddd'); // Get current day name
+      console.log(`Processing date: ${scheduleStartDate.format('YYYY-MM-DD')} (${dayName})`);
+
       const dailyEmployees = [...employees];
 
       for (const shift of shifts) {
+        console.log(`  Processing shift: ${shift.type}`);
         const shiftStart = moment(scheduleStartDate).set(shift.start);
         const shiftEnd = moment(scheduleStartDate).set(shift.end);
         const shiftDuration = moment.duration(shiftEnd.diff(shiftStart)).asHours();
 
-        // Schedule based on user-defined requirements
-        await Promise.all(positions.map(async position => {
-          const requiredCount = params.employeesPerDay[dayName][position];
+        // Determine positions based on schedule type
+        // const positions = isKitchen ? ['Cook'] : ['Host', 'Server', 'Busser'];
 
-          // Filter available employees based on position and availability
-          const availableEmployees = dailyEmployees.filter(
-            (employee) =>
-              employee.employee_position === position &&
-              !hasOverlappingSchedule(
-                employee.id,
-                shiftStart.toDate(),
-                shiftEnd.toDate()
-              ) && 
-              Array.isArray(employee.employee_availability) &&
-              employee.employee_availability.includes(shift.type) &&
-              (employeeHours[employee.id].scheduledHours + shiftDuration) <= employeeHours[employee.id].maxHours
-          );
+        await Promise.all(
+          positions.map(async position => {
+            try {
+              console.log(`    Processing position: ${position}`);
+            const requiredCount = params.employeesPerDay[dayName][position];
+            console.log(`    Required count for ${position} on ${dayName}:`, requiredCount);
 
-          for (let i = 0; i < requiredCount && i < availableEmployees.length; i++) {
-            const selectedEmployeeIndex = Math.floor(Math.random() * availableEmployees.length);
-            const selectedEmployee = availableEmployees[selectedEmployeeIndex];
+            // Skip if no employees required for this position on this day
+            if (!requiredCount || requiredCount <= 0) return;
 
-            const newEvent = {
-              title: `${selectedEmployee.employee_fname} ${selectedEmployee.employee_lname} (${position})`,
-              start: shiftStart.toDate(),
-              end: shiftEnd.toDate(),
-              employeeId: selectedEmployee.id,
-              description: `Auto-generated ${shift.type} shift - ${position}`,
-              color: positionColors[position], // Assign color based on position
-            };
+            // Filter available employees based on position and availability
+            const availableEmployees = dailyEmployees.filter(
+              employee => {
+                const availability = Array.isArray(employee.employee_availability) ? employee.employee_availability : [employee.employee_availability];
+                
+                return (
+                  employee.employee_position === position &&
+                  employee.employee_system === (isKitchen ? 'Kitchen Side' : 'Dining Side') &&
+                  !hasOverlappingSchedule(employee.id, shiftStart.toDate(), shiftEnd.toDate()) &&
+                  availability.includes(shift.type) &&
+                  employeeHours[employee.id].scheduledHours + shiftDuration <= employeeHours[employee.id].maxHours
+                );
+              }
 
-            const docRefId = await addSchedule(
-              newEvent.title,
-              newEvent.start,
-              newEvent.end,
-              newEvent.employeeId,
-              newEvent.description
             );
-            newEvents.push({ ...newEvent, id: docRefId });
+            console.log(`    Available employees for ${position} on ${dayName}:`, availableEmployees);
 
-            // Update scheduled hours for the employee
-            employeeHours[selectedEmployee.id].scheduledHours += shiftDuration;
+            for (let i = 0; i < requiredCount && availableEmployees.length > 0; i++) {
+              // Randomly select an available employee
+              const selectedEmployeeIndex = Math.floor(Math.random() * availableEmployees.length);
+              const selectedEmployee = availableEmployees[selectedEmployeeIndex];
 
-            // Remove the scheduled employee from the daily pool
-            dailyEmployees.splice(dailyEmployees.findIndex(emp => emp.id === selectedEmployee.id), 1);
+              const newEvent = {
+                title: `${selectedEmployee.employee_fname} ${selectedEmployee.employee_lname} (${position})`,
+                start: shiftStart.toDate(),
+                end: shiftEnd.toDate(),
+                employeeId: selectedEmployee.id,
+                description: `Auto-generated ${shift.type} shift - ${position}`,
+                position: selectedEmployee.employee_position,
+              };
+
+              
+        // Create a new schedule batch
+        // const batchRef = await addDoc(collection(db, 'scheduleBatches'), {
+        //   startDate: scheduleStartDate.toDate(),
+        //   endDate: scheduleEndDate.toDate(),
+        //   status: 'Draft',
+        //   scheduleType: isKitchen ? 'Kitchen Side' : 'Dining Side',
+        //   createdAt: new Date(),
+        // });
+
+        // const batchId = batchRef.id;
+
+              const addedEvent = await addSchedule(
+                newEvent.title,
+                newEvent.start,
+                newEvent.end,
+                newEvent.employeeId,
+                newEvent.description,
+                isKitchen,
+                // batchId 
+              );
+
+              if (addedEvent) {
+                newEvents.push(addedEvent);
+              }
+
+              // Update scheduled hours for the employee
+              employeeHours[selectedEmployee.id].scheduledHours += shiftDuration;
+
+              // Remove the scheduled employee from the daily pool
+              availableEmployees.splice(selectedEmployeeIndex, 1);
+              dailyEmployees.splice(
+                dailyEmployees.findIndex(emp => emp.id === selectedEmployee.id),
+                1
+              );
+            }
+          } catch (error) {
+            console.error(`Error scheduling position ${position} on ${dayName}:`, error);
           }
-        }));
+          })
+        );
       }
 
-      scheduleStartDate.add(1, "day");
+      scheduleStartDate.add(1, 'day');
     }
-
-    setEvents((prevEvents) => [...prevEvents, ...newEvents]);
+console.log("Generated events: ", newEvents);
+    setEvents(prevEvents => [...prevEvents, ...newEvents]);
 
     // Update employee hours in the UI
     Object.entries(employeeHours).forEach(([employeeId, hours]) => {
       const remainingHours = hours.maxHours - hours.scheduledHours;
       updateEmployeeHours(employeeId, remainingHours);
     });
+      // Close the dialog after generating the schedule
+      handleDialogClose();
 
-    handleDialogClose();
-  }, [employees, addSchedule, hasOverlappingSchedule, setEvents, params, updateEmployeeHours]);
+      alert('Schedule generated successfully!');
+  } catch (error) {
+    console.error('Error in autoGenerateSchedule:', error);
+    alert('An error occurred while generating the schedule.');
+  }
+  }, [employees, addSchedule, hasOverlappingSchedule, setEvents, params, updateEmployeeHours, isKitchen]);
 
   return (
     <>
-      <Button 
-      onClick={handleGenerateClick} 
-      variant="contained" 
-      // size="small" 
-      color="primary"
-      sx={{
-        marginTop: '57px',    // Adds space above the button
-        marginBottom: '16px', // Adds space below the button
-        marginLeft: '16px',   //Adds space to the left of the button
-        height: '50px',       // Adjust button height
-        width: '250px',       // Adjust button width
-        border: '3px solid #6200ea',  // Add border (purple color, adjust as needed)
-        borderRadius: '5px',     // Rounded corners (optional)
-        padding: '10px 20px',    // Optional padding for extra spacing inside the button 
-        backgroundColor: "primary", 
-        '&:hover': {
-          backgroundColor: '#4b00c7', // Darker purple on hover
-          borderColor: '#4b00c7',     // Darker border color on hover
-        } 
-      }}
+      <Button
+        onClick={handleGenerateClick}
+        variant="contained"
+        color="primary"
+        sx={{
+          marginTop: '57px',
+          marginBottom: '16px',
+          marginLeft: '16px',
+          height: '50px',
+          width: '250px',
+          border: '3px solid #6200ea',
+          borderRadius: '5px',
+          padding: '10px 20px',
+          backgroundColor: 'primary',
+          '&:hover': {
+            backgroundColor: '#4b00c7',
+            borderColor: '#4b00c7',
+          },
+        }}
       >
         Generate Auto Schedule
       </Button>
@@ -186,7 +234,7 @@ const AutoGenerateSchedule = ({ employees, addSchedule, hasOverlappingSchedule, 
             type="number"
             fullWidth
             value={params.numberOfWeeks}
-            onChange={(e) => setParams({ ...params, numberOfWeeks: parseInt(e.target.value) })}
+            onChange={e => setParams({ ...params, numberOfWeeks: parseInt(e.target.value) })}
             margin="normal"
           />
           {Object.keys(params.employeesPerDay).map(day => (
@@ -199,7 +247,7 @@ const AutoGenerateSchedule = ({ employees, addSchedule, hasOverlappingSchedule, 
                   type="number"
                   fullWidth
                   value={params.employeesPerDay[day][position]}
-                  onChange={(e) => handleParamChange(day, position, e.target.value)}
+                  onChange={e => handleParamChange(day, position, e.target.value)}
                   margin="normal"
                 />
               ))}
@@ -208,7 +256,9 @@ const AutoGenerateSchedule = ({ employees, addSchedule, hasOverlappingSchedule, 
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose}>Cancel</Button>
-          <Button onClick={autoGenerateSchedule} color="primary">Generate</Button>
+          <Button onClick={() => {console.log('Generate button clicked'); autoGenerateSchedule()}} color="primary">
+            Generate
+          </Button>
         </DialogActions>
       </Dialog>
     </>

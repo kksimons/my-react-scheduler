@@ -32,7 +32,7 @@ import AutoGenerateSchedule from "./AutoGenerateSchedule";
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
 
-const EmployeeScheduler = ({ employees }) => {
+const EmployeeScheduler = ({ employees, isKitchen }) => {
   // const [employees, setEmployees] = useState(initialEmployees);
   const [events, setEvents] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
@@ -58,18 +58,22 @@ const EmployeeScheduler = ({ employees }) => {
     const scheduleSnapshot = await getDocs(scheduleCollection);
     const scheduleList = scheduleSnapshot.docs.map((doc) => {
       const data = doc.data();
-      const employee = employees.find(emp => emp.id === data.employeeId);
+      const employee = employees.find((emp) => emp.id === data.employeeId);
 
       return {
         id: doc.id,
         ...doc.data(),
         start: doc.data().start.toDate(),
         end: doc.data().end.toDate(),
-        position: employee?.employee_position || 'Unknown',
-      }
-
+        position: employee?.employee_position || "Unknown",
+      };
     });
-    setEvents(scheduleList);
+
+    // Filter events based on schedule type
+    const filteredEvents = scheduleList.filter(
+      (event) => event.scheduleType === (isKitchen ? "Kitchen" : "Dining")
+    );
+    setEvents(filteredEvents);
   };
 
   const initializeEmployeeHours = () => {
@@ -81,69 +85,102 @@ const EmployeeScheduler = ({ employees }) => {
   };
 
   const getMaxHours = (employeeType) => {
-    return employeeType === 'Full-Time' ? 40 : 24;
+    return employeeType === "Full-Time" ? 40 : 24;
   };
-
-
 
   const eventStyleGetter = (event) => {
     let backgroundColor;
 
     switch (event.position) {
-      case 'Server':
-          backgroundColor = 'Red'; // Color for Server
-          break;
-      case 'Busser':
-          backgroundColor = 'green'; // Color for Busser
-          break;
-      case 'Cook':
-          backgroundColor = 'orange'; // Color for Cook
-          break;
-      case 'Host':
-          backgroundColor = 'purple'; // Color for Host
-          break;
+      case "Server":
+        backgroundColor = "Red"; // Color for Server
+        break;
+      case "Busser":
+        backgroundColor = "green"; // Color for Busser
+        break;
+      case "Cook":
+        backgroundColor = "orange"; // Color for Cook
+        break;
+      case "Host":
+        backgroundColor = "purple"; // Color for Host
+        break;
       default:
-          backgroundColor = 'gray'; // Fallback color
-  }
+        backgroundColor = "gray"; // Fallback color
+    }
 
-  return {
+    return {
       style: {
-          backgroundColor,
-          color: 'white', // Optional text color for better contrast
+        backgroundColor,
+        color: "white", // Optional text color for better contrast
       },
+    };
   };
-  }
 
   // function for worked hour
   const getEmployeeHours = (employeeType) => {
     return employeeType === "Full-Time" ? "40hr" : "24hr";
   };
 
-  const addSchedule = async (title, start, end, employeeId, description) => {
+  const addSchedule = async (
+    title,
+    start,
+    end,
+    employeeId,
+    description,
+    isKitchen,
+    // batchId
+  ) => {
     try {
+      // Check if the employee is eligible for scheduling based on the type of schedule
+      const employee = employees.find((emp) => emp.id === employeeId);
+
+      if (isKitchen && employee?.employee_system !== "Kitchen Side") {
+        alert("Only cooks can be scheduled in the kitchen.");
+        return;
+      } else if (!isKitchen && employee?.employee_system !== "Dining Side") {
+        alert(
+          "Only Hosts, Servers, and Bussers can be scheduled in the dining area."
+        );
+        return;
+      }
+
+      // Proceed to add the schedule to firestore if validation passes
       const docRef = await addDoc(collection(db, "schedules"), {
         title,
         start,
         end,
         employeeId,
         description,
+        scheduleType: isKitchen ? "Kitchen Side" : "Dining Side",
+        // batchId,
       });
-      console.log("Document written with ID:", docRef.id);
-      return docRef.id;
-    } catch (e) {
-      console.error("Error adding document:", e);
-    }
-  };
 
-  const updateSchedule = async (eventId, updatedEvent) => {
-    try {
-      const { title, start, end, employeeId, description } = updatedEvent;
-      await updateDoc(doc(db, "schedules", eventId), {
+      console.log("Document written with ID:", docRef.id);
+
+      // Return the newly created event object
+      return {
+        id: docRef.id,
         title,
         start,
         end,
         employeeId,
         description,
+        position: employee?.employee_position,
+        scheduleType: isKitchen ? "Kitchen Side" : "Dining Side",
+        // batchId,
+      };
+    } catch (e) {
+      console.error("Error adding document:", e);
+      alert("Failed to add schedule. Please try again.");
+    }
+  };
+
+  // EmployeeScheduler.jsx
+  const updateSchedule = async (eventId, updatedEvent) => {
+    try {
+      await updateDoc(doc(db, "schedules", eventId), {
+        ...updatedEvent,
+        scheduleType: isKitchen ? "Kitchen" : "Dining",
       });
       console.log("Document updated with ID:", eventId);
     } catch (e) {
@@ -152,9 +189,9 @@ const EmployeeScheduler = ({ employees }) => {
   };
 
   const updateEmployeeHours = useCallback((employeeId, hoursWorked) => {
-    setEmployeeRemainingHours(prevHours => ({
+    setEmployeeRemainingHours((prevHours) => ({
       ...prevHours,
-      [employeeId]: Math.max(0, (prevHours[employeeId] || 0) - hoursWorked)
+      [employeeId]: Math.max(0, (prevHours[employeeId] || 0) - hoursWorked),
     }));
   }, []);
 
@@ -221,74 +258,77 @@ const EmployeeScheduler = ({ employees }) => {
     newEventEnd.setHours(endHour, endMinute);
 
     if (newEventEnd <= newEventStart) {
-        alert("End time must be after start time.");
-        return;
+      alert("End time must be after start time.");
+      return;
     }
     if (!selectedEmployeeId) {
-        alert("No employee selected.");
-        return;
+      alert("No employee selected.");
+      return;
     }
     if (
-        hasOverlappingSchedule(
-            selectedEmployeeId,
-            newEventStart,
-            newEventEnd,
-            selectedEventId
-        )
+      hasOverlappingSchedule(
+        selectedEmployeeId,
+        newEventStart,
+        newEventEnd,
+        selectedEventId
+      )
     ) {
-        alert(
-            "This schedule overlaps with an existing schedule for this employee."
-        );
-        return;
+      alert(
+        "This schedule overlaps with an existing schedule for this employee."
+      );
+      return;
     }
 
     const employee = employees.find((emp) => emp.id === selectedEmployeeId);
     if (!employee) {
-        alert("Selected employee not found.");
-        return;
+      alert("Selected employee not found.");
+      return;
     }
 
     const title = `${employee.employee_fname} ${employee.employee_lname}`;
-    
+
     // Create a new event including position
     const newEvent = {
-        id: "", // This will be set after adding to Firestore
-        title,
-        start: newEventStart,
-        end: newEventEnd,
-        employeeId: employee.id,
-        description: eventDescription,
-        position: employee.employee_position // Include position here
+      id: "", // This will be set after adding to Firestore
+      title,
+      start: newEventStart,
+      end: newEventEnd,
+      employeeId: employee.id,
+      description: eventDescription,
+      position: employee.employee_position, // Include position here
     };
 
     if (selectedEventId) {
-        await updateSchedule(selectedEventId, {
-            ...newEvent,
-            id: selectedEventId,
-        });
-        setEvents((prev) =>
-            prev.map((ev) =>
-                ev.id === selectedEventId ? { ...newEvent, id: selectedEventId } : ev
-            )
-        );
+      // Update an existing schedule
+      await updateSchedule(selectedEventId, {
+        ...newEvent,
+        id: selectedEventId,
+        scheduleType,
+      });
+      setEvents((prev) =>
+        prev.map((ev) =>
+          ev.id === selectedEventId ? { ...newEvent, id: selectedEventId } : ev
+        )
+      );
     } else {
-        const docRefId = await addSchedule(
-            newEvent.title,
-            newEvent.start,
-            newEvent.end,
-            newEvent.employeeId,
-            newEvent.description
-        );
-        
-        // Set the ID for the newly created event
-        newEvent.id = docRefId;
+      // Adding a new schedule
+      const addedEvent = await addSchedule(
+        newEvent.title,
+        newEvent.start,
+        newEvent.end,
+        newEvent.employeeId,
+        newEvent.description,
+        isKitchen
+      );
 
-        // Add the event with its position to state
-        setEvents((prev) => [...prev, newEvent]);
+      // Add the event with its position to state
+      if (addedEvent) {
+        setEvents((prev) => [...prev, addedEvent]);
+      }
     }
-    
+
     handleDialogClose();
-};
+  };
 
   const handleDeleteSchedule = async () => {
     if (!selectedEventId) return;
@@ -296,9 +336,9 @@ const EmployeeScheduler = ({ employees }) => {
     setEvents((prev) => prev.filter((ev) => ev.id !== selectedEventId));
     handleDialogClose();
   };
-  useEffect(() => {
-    console.log("Events to be displayed:", events);
-  }, [events]); // This will log whenever events change
+  // useEffect(() => {
+  //   console.log("Events to be displayed:", events);
+  // }, [events]); // This will log whenever events change
 
   return (
     <Box sx={{ display: "flex", height: "100%" }}>
@@ -364,6 +404,7 @@ const EmployeeScheduler = ({ employees }) => {
                     </Typography>
                   </Box>
                 }
+                secondaryTypographyProps={{ component: "div" }} 
                 sx={{
                   backgroundColor: "#B0C4DE",
                   padding: "9px",
@@ -374,7 +415,6 @@ const EmployeeScheduler = ({ employees }) => {
           ))}
         </List>
       </Paper>
-
 
       <DnDCalendar
         localizer={localizer}
@@ -456,14 +496,15 @@ const EmployeeScheduler = ({ employees }) => {
           </Button>
         </DialogActions>
       </Dialog>
-      <Box >
+      <Box>
         <AutoGenerateSchedule
           employees={employees}
           addSchedule={addSchedule}
           hasOverlappingSchedule={hasOverlappingSchedule}
           setEvents={setEvents}
           updateEmployeeHours={updateEmployeeHours}
-          employeeRemainingHours={employeeRemainingHours}
+          // employeeRemainingHours={employeeRemainingHours}
+          isKitchen={isKitchen}
         />
       </Box>
     </Box>
