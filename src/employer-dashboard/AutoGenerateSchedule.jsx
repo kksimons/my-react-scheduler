@@ -102,6 +102,7 @@ const AutoGenerateSchedule = ({ employees, addSchedule, hasOverlappingSchedule, 
                 shiftStart.toDate(),
                 shiftEnd.toDate()
               ) && 
+              Array.isArray(employee.employee_availability) &&
               employee.employee_availability.includes(shift.type) &&
               (employeeHours[employee.id].scheduledHours + shiftDuration) <= employeeHours[employee.id].maxHours
           );
