@@ -100,7 +100,7 @@ const ClassesPage: React.FC = () => {
       Th: 4,
       F: 5,
     };
-    const referenceDate = new Date("2024-11-04T00:00:00");
+    const referenceDate = new Date("2024-11-18T00:00:00");
 
     return data.schedules
       .flatMap((schedule, index) => {
@@ -229,7 +229,16 @@ const ClassesPage: React.FC = () => {
           </div>
         ) : events.length > 0 ? (
           <>
-            <div className="schedule-container">
+            <div
+              className="schedule-container"
+              style={{
+                maxHeight: "90vh",
+                overflowY: "auto",
+                padding: "10px",
+                border: "1px solid #ccc",
+                borderRadius: "8px",
+              }}
+            >
               <Schedule
                 events={events}
                 onEventClick={(event) =>
