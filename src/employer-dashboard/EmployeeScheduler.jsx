@@ -1,8 +1,14 @@
+//  Resources: 
+//    - ChatGPt
+
 import React, { useState, useEffect, useCallback } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+
+import jsPDF from "jspdf";
+
 import {
   Box,
   Paper,
@@ -341,6 +347,83 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
   //   console.log("Events to be displayed:", events);
   // }, [events]); // This will log whenever events change
 
+
+    // Export to pdf function 
+    const exportToPDF = () => {
+      // Identify the week (starting from Monday)
+      const startOfWeek = moment().startOf('week').add(1, 'days'); 
+      const endOfWeek = moment().endOf('week').add(1, 'days'); 
+    
+      // Format the week range 
+      const weekRange = `Week of ${startOfWeek.format("MMMM D, YYYY")} - ${endOfWeek.format("MMMM D, YYYY")}`;
+    
+      // Filter the events to get only those that fall within the current week
+      const filteredEvents = events.filter((event) => {
+        const eventStart = moment(event.start);
+        return eventStart.isBetween(startOfWeek, endOfWeek, 'days', '[]');
+      });
+    
+      // Group events by day of the week 
+      const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+      const eventsByDay = daysOfWeek.reduce((acc, day) => {
+        acc[day] = [];
+        return acc;
+      }, {});
+    
+      // Fill the eventsByDay object with events
+      filteredEvents.forEach((event) => {
+        const dayOfWeek = moment(event.start).format("dddd"); // Get day name (e.g., "Monday")
+        if (eventsByDay[dayOfWeek]) {
+          eventsByDay[dayOfWeek].push(event);
+        }
+      });
+    
+      // Create the PDF document
+      const doc = new jsPDF();
+      doc.setFontSize(12);
+      doc.text(weekRange, 14, 10);
+      doc.line(14, 15, 200, 15);
+    
+      let yPosition = 20; // Start adding text at y = 20
+    
+      // Loop over the days of the week 
+      daysOfWeek.forEach((day) => {
+        // Add the day of the week as a header 
+        doc.setFontSize(14);
+        doc.text(day, 14, yPosition);
+        // Draw a line under the day header
+        doc.line(14, yPosition + 5, 200, yPosition + 5); 
+        yPosition += 10; // Move y position down for the events
+    
+        // Add events for the current day
+        eventsByDay[day].forEach((event, index) => {
+          const employee = employees.find((emp) => emp.id === event.employeeId);
+          const startTime = moment(event.start).format("HH:mm");
+          const endTime = moment(event.end).format("HH:mm");
+          const eventDescription = event.description || "No description";
+    
+          const text = `${employee.employee_fname} ${employee.employee_lname} - ${startTime} - ${endTime} (${eventDescription})`;
+    
+          // Add the event text to the PDF
+          doc.setFontSize(12);
+          doc.text(text, 14, yPosition + (index * 10));
+          yPosition += 10; // Increment position for the next event
+    
+          // If there are too many events, break and add a page
+          if (yPosition > 270) {
+            doc.addPage();
+            yPosition = 10; // Reset y position after a page break
+          }
+        });
+    
+        // Add some space after each day
+        yPosition += 10;
+      });
+    
+      // Save the PDF document
+      doc.save("employee_schedule.pdf");
+    };
+
   return (
     <Box sx={{ display: "flex", height: "100%" }}>
       <Paper
@@ -416,6 +499,31 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
           ))}
         </List>
       </Paper>
+
+          {/* Button to create a pdf schedule */}
+      <Button 
+      variant="contained"  
+      size="small" 
+      onClick={exportToPDF}
+      sx={{
+        position: 'absolute',         
+        bottom: '500px',               
+        right: '16px',                
+        width: '250px',               
+        borderRadius: '8px',          
+        padding: '10px 20px',              
+        height: '50px',
+        width: '250px',
+        border: '1px solid #000000',
+        backgroundColor: 'primary',
+          '&:hover': {
+            backgroundColor: '#4b00c7',
+            borderColor: '#4b00c7',
+          },
+      }}
+      >
+        Export Schedule to PDF
+      </Button>
 
       <DnDCalendar
         localizer={localizer}

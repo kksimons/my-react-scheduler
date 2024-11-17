@@ -207,14 +207,16 @@ console.log("Generated events: ", newEvents);
         onClick={handleGenerateClick}
         variant="contained"
         color="primary"
+        size="small"
         sx={{
           marginTop: '57px',
           marginBottom: '16px',
           marginLeft: '16px',
+          marginRight: '16px',
           height: '50px',
           width: '250px',
-          border: '3px solid #6200ea',
-          borderRadius: '5px',
+          border: '1px solid #000000',
+          borderRadius: '8px',
           padding: '10px 20px',
           backgroundColor: 'primary',
           '&:hover': {
