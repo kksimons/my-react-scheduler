@@ -52,7 +52,7 @@ let theme = createTheme({
     },
     background: {
       primary: '#4314ff',      // Main background color
-      secondary: '#eaeaf2',    // Background for sections like cards
+      secondary: '#CCC1FF',    // Background for sections like cards
       third: 'white',          // Background for main content area
       alternative: '#dfe0e6',  // Background for input fields, etc.
       accent: '#f0f2ff',       // Accent background for focus areas

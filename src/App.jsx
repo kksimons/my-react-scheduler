@@ -17,6 +17,15 @@ import Availability from '@userAuth/Availability';
 import ForgotPassword from '@userAuth/services/ForgotPassword';
 import PricingPage from './PricingPage';
 
+
+import UserProfile from '@dashboard/components/UserProfile';
+import EmployerNavigation from './dashboard/employer-dashboard/employerNavigation';
+import AddEmployee from '@dashboard/employer-dashboard/AddEmployee';
+import EmployeeScheduler from '@dashboard/employee-dashboard/EmployeeScheduler';
+import EmployeeManagement from '@dashboard/employer-dashboard/EmployeeManagement';
+import AllEmployeeList from '@dashboard/employer-dashboard/AllEmployeeList';
+import AutoGenerateSchedule from './dashboard/employer-dashboard/AutoGenerateSchedule';
+
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -49,6 +58,8 @@ const App = () => {
             <Route path="/ForgotPassword" element={<ForgotPassword />} />
             <Route path="/PricingPage" element={<PricingPage />} />
 
+
+
             {/* {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/EmployerDashboard" element={<EmployerDashboard />} />
@@ -59,6 +70,19 @@ const App = () => {
               <Route path="/SelectRole" element={<SelectRole />} />
               <Route path="/Availability" element={<Availability />} />
               <Route path="/ForgotPassword" element={<ForgotPassword />} /> 
+              <Route path= "/UserProfile" element={<UserProfile />} />
+             
+              
+              
+            {/* Routing for employer dashboard*/} 
+              <Route path="/EmployerDashboard" element={<EmployerDashboard />} />
+              <Route path="/AddEmployee" element={<AddEmployee />} />
+              <Route path="/EmployeeScheduler" element={<EmployeeScheduler />} />
+              <Route path="/EmployeeManagement" element={<EmployeeManagement />} />
+              <Route path="/AllEmployeeList" element={<AllEmployeeList />} />
+              <Route path="/AutoGenerateSchedule" element={<AutoGenerateSchedule />} />
+              <Route path="/employerNavigation" element={<EmployerNavigation />} />
+            
               
             </Route>
             
