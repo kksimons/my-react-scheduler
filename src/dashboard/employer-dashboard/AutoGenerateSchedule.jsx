@@ -213,7 +213,7 @@ console.log("Generated events: ", newEvents);
           marginBottom: '16px',
           marginLeft: '16px',
           marginRight: '16px',
-          height: '50px',
+          height: '30px',
           width: '250px',
           border: '1px solid #000000',
           borderRadius: '8px',
