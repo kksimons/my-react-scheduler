@@ -11,11 +11,11 @@ import AddEmployee from './AddEmployee';
 import EmployeeList from './AllEmployeeList';
 import EmployeeManagement from './EmployeeManagement';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../userAuth/firebase';
+import { db } from '@userAuth/firebase';
 import { AppProvider, DashboardLayout } from '@toolpad/core';
-import theme from '../theme/theme';
+import theme from '@theme/theme';
 import { ThemeProvider } from '@emotion/react';
-import logo from "../assets/logo.png";
+import logo from "@assets/logo.png";
 
 
 //This is only for navigation side bar title and icons, it does not have any functionality 
@@ -55,21 +55,11 @@ const NAVIGATION = [
     icon: <PeopleAltIcon />,
     children: [
       {
-        segment: 'addEmployee',
-        title: 'Add Employee',
-        icon: <PersonAddIcon />,
-      },
-      {
         segment: 'employeeList',
         title: 'Employee List',
         icon: <DescriptionIcon />,
       },
     ],
-  },
-  {
-    segment: 'contactList',
-    title: 'Contact List',
-    icon: <ContactsIcon />,
   },
 ];
 
@@ -87,7 +77,7 @@ function useDemoRouter(initialPath) {
   return router;
 }
 
-function EmployerNavigation() {
+function EmployeeNavigation() {
   const [employees, setEmployees] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -135,17 +125,11 @@ function EmployerNavigation() {
         // return <EmployeeManagement employees={employees} setEmployees={setEmployees} defaultView="scheduler" />;
       case 'employeeManagement':
         switch(subSegment) {
-          case 'addEmployee':
-            return <EmployeeManagement employees={employees} setEmployees={setEmployees} defaultView="addEmployee" />;
           case 'employeeList':
             return <EmployeeManagement employees={employees} setEmployees={setEmployees} defaultView="list" />;
           default:
             return <EmployeeManagement employees={employees} setEmployees={setEmployees} defaultView="list" />;
         }
-      case 'contactList':
-        return <div>Contact List</div>;
-      default:
-        return <EmployeeManagement employees={employees} setEmployees={setEmployees} defaultView="scheduler" />;
     }
   };
 
@@ -168,4 +152,4 @@ function EmployerNavigation() {
   );
 }
 
-export default EmployerNavigation;
+export default EmployeeNavigation;

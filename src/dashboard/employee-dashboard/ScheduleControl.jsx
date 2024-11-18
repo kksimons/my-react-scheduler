@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { db } from "../userAuth/firebase";
+import { db } from "@userAuth/firebase";
 import { collection, query } from "firebase/firestore";
 import ScheduleBatchCard from "./ScheduleBatchCard";
 

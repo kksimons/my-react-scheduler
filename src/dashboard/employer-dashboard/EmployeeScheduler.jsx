@@ -31,7 +31,7 @@ import {
   updateDoc,
   doc,
 } from "firebase/firestore";
-import { db } from "../userAuth/firebase";
+import { db } from "@userAuth/firebase";
 import CustomEvent from "./CustomEvent";
 import AutoGenerateSchedule from "./AutoGenerateSchedule";
 
