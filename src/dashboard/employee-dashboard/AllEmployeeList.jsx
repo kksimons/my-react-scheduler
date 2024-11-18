@@ -2,10 +2,12 @@ import React from "react";
 import { CssBaseline, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, ThemeProvider, Typography } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import Tooltip from '@mui/material/Tooltip';
 import theme from "@theme/theme"; // Assuming theme is defined elsewhere
 
 // EmployeeList component to display all employees
-const AllEmployeeList = ({ employees, onDelete, onUpdate }) => {
+const AllEmployeeList = ({ employees, onViewProfile }) => {
   if (employees.length === 0) {
     return <div>No employees found.</div>;
   }
@@ -47,6 +49,11 @@ const AllEmployeeList = ({ employees, onDelete, onUpdate }) => {
                   <TableCell>{employee.employee_type}</TableCell>
                   <TableCell>{employee.employee_availability}</TableCell>
                   <TableCell>
+                  <Tooltip title="View Profile" arrow>
+                    <IconButton onClick={() => onViewProfile(employee.id)}>
+                      <AccountBoxIcon />
+                    </IconButton>
+                    </Tooltip>
                   </TableCell>
                 </TableRow>
               ))}

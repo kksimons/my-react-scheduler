@@ -6,7 +6,7 @@ import { Box } from "@mui/material";
 import AddEmployee from "./AddEmployee";
 import EmployeeScheduler from "./EmployeeScheduler";
 
-const EmployeeManagement = ({ employees, setEmployees, defaultView = 'list' }) => {
+const EmployeeManagement = ({ employees, setEmployees, defaultView = 'list', navigate }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [editEmployee, setEditEmployee] = useState(null);
@@ -51,28 +51,49 @@ const EmployeeManagement = ({ employees, setEmployees, defaultView = 'list' }) =
   };
 
   return (
+    // <Box
+    //   className="employee-management-container"
+    //   sx={{ padding: "10px", position: "relative", minHeight: "100vh" }}
+    // >
+    //   {defaultView === 'addEmployee' || editEmployee ? (
+    //     <AddEmployee
+    //       onEmployeeAdded={handleAddEmployee}
+    //       initialData={editEmployee}
+    //       onEmployeeUpdated={handleEmployeeUpdated}
+    //     />
+    //   ) 
+    //   : defaultView === 'scheduler' ? (
+    //     <EmployeeScheduler employees={employees} />
+    //   ) 
+    //   : (
+    //     <AllEmployeeList
+    //       employees={employees}
+    //       onDelete={handleDelete}
+    //       onUpdate={handleUpdateEmployee}
+    //     />
+    //   )}
+    // </Box>
     <Box
-      className="employee-management-container"
-      sx={{ padding: "10px", position: "relative", minHeight: "100vh" }}
-    >
-      {defaultView === 'addEmployee' || editEmployee ? (
-        <AddEmployee
-          onEmployeeAdded={handleAddEmployee}
-          initialData={editEmployee}
-          onEmployeeUpdated={handleEmployeeUpdated}
-        />
-      ) 
-      : defaultView === 'scheduler' ? (
-        <EmployeeScheduler employees={employees} />
-      ) 
-      : (
-        <AllEmployeeList
-          employees={employees}
-          onDelete={handleDelete}
-          onUpdate={handleUpdateEmployee}
-        />
-      )}
-    </Box>
+    className="employee-management-container"
+    sx={{ padding: "10px", position: "relative", minHeight: "100vh" }}
+  >
+    {defaultView === 'addEmployee' || editEmployee ? (
+      <AddEmployee
+        onEmployeeAdded={handleAddEmployee}
+        initialData={editEmployee}
+        onEmployeeUpdated={handleEmployeeUpdated}
+      />
+    ) : defaultView === 'scheduler' ? (
+      <EmployeeScheduler employees={employees} />
+    ) : (
+      <AllEmployeeList
+        employees={employees}
+        onDelete={handleDelete}
+        onUpdate={handleUpdateEmployee}
+        onViewProfile={(employeeId) => navigate(`/employeeManagement/employeeProfile/${employeeId}`)}
+      />
+    )}
+  </Box>
   );
 };
 

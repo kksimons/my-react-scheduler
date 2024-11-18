@@ -140,6 +140,7 @@ const EmployerRegistration = () => {
                     employer_phone_number: formData.phoneNumber,
                     employer_system: formData.systemSide,
                     employer_position: formData.position,
+                    photoURL: "", //placeholder for photoURL 
                 }, 
                 { merge: true } //merge the data with the existing data
             );
