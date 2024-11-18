@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { db } from "../userAuth/firebase";
+import { db } from "@userAuth/firebase";
 import { deleteDoc, doc } from "firebase/firestore";
 import AllEmployeeList from "./AllEmployeeList";
 import { Box } from "@mui/material";

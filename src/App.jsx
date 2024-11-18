@@ -2,8 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, BrowserRouter, createBrowserRouter, RouterProvider } from 'react-router-dom';
 import LandingPage from './LandingPage';
 
-import EmployerDashboard from '@employer-dashboard/EmployerDashboard';
-import EmployeeDashboard from '@employee-dashboard/EmployeeDashboard';
+import EmployerDashboard from '@dashboard/employer-dashboard/EmployerDashboard';
+import EmployeeDashboard from '@dashboard/employee-dashboard/EmployeeDashboard';
 import ProtectedRoute from '@userAuth/contexts/ProtectedRoute';
 import SelectRole from '@userAuth/SelectRole';
 import AuthProvider from '@userAuth/contexts/AuthContext';

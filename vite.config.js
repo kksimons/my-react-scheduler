@@ -17,6 +17,7 @@ export default defineConfig({
       { find: '@employer-dashboard', replacement: '/src/employer-dashboard' },
       { find: '@employee-dashboard', replacement: '/src/employee-dashboard' },
       { find: '@assets', replacement: '/src/assets' },
+      { find: '@dashboard', replacement: '/src/dashboard' },
     ],
   },
   server: {

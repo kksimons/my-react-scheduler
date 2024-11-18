@@ -4,7 +4,7 @@ import Scheduler from '@aldabil/react-scheduler';
 import { Container, Typography, Box } from '@mui/material';
 import { styled } from '@mui/system';
 import SignOut from '@userAuth/services/SignOut';
-import EmployeeNavigation from './employeeNavigation';
+import EmployeeNavigation from './EmployeeNavigation';
 
 
 

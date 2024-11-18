@@ -2,7 +2,7 @@ import React from "react";
 import { CssBaseline, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, ThemeProvider, Typography } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import theme from "../theme/theme"; // Assuming theme is defined elsewhere
+import theme from "@theme/theme"; // Assuming theme is defined elsewhere
 
 // EmployeeList component to display all employees
 const AllEmployeeList = ({ employees, onDelete, onUpdate }) => {
