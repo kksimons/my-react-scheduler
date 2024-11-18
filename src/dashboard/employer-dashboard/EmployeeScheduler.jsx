@@ -77,7 +77,7 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
 
     // Filter events based on schedule type
     const filteredEvents = scheduleList.filter(
-      (event) => event.scheduleType === (isKitchen ? "Kitchen" : "Dining")
+      (event) => event.scheduleType === (isKitchen ? "Kitchen Side" : "Dining Side")
     );
     setEvents(filteredEvents);
   };
@@ -182,7 +182,7 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
     }
   };
 
-  // EmployeeScheduler.jsx
+  
   const updateSchedule = async (eventId, updatedEvent) => {
     try {
       await updateDoc(doc(db, "schedules", eventId), {

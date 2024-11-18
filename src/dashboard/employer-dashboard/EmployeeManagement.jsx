@@ -10,6 +10,7 @@ const EmployeeManagement = ({ employees, setEmployees, defaultView = 'list', nav
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [editEmployee, setEditEmployee] = useState(null);
+  const [isAddEmployeeOpen, setIsAddEmployeeOpen] = useState(false);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -33,11 +34,13 @@ const EmployeeManagement = ({ employees, setEmployees, defaultView = 'list', nav
   // Handle Add Employee
   const handleAddEmployee = (newEmployee) => {
     setEmployees([...employees, newEmployee]);
+    setIsAddEmployeeOpen(true);
   };
 
   // Handle Update Employee
   const handleUpdateEmployee = (employeeToUpdate) => {
     setEditEmployee(employeeToUpdate);
+    setIsAddEmployeeOpen(true);
   };
 
   // Handle Employee After Update
@@ -48,6 +51,7 @@ const EmployeeManagement = ({ employees, setEmployees, defaultView = 'list', nav
       )
     );
     setEditEmployee(null);
+    setIsAddEmployeeOpen(false);
   };
 
   return (
@@ -82,6 +86,7 @@ const EmployeeManagement = ({ employees, setEmployees, defaultView = 'list', nav
         onEmployeeAdded={handleAddEmployee}
         initialData={editEmployee}
         onEmployeeUpdated={handleEmployeeUpdated}
+        navigate={navigate}
       />
     ) : defaultView === 'scheduler' ? (
       <EmployeeScheduler employees={employees} />

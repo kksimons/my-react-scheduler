@@ -39,7 +39,7 @@ const AutoGenerateSchedule = ({ employees, addSchedule, hasOverlappingSchedule, 
         ...prev.employeesPerDay,
         [day]: {
           ...prev.employeesPerDay[day],
-          [position]: parseInt(value) || 0, // Ensure it defaults to 0 if not a valid number
+          [position]: parseInt(value) || 0, 
         },
       },
     }));
@@ -122,7 +122,7 @@ const AutoGenerateSchedule = ({ employees, addSchedule, hasOverlappingSchedule, 
               }
 
             );
-            console.log(`    Available employees for ${position} on ${dayName}:`, availableEmployees);
+            console.log(`Available employees for ${position} on ${dayName}:`, availableEmployees);
 
             for (let i = 0; i < requiredCount && availableEmployees.length > 0; i++) {
               // Randomly select an available employee
