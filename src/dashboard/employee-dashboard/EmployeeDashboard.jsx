@@ -4,6 +4,7 @@ import Scheduler from '@aldabil/react-scheduler';
 import { Container, Typography, Box } from '@mui/material';
 import { styled } from '@mui/system';
 import SignOut from '@userAuth/services/SignOut';
+import EmployeeNavigation from './EmployeeNavigation';
 
 
 
@@ -11,15 +12,21 @@ import SignOut from '@userAuth/services/SignOut';
 
 const EmployeeDashboard = () => {
     return (
-        <Container>
-            <Typography variant="h4">This Is Employee Dashboard</Typography>
-            <Typography variant="subtitle1">Available Page:</Typography>
-            <Box mt={2}>
+        // <Container>
+        //     <Typography variant="h4">This Is Employee Dashboard</Typography>
+        //     <Typography variant="subtitle1">Available Page:</Typography>
+        //     <Box mt={2}>
 
-                <SignOut/>
+        //         <SignOut/>
                 
-            </Box>
-        </Container>
+        //     </Box>
+        // </Container>
+
+        <Box>
+            <EmployeeNavigation />
+            <SignOut />
+        </Box>
+
     );
 };
 

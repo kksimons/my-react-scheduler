@@ -11,11 +11,14 @@ import AddEmployee from './AddEmployee';
 import EmployeeList from './AllEmployeeList';
 import EmployeeManagement from './EmployeeManagement';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../userAuth/firebase';
+import { db } from '@userAuth/firebase';
 import { AppProvider, DashboardLayout } from '@toolpad/core';
-import theme from '../theme/theme';
+import theme from '@theme/theme';
 import { ThemeProvider } from '@emotion/react';
-import logo from "../assets/logo.png";
+import logo from "@assets/logo.png";
+import { navigate } from 'react-big-calendar/lib/utils/constants';
+import UserProfile from '@dashboard/components/UserProfile';
+import { useNavigate } from 'react-router-dom';
 
 
 //This is only for navigation side bar title and icons, it does not have any functionality 
@@ -64,6 +67,11 @@ const NAVIGATION = [
         title: 'Employee List',
         icon: <DescriptionIcon />,
       },
+      // {
+      //   segment: 'employeeProfile',
+      //   title: 'Employee Profile',
+      //   icon: <DescriptionIcon />,
+      // },
     ],
   },
   {
@@ -118,13 +126,16 @@ function EmployerNavigation() {
   }, []);
 
   const renderContent = () => {
-    const [mainSegment, subSegment] = router.pathname.split('/').slice(1);
+    // Split the pathname to get the main and sub segments of the URL 
+    const [mainSegment, subSegment, employeeId] = router.pathname.split('/').slice(1); 
     
+    // Check if the data is still loading or if there is an error
     if (isLoading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
   
+    // Render the content based on the main and sub segments of the URL
     switch(mainSegment) {
-      case 'schedule':
+      case 'schedule': // If the main segment is 'schedule'
         switch(subSegment) {
           case 'diningSchedule':
             return <EmployeeScheduler employees={employees.filter(emp => emp.employee_system === 'Dining Side')} isKitchen={false} />
@@ -132,15 +143,51 @@ function EmployerNavigation() {
             return <EmployeeScheduler employees={employees.filter(emp => emp.employee_system === 'Kitchen Side')} isKitchen={true} />;
             default:
         }
-        // return <EmployeeManagement employees={employees} setEmployees={setEmployees} defaultView="scheduler" />;
+        break;
+
+      // If the main segment is 'employeeManagement', switch submerge 
       case 'employeeManagement':
-        switch(subSegment) {
-          case 'addEmployee':
-            return <EmployeeManagement employees={employees} setEmployees={setEmployees} defaultView="addEmployee" />;
+        switch(subSegment) { // Check the sub segment of the URL
+          case 'addEmployee': 
+            return <EmployeeManagement
+                    employees={employees}
+                    setEmployees={setEmployees} 
+                    defaultView="addEmployee"
+                    navigate={router.navigate} />;
+
+
           case 'employeeList':
-            return <EmployeeManagement employees={employees} setEmployees={setEmployees} defaultView="list" />;
+            return <EmployeeManagement
+                    employees={employees} 
+                    setEmployees={setEmployees} 
+                    defaultView="list"
+                    navigate={router.navigate}
+                     />;
+
+          //case for employee profile
+          case 'employeeProfile':
+          if (employeeId) {
+            return <UserProfile employeeId={employeeId} navigate={router.navigate} />;
+          } else {
+            return (
+              <EmployeeManagement
+                employees={employees}
+                setEmployees={setEmployees}
+                defaultView="list"
+                viewerId={auth.currentUser?.uid}
+                navigate={router.navigate}
+              />
+            );
+          }
+          
           default:
-            return <EmployeeManagement employees={employees} setEmployees={setEmployees} defaultView="list" />;
+            return <EmployeeManagement
+                    employees={employees} 
+                    setEmployees={setEmployees} 
+                    defaultView="list"
+                    navigate={router.navigate}
+                     />;
+
         }
       case 'contactList':
         return <div>Contact List</div>;

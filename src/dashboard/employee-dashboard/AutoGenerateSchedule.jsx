@@ -203,28 +203,6 @@ console.log("Generated events: ", newEvents);
 
   return (
     <>
-      <Button
-        onClick={handleGenerateClick}
-        variant="contained"
-        color="primary"
-        sx={{
-          marginTop: '57px',
-          marginBottom: '16px',
-          marginLeft: '16px',
-          height: '50px',
-          width: '250px',
-          border: '3px solid #6200ea',
-          borderRadius: '5px',
-          padding: '10px 20px',
-          backgroundColor: 'primary',
-          '&:hover': {
-            backgroundColor: '#4b00c7',
-            borderColor: '#4b00c7',
-          },
-        }}
-      >
-        Generate Auto Schedule
-      </Button>
       <Dialog open={openDialog} onClose={handleDialogClose}>
         <DialogTitle>Auto Generate Schedule</DialogTitle>
         <DialogContent>

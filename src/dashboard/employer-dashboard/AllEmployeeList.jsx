@@ -1,11 +1,13 @@
 import React from "react";
-import { CssBaseline, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, ThemeProvider, Typography } from "@mui/material";
+import { CssBaseline, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, ThemeProvider, Tooltip, Typography } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import theme from "../theme/theme"; // Assuming theme is defined elsewhere
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import theme from "@theme/theme"; // Assuming theme is defined elsewhere
+import { useNavigate } from "react-router-dom";
 
 // EmployeeList component to display all employees
-const AllEmployeeList = ({ employees, onDelete, onUpdate }) => {
+const AllEmployeeList = ({ employees, onDelete, onUpdate, onViewProfile }) => {
   if (employees.length === 0) {
     return <div>No employees found.</div>;
   }
@@ -47,12 +49,24 @@ const AllEmployeeList = ({ employees, onDelete, onUpdate }) => {
                   <TableCell>{employee.employee_type}</TableCell>
                   <TableCell>{employee.employee_availability}</TableCell>
                   <TableCell>
+
+                  <Tooltip title="Edit Employee" arrow>
                     <IconButton onClick={() => onUpdate(employee)}>
                       <EditIcon />
                     </IconButton>
-                    <IconButton onClick={() => onDelete(employee.id)}>
-                      <DeleteIcon />
+                    </Tooltip>
+
+                    <Tooltip title="Delete Employee" arrow>
+                      <IconButton onClick={() => onDelete(employee.id)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
+
+                    <Tooltip title="View Profile" arrow>
+                    <IconButton onClick={() => onViewProfile(employee.id)}>
+                      <AccountBoxIcon />
                     </IconButton>
+                    </Tooltip>
                   </TableCell>
                 </TableRow>
               ))}

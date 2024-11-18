@@ -136,6 +136,7 @@ const EmployeeRegistration = () => {
                     employee_position: formData.position,
                     employee_type: formData.employeeType,
                     availability: {}, // Placeholder for availability to be filled in later
+                    photoURL: "", // Placeholder for profile picture URL
                 });
 
                 // Redirect to the Availability page
