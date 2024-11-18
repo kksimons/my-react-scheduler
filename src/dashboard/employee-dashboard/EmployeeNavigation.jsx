@@ -126,7 +126,7 @@ function EmployeeNavigation() {
 
   // Render Content Based on Route
   const renderContent = () => {
-    const [mainSegment, subSegment] = router.pathname.split('/').slice(1);
+    const [mainSegment, subSegment, employeeId] = router.pathname.split('/').slice(1);
 
     if (isLoading) return <div className="loading">Loading...</div>;
     if (error) return <div className="error">{error}</div>;
@@ -139,6 +139,7 @@ function EmployeeNavigation() {
               <EmployeeScheduler
                 employees={employees.filter(emp => emp.employee_system === 'Dining Side')}
                 isKitchen={false}
+                navigate={router.navigate}
               />
             );
           case 'kitchenSchedule':
@@ -146,6 +147,7 @@ function EmployeeNavigation() {
               <EmployeeScheduler
                 employees={employees.filter(emp => emp.employee_system === 'Kitchen Side')}
                 isKitchen={true}
+                navigate={router.navigate}
               />
             );
           default:
@@ -159,8 +161,24 @@ function EmployeeNavigation() {
                 employees={employees}
                 setEmployees={setEmployees}
                 defaultView="list"
+                navigate={router.navigate}
               />
             );
+                      //case for employee profile
+          case 'employeeProfile':
+            if (employeeId) {
+              return <UserProfile employeeId={employeeId} navigate={router.navigate} />;
+            } else {
+              return (
+                <EmployeeManagement
+                  employees={employees}
+                  setEmployees={setEmployees}
+                  defaultView="list"
+                  viewerId={auth.currentUser?.uid}
+                  navigate={router.navigate}
+                />
+              );
+            }
           default:
             return <div>Select an employee management option</div>;
         }

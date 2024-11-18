@@ -6,7 +6,7 @@ import { Box } from "@mui/material";
 import AddEmployee from "./AddEmployee";
 import EmployeeScheduler from "./EmployeeScheduler";
 
-const EmployeeManagement = ({ employees, setEmployees, defaultView = 'list' }) => {
+const EmployeeManagement = ({ employees, setEmployees, defaultView = 'list', navigate }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [editEmployee, setEditEmployee] = useState(null);
@@ -70,6 +70,7 @@ const EmployeeManagement = ({ employees, setEmployees, defaultView = 'list' }) =
           employees={employees}
           onDelete={handleDelete}
           onUpdate={handleUpdateEmployee}
+          onViewProfile={(employeeId) => navigate(`/employeeManagement/employeeProfile/${employeeId}`)}
         />
       )}
     </Box>

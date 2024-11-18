@@ -367,7 +367,7 @@ const UserProfile = ({ employeeId, viewerId, navigate }) => {
         backgroundColor: 'background.paper',
         borderRadius: 2,
         boxShadow: 3,
-        maxWidth: 500,
+        maxWidth: 800,
         margin: '0 auto',
       }}
     >
@@ -376,20 +376,6 @@ const UserProfile = ({ employeeId, viewerId, navigate }) => {
         alt={fullName}
         sx={{ width: 150, height: 150, mb: 2 }}
       />
-    {canEdit && (
-    <Button
-        variant="outlined"
-        component="label"
-        sx={{ mt: 2 }}
-    >
-        Choose File
-        <input
-        type="file"
-        hidden
-        onChange={(e) => handleProfilePictureUpload(e.target.files[0])} // Add upload logic
-        />
-    </Button>
-    )}
 
       <Typography variant="h4" gutterBottom color="primary">
         {fullName}
@@ -459,7 +445,16 @@ const UserProfile = ({ employeeId, viewerId, navigate }) => {
             </Grid>
 
             {/* Edit Profile Button */}
-            {canEdit}
+            {canEdit && (
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={handleEditToggle}
+                sx={{ mt: 3 }}
+              >
+                Edit Profile
+              </Button>
+            )}
           </>
         ) : editMode && userData ? (
           <>

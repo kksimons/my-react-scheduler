@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, uploadBytes, getDownloadURL, } from "firebase/storage";
 import { getFirestore, doc, updateDoc } from "firebase/firestore";
 import { auth } from "@userAuth/firebase"; 
 import { Button, Box, Typography, CircularProgress } from "@mui/material";
@@ -27,6 +27,7 @@ const ProfilePicture = ({ role }) => {
             setSelectedFile(e.target.files[0]); //set the selected file to the first file in the array
         }
     };
+    
 
     //handle upload file 
     const handleUpload = async () => {
