@@ -528,7 +528,7 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
         borderRadius: '8px',          
         padding: '10px 20px',              
         height: '50px',
-        width: '250px',
+        width: '200px',
         border: '1px solid #000000',
         backgroundColor: 'primary',
           '&:hover': {

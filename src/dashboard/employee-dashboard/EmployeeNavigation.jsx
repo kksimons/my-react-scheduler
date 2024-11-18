@@ -200,7 +200,6 @@ function EmployeeNavigation() {
   };
 
   return (
-    <ThemeProvider theme={theme}>
       <AppProvider
         navigation={NAVIGATION}
         router={router}
@@ -212,7 +211,6 @@ function EmployeeNavigation() {
       >
         <DashboardLayout>{renderContent()}</DashboardLayout>
       </AppProvider>
-    </ThemeProvider>
   );
 }
 
