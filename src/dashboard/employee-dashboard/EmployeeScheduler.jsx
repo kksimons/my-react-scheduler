@@ -343,9 +343,7 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
     setEvents((prev) => prev.filter((ev) => ev.id !== selectedEventId));
     handleDialogClose();
   };
-  // useEffect(() => {
-  //   console.log("Events to be displayed:", events);
-  // }, [events]); // This will log whenever events change
+
 
 
     // Export to pdf function 

@@ -20,7 +20,7 @@ router.post('/', async (req, res) => {
 
 // Function to generate schedules (implement your logic here)
 const generateSchedules = (numEmployees, shiftsPerDay, totalDays, employeeTypes) => {
-    // Your logic for generating schedules based on input parameters
+    
     const schedules = []; // Example of generated schedules logic
     return schedules;
 };

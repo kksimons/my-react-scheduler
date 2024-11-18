@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { db } from "@userAuth/firebase";
 import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
 import Select from "react-select";
-import { useNavigate } from "react-router-dom";
 import {
   Button,
   Box,
@@ -22,7 +21,9 @@ const AddEmployee = ({ onEmployeeAdded, onEmployeeUpdated, initialData }) => {
     phone: initialData?.employee_phone_number || "",
     employeeType: initialData?.employee_type || "",
     position: initialData?.employee_position || "",
-    availableShift: initialData?.employee_availability || "",
+    availableShift: initialData?.employee_availability
+      ? initialData.employee_availability.split(", ")
+      : [],
   });
 
   const employeesCollectionRef = collection(db, "employees");
@@ -36,8 +37,8 @@ const AddEmployee = ({ onEmployeeAdded, onEmployeeUpdated, initialData }) => {
     setValues((prevValues) => ({
       ...prevValues,
       availableShift: selectedOptions
-        ? selectedOptions.map((option) => option.value).join(", ")
-        : "",
+        ? selectedOptions.map((option) => option.value)
+        : [],
     }));
   };
 
@@ -56,7 +57,7 @@ const AddEmployee = ({ onEmployeeAdded, onEmployeeUpdated, initialData }) => {
       employee_type: capitalize(values.employeeType),
       employee_system:
         values.position === "Cook" ? "Kitchen Side" : "Dining Side",
-      employee_availability: capitalize(values.availableShift),
+      employee_availability: values.availableShift.join(", "),
     };
 
     try {
@@ -73,9 +74,8 @@ const AddEmployee = ({ onEmployeeAdded, onEmployeeUpdated, initialData }) => {
           `New employee ${employeeData.employee_fname} ${employeeData.employee_lname} has been added.`
         );
       }
-      // Reset form values can go here if needed.
     } catch (error) {
-      console.error("Error adding employee:", error);
+      console.error("Error adding/updating employee:", error);
     }
   };
 
@@ -88,7 +88,9 @@ const AddEmployee = ({ onEmployeeAdded, onEmployeeUpdated, initialData }) => {
         phone: initialData.employee_phone_number || "",
         employeeType: initialData.employee_type || "",
         position: initialData.employee_position || "",
-        availableShift: initialData.employee_availability || "",
+        availableShift: initialData.employee_availability
+          ? initialData.employee_availability.split(", ")
+          : [],
       });
     }
   }, [initialData]);
@@ -103,8 +105,6 @@ const AddEmployee = ({ onEmployeeAdded, onEmployeeUpdated, initialData }) => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-
-      {/* Main container for add employee form */}
       <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
         <Paper
           elevation={3}
@@ -118,22 +118,19 @@ const AddEmployee = ({ onEmployeeAdded, onEmployeeUpdated, initialData }) => {
           <Typography variant="h5" color="primary.dark" gutterBottom>
             {initialData ? "Edit Employee" : "Add New Employee"}
           </Typography>
-
-          {/* Form Container */}
-          <Box onSubmit={handleSubmit}>
+          {/* Changed Box to form */}
+          <Box component="form" onSubmit={handleSubmit}>
             {/* Form fields */}
-
             <TextField
               label="First Name"
               name="firstName"
-              type="email"
               value={values.firstName}
               onChange={handleChanges}
               required
               fullWidth
               size="small"
               sx={{
-                backgroundColor: "white", // Setting the background color to white
+                backgroundColor: "white",
                 mb: 2,
               }}
             />
@@ -141,14 +138,13 @@ const AddEmployee = ({ onEmployeeAdded, onEmployeeUpdated, initialData }) => {
             <TextField
               label="Last Name"
               name="lastName"
-              type="lastname"
               value={values.lastName}
               onChange={handleChanges}
               required
               fullWidth
               size="small"
               sx={{
-                backgroundColor: "white", // Setting the background color to white
+                backgroundColor: "white",
                 mb: 2,
               }}
             />
@@ -156,15 +152,13 @@ const AddEmployee = ({ onEmployeeAdded, onEmployeeUpdated, initialData }) => {
             <TextField
               label="Phone Number"
               name="phone"
-              type="tel"
               value={values.phone}
               onChange={handleChanges}
               required
               fullWidth
               size="small"
-              marginTop="10px"
               sx={{
-                backgroundColor: "white", // Setting the background color to white
+                backgroundColor: "white",
               }}
             />
 
@@ -175,9 +169,6 @@ const AddEmployee = ({ onEmployeeAdded, onEmployeeUpdated, initialData }) => {
               value={values.dob}
               onChange={handleChanges}
               required
-              sx={{
-                height: "400px", // You can adjust this value as needed
-              }}
             />
 
             <Box sx={{ mt: 2 }}>
@@ -197,8 +188,8 @@ const AddEmployee = ({ onEmployeeAdded, onEmployeeUpdated, initialData }) => {
                 }}
               >
                 <option value="">Select Employee Type</option>
-                <option value="full-time">Full Time</option>
-                <option value="part-time">Part Time</option>
+                <option value="Full-Time">Full Time</option>
+                <option value="Part-Time">Part Time</option>
               </select>
             </Box>
 
@@ -275,7 +266,6 @@ const FormField = ({
     </Typography>
     <input
       type={type}
-      placeholder={`Enter ${label}`}
       name={name}
       onChange={onChange}
       required={required}
