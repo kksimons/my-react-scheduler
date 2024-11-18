@@ -348,81 +348,147 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
   // }, [events]); // This will log whenever events change
 
 
+  // Export to pdf function 
+  const exportToPDF = () => {
+    // Identify the week (starting from Monday)
+    const startOfWeek = moment().startOf('week').add(1, 'days'); 
+    const endOfWeek = moment().endOf('week').add(1, 'days'); 
+    
+    // Format the week range 
+    const weekRange = `Week of ${startOfWeek.format("MMMM D, YYYY")} - ${endOfWeek.format("MMMM D, YYYY")}`;
+    
+    // Filter the events to get only those that fall within the current week
+    const filteredEvents = events.filter((event) => {
+      const eventStart = moment(event.start);
+      return eventStart.isBetween(startOfWeek, endOfWeek, 'days', '[]');
+    });
+    
+    // Group events by day of the week 
+    const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    const eventsByDay = daysOfWeek.reduce((acc, day) => {
+      acc[day] = [];
+       return acc;
+    }, {});
+    
+    // Fill the eventsByDay object with events
+    filteredEvents.forEach((event) => {
+      const dayOfWeek = moment(event.start).format("dddd"); // Get day name (e.g., "Monday")
+      if (eventsByDay[dayOfWeek]) {
+        eventsByDay[dayOfWeek].push(event);
+      }
+    });
+    
     // Export to pdf function 
-    const exportToPDF = () => {
-      // Identify the week (starting from Monday)
-      const startOfWeek = moment().startOf('week').add(1, 'days'); 
-      const endOfWeek = moment().endOf('week').add(1, 'days'); 
+const exportToPDF = () => {
+  
+  // Identify the start and end of the week (starting from Monday).
+  // Moment.js's startOf('week') gets the start of the week (Sunday), so we add 1 day to make it Monday.
+  const startOfWeek = moment().startOf('week').add(1, 'days'); 
+  
+  // End of the week is determined by adding 1 day to the end of the week (Sunday), to get the actual end date.
+  const endOfWeek = moment().endOf('week').add(1, 'days'); 
+  
+  // Format the week range as a string, e.g., "Week of October 1, 2024 - October 7, 2024".
+  const weekRange = `Week of ${startOfWeek.format("MMMM D, YYYY")} - ${endOfWeek.format("MMMM D, YYYY")}`;
+  
+  // Filter the events to get only those that occur during the current week.
+  const filteredEvents = events.filter((event) => {
+    // Convert event's start time to a moment object for comparison.
+    const eventStart = moment(event.start);
+    // Check if the event start time falls within the start and end of the current week.
+    return eventStart.isBetween(startOfWeek, endOfWeek, 'days', '[]');
+  });
+  
+  // Define the days of the week to loop through later.
+  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  
+  // Create an object to store events grouped by day of the week.
+  // The 'reduce' function initializes the object and adds empty arrays for each day.
+  const eventsByDay = daysOfWeek.reduce((acc, day) => {
+    acc[day] = [];
+    return acc;
+  }, {});
+  
+  // Loop through the filtered events to group them by day of the week.
+  filteredEvents.forEach((event) => {
+    // Get the name of the day for the event (e.g., "Monday").
+    const dayOfWeek = moment(event.start).format("dddd");
+    // If the event's day matches one of the days in our 'eventsByDay' object, add the event to that day.
+    if (eventsByDay[dayOfWeek]) {
+      eventsByDay[dayOfWeek].push(event);
+    }
+  });
+  
+  // Create a new PDF document using jsPDF.
+  const doc = new jsPDF();
+  
+  // Set the font size for the document text to 12 (standard size).
+  doc.setFontSize(12);
+  
+  // Add the formatted week range (e.g., "Week of October 1, 2024 - October 7, 2024") to the PDF at position (14, 10).
+  doc.text(weekRange, 14, 10);
+  
+  // Draw a horizontal line from (14, 15) to (200, 15) to visually separate the header from the body of the document.
+  doc.line(14, 15, 200, 15);
+  
+  // Initialize the starting y-position for placing text in the PDF.
+  let yPosition = 20; // Start adding text at y = 20 (below the header).
+  
+  // Loop through the days of the week.
+  daysOfWeek.forEach((day) => {
     
-      // Format the week range 
-      const weekRange = `Week of ${startOfWeek.format("MMMM D, YYYY")} - ${endOfWeek.format("MMMM D, YYYY")}`;
+    // Set font size to 14 for the day header (e.g., "Monday").
+    doc.setFontSize(14);
     
-      // Filter the events to get only those that fall within the current week
-      const filteredEvents = events.filter((event) => {
-        const eventStart = moment(event.start);
-        return eventStart.isBetween(startOfWeek, endOfWeek, 'days', '[]');
-      });
+    // Add the name of the day (e.g., "Monday") to the PDF at the current y-position.
+    doc.text(day, 14, yPosition);
     
-      // Group events by day of the week 
-      const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-      const eventsByDay = daysOfWeek.reduce((acc, day) => {
-        acc[day] = [];
-        return acc;
-      }, {});
+    // Draw a line under the day header to separate it from the event list.
+    doc.line(14, yPosition + 5, 200, yPosition + 5); 
     
-      // Fill the eventsByDay object with events
-      filteredEvents.forEach((event) => {
-        const dayOfWeek = moment(event.start).format("dddd"); // Get day name (e.g., "Monday")
-        if (eventsByDay[dayOfWeek]) {
-          eventsByDay[dayOfWeek].push(event);
-        }
-      });
+    // Move the y-position down by 10 pixels after the day header for the events.
+    yPosition += 10; 
     
-      // Create the PDF document
-      const doc = new jsPDF();
+    // Loop through the events for the current day and add them to the PDF.
+    eventsByDay[day].forEach((event, index) => {
+      
+      // Find the employee associated with the current event based on their employeeId.
+      const employee = employees.find((emp) => emp.id === event.employeeId);
+      
+      // Format the event's start and end times to display them in "HH:mm" format (e.g., "08:00").
+      const startTime = moment(event.start).format("HH:mm");
+      const endTime = moment(event.end).format("HH:mm");
+      
+      // If there's no description for the event, default to "No description".
+      const eventDescription = event.description || "No description";
+      
+      // Construct the text for the event, including employee name, time range, and description.
+      const text = `${employee.employee_fname} ${employee.employee_lname} - ${startTime} - ${endTime} (${eventDescription})`;
+      
+      // Set the font size back to 12 for event details.
       doc.setFontSize(12);
-      doc.text(weekRange, 14, 10);
-      doc.line(14, 15, 200, 15);
+      
+      // Add the event text to the PDF at the current y-position, adjusting by (index * 10) for spacing between multiple events.
+      doc.text(text, 14, yPosition + (index * 10));
+      
+      // Increment the y-position for the next event.
+      yPosition += 10; 
     
-      let yPosition = 20; // Start adding text at y = 20
+      // If there are too many events to fit on the page (y-position exceeds 270), add a new page.
+      if (yPosition > 270) {
+        doc.addPage();
+        yPosition = 10; // Reset y position to 10 at the top of the new page.
+      }
+    });
     
-      // Loop over the days of the week 
-      daysOfWeek.forEach((day) => {
-        // Add the day of the week as a header 
-        doc.setFontSize(14);
-        doc.text(day, 14, yPosition);
-        // Draw a line under the day header
-        doc.line(14, yPosition + 5, 200, yPosition + 5); 
-        yPosition += 10; // Move y position down for the events
-    
-        // Add events for the current day
-        eventsByDay[day].forEach((event, index) => {
-          const employee = employees.find((emp) => emp.id === event.employeeId);
-          const startTime = moment(event.start).format("HH:mm");
-          const endTime = moment(event.end).format("HH:mm");
-          const eventDescription = event.description || "No description";
-    
-          const text = `${employee.employee_fname} ${employee.employee_lname} - ${startTime} - ${endTime} (${eventDescription})`;
-    
-          // Add the event text to the PDF
-          doc.setFontSize(12);
-          doc.text(text, 14, yPosition + (index * 10));
-          yPosition += 10; // Increment position for the next event
-    
-          // If there are too many events, break and add a page
-          if (yPosition > 270) {
-            doc.addPage();
-            yPosition = 10; // Reset y position after a page break
-          }
-        });
-    
-        // Add some space after each day
-        yPosition += 10;
-      });
-    
-      // Save the PDF document
-      doc.save("employee_schedule.pdf");
-    };
+    // Add some extra space after each day's events to visually separate the days.
+    yPosition += 10;
+  });
+  
+  // Save the generated PDF document with the filename "employee_schedule.pdf".
+  doc.save("employee_schedule.pdf");
+};
+
 
   return (
     <Box sx={{ display: "flex", height: "100%" }}>
@@ -500,7 +566,7 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
         </List>
       </Paper>
 
-          {/* Button to create a pdf schedule */}
+        {/* Button to create a pdf schedule */}
       <Button 
       variant="contained"  
       size="small" 
@@ -508,8 +574,7 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
       sx={{
         position: 'absolute',         
         bottom: '500px',               
-        right: '16px',                
-        width: '250px',               
+        right: '16px',                              
         borderRadius: '8px',          
         padding: '10px 20px',              
         height: '50px',
