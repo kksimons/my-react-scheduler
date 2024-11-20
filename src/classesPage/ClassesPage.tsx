@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
-import courseData from "././data/courseDefaultsAll.json";
+import courseData from "./data/courseDefaultsAll.json";
 import "./ClassesPage.css";
 import { CircularProgress } from "@mui/material";
 import { ApiResponse, Course, Event } from "./utils/types";
@@ -100,7 +100,7 @@ const ClassesPage: React.FC = () => {
       Th: 4,
       F: 5,
     };
-    const referenceDate = new Date("2024-11-04T00:00:00");
+    const referenceDate = new Date("2024-11-18T00:00:00");
 
     return data.schedules
       .flatMap((schedule, index) => {

@@ -29,6 +29,7 @@ import AutoGenerateSchedule from './dashboard/employer-dashboard/AutoGenerateSch
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import ClassesPage from "./classesPage/ClassesPage";
 
 
 import './App.css';
@@ -83,6 +84,8 @@ const App = () => {
               <Route path="/AutoGenerateSchedule" element={<AutoGenerateSchedule />} />
               <Route path="/employerNavigation" element={<EmployerNavigation />} />
             
+              {/* Route for ClassesPage */}
+              <Route path="/classes" element={<ClassesPage />} />
               
             </Route>
             
