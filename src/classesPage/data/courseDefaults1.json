@@ -1,0 +1,322 @@
+[
+    {
+      "course": "COMM 238 Technical Communcations I",
+      "sections": [
+        {
+          "day1": {
+            "day": "Tu",
+            "start": "12:00",
+            "end": "13:50",
+            "format": "in-person"
+          },
+          "day2": {
+            "day": "F",
+            "start": "12:00",
+            "end": "13:50",
+            "format": "in-person"
+          },
+          "professor": "Dawn Muenchrath"
+        },
+        {
+          "day1": {
+            "day": "W",
+            "start": "08:00",
+            "end": "09:50",
+            "format": "in-person"
+          },
+          "day2": {
+            "day": "F",
+            "start": "08:00",
+            "end": "09:50",
+            "format": "in-person"
+          },
+          "professor": "Briana Fleckenstein"
+        },
+        {
+          "day1": {
+            "day": "M",
+            "start": "16:00",
+            "end": "17:50",
+            "format": "in-person"
+          },
+          "day2": {
+            "day": "W",
+            "start": "16:00",
+            "end": "17:50",
+            "format": "in-person"
+          },
+          "professor": "Asheka Khan"
+        },
+        {
+          "day1": {
+            "day": "Tu",
+            "start": "14:00",
+            "end": "15:50",
+            "format": "in-person"
+          },
+          "day2": {
+            "day": "Th",
+            "start": "15:00",
+            "end": "16:50",
+            "format": "in-person"
+          },
+          "professor": "Rajani Suthar"
+        }
+      ]
+    },
+    {
+      "course": "CPNT 217 Introduction to Network Systems",
+      "sections": [
+        {
+          "day1": {
+            "day": "W",
+            "start": "14:00",
+            "end": "16:50",
+            "format": "in-person"
+          },
+          "day2": {
+            "day": "F",
+            "start": "15:00",
+            "end": "16:50",
+            "format": "online"
+          },
+          "professor": "Qi Gang Hu"
+        },
+        {
+          "day1": {
+            "day": "Th",
+            "start": "10:00",
+            "end": "11:50",
+            "format": "online"
+          },
+          "day2": {
+            "day": "M",
+            "start": "12:00",
+            "end": "14:50",
+            "format": "in-person"
+          },
+          "professor": "Qi Gang Hu"
+        },
+        {
+          "day1": {
+            "day": "M",
+            "start": "10:00",
+            "end": "11:50",
+            "format": "online"
+          },
+          "day2": {
+            "day": "F",
+            "start": "12:00",
+            "end": "14:50",
+            "format": "in-person"
+          },
+          "professor": "Jairo Paredes"
+        },
+        {
+          "day1": {
+            "day": "Tu",
+            "start": "12:00",
+            "end": "14:50",
+            "format": "in-person"
+          },
+          "day2": {
+            "day": "Th",
+            "start": "12:00",
+            "end": "13:50",
+            "format": "online"
+          },
+          "professor": "Jairo Paredes"
+        }
+      ]
+    },
+    {
+      "course": "CPRG 213 Web Development 1",
+      "sections": [
+        {
+          "day1": {
+            "day": "Th",
+            "start": "11:00",
+            "end": "12:50",
+            "format": "online"
+          },
+          "day2": {
+            "day": "Tu",
+            "start": "15:00",
+            "end": "16:50",
+            "format": "in-person"
+          },
+          "professor": "Aaron Warsylewicz"
+        },
+        {
+          "day1": {
+            "day": "M",
+            "start": "13:00",
+            "end": "14:50",
+            "format": "online"
+          },
+          "day2": {
+            "day": "Tu",
+            "start": "14:00",
+            "end": "16:50",
+            "format": "in-person"
+          },
+          "professor": "Aaron Warsylewicz"
+        },
+        {
+          "day1": {
+            "day": "Tu",
+            "start": "08:00",
+            "end": "09:50",
+            "format": "online"
+          },
+          "day2": {
+            "day": "Th",
+            "start": "08:00",
+            "end": "10:50",
+            "format": "in-person"
+          },
+          "professor": "Hamdy Ibrahim"
+        },
+        {
+          "day1": {
+            "day": "M",
+            "start": "11:00",
+            "end": "12:50",
+            "format": "online"
+          },
+          "day2": {
+            "day": "W",
+            "start": "13:00",
+            "end": "15:50",
+            "format": "in-person"
+          },
+          "professor": "Hamdy Ibrahim"
+        }
+      ]
+    },
+      {
+        "course": "CPRG 216 Object-Oriented Programming 1",
+        "sections": [
+          {
+            "day1": {
+              "day": "F",
+              "start": "08:00",
+              "end": "10:50",
+              "format": "in-person"
+            },
+            "day2": {
+              "day": "Tu",
+              "start": "10:00",
+              "end": "11:50",
+              "format": "online"
+            },
+            "professor": "Hamdy Ibrahim"
+          },
+          {
+            "day1": {
+              "day": "Tu",
+              "start": "12:00",
+              "end": "14:50",
+              "format": "in-person"
+            },
+            "day2": {
+              "day": "M",
+              "start": "13:00",
+              "end": "14:50",
+              "format": "online"
+            },
+            "professor": "Hamdy Ibrahim"
+          },
+          {
+            "day1": {
+              "day": "W",
+              "start": "13:00",
+              "end": "15:50",
+              "format": "in-person"
+            },
+            "day2": {
+              "day": "M",
+              "start": "15:00",
+              "end": "16:50",
+              "format": "online"
+            },
+            "professor": "Linda Zhang"
+          },
+          {
+            "day1": {
+              "day": "M",
+              "start": "08:00",
+              "end": "09:50",
+              "format": "online"
+            },
+            "day2": {
+              "day": "W",
+              "start": "08:00",
+              "end": "10:50",
+              "format": "in-person"
+            },
+            "professor": "Maryam Moussavi"
+          },
+          {
+            "day1": {
+              "day": "Tu",
+              "start": "08:00",
+              "end": "09:50",
+              "format": "online"
+            },
+            "day2": {
+              "day": "Th",
+              "start": "08:00",
+              "end": "10:50",
+              "format": "in-person"
+            },
+            "professor": "Maryam Moussavi"
+          },
+          {
+            "day1": {
+              "day": "Tu",
+              "start": "12:00",
+              "end": "14:50",
+              "format": "in-person"
+            },
+            "day2": {
+              "day": "F",
+              "start": "12:00",
+              "end": "13:50",
+              "format": "online"
+            },
+            "professor": "Uzma Ahmed Din"
+          },
+          {
+            "day1": {
+              "day": "Tu",
+              "start": "15:00",
+              "end": "17:50",
+              "format": "in-person"
+            },
+            "day2": {
+              "day": "Th",
+              "start": "15:00",
+              "end": "16:50",
+              "format": "online"
+            },
+            "professor": "Mohamed Ibrahim"
+          },
+          {
+            "day1": {
+              "day": "M",
+              "start": "10:00",
+              "end": "12:50",
+              "format": "in-person"
+            },
+            "day2": {
+              "day": "W",
+              "start": "11:00",
+              "end": "12:50",
+              "format": "online"
+            },
+            "professor": "Sandra Shier"
+          }
+        ]
+      }
+  ]
