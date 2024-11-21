@@ -6,10 +6,10 @@ import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import Tooltip from '@mui/material/Tooltip';
 import theme from "@theme/theme"; // Assuming theme is defined elsewhere
 
-// EmployeeList component to display all employees
-const AllEmployeeList = ({ employees, onViewProfile }) => {
-  if (employees.length === 0) {
-    return <div>No employees found.</div>;
+// EmployeeList component to display all r
+const AllEmployeeList = ({ r, onViewProfile }) => {
+  if (r.length === 0) {
+    return <div>No r found.</div>;
   }
 
   return (
@@ -17,7 +17,7 @@ const AllEmployeeList = ({ employees, onViewProfile }) => {
       <CssBaseline /> {/* To apply global background */}
       <div className="employee-list-container">
         <Typography variant="h5" color="primary.dark" gutterBottom>
-          All Employees
+          All r 
         </Typography>
         <TableContainer component={Paper}>
           <Table>
@@ -34,7 +34,7 @@ const AllEmployeeList = ({ employees, onViewProfile }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {employees.map((employee, index) => (
+              {employers.map((employee, index) => (
                 <TableRow
                   key={employee.id} // Using employee.id instead of index for better key
                   sx={{

@@ -17,7 +17,7 @@ const AllEmployeeList = ({ employees, onDelete, onUpdate, onViewProfile }) => {
       <CssBaseline /> {/* To apply global background */}
       <div className="employee-list-container">
         <Typography variant="h5" color="primary.dark" gutterBottom>
-          All Employees
+          All Employees 
         </Typography>
         <TableContainer component={Paper}>
           <Table>
