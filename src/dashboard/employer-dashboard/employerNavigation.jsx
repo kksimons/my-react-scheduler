@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import DescriptionIcon from '@mui/icons-material/Description';
 import ContactsIcon from '@mui/icons-material/Contacts';
@@ -19,6 +18,7 @@ import logo from "@assets/logo.png";
 import { navigate } from 'react-big-calendar/lib/utils/constants';
 import UserProfile from '@dashboard/components/UserProfile';
 import { useNavigate } from 'react-router-dom';
+import ContactList from './ContactList';
 
 
 //This is only for navigation side bar title and icons, it does not have any functionality 
@@ -189,11 +189,11 @@ function EmployerNavigation() {
                      />;
 
         }
-      case 'contactList':
-        return <div>Contact List</div>;
-      default:
-        return <EmployeeManagement employees={employees} setEmployees={setEmployees} defaultView="scheduler" />;
-    }
+        case 'contactList':
+          return <ContactList />
+        default:
+          return <EmployeeManagement employees={employees} setEmployees={setEmployees} defaultView="list" />;
+      }
   };
 
   return (
