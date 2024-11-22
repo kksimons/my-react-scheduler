@@ -15,6 +15,7 @@ import { ThemeProvider } from '@emotion/react';
 import logo from "@assets/logo.png";
 import UserProfile from '@dashboard/components/UserProfile';
 import { useAuth } from '@userAuth/contexts/AuthContext'; 
+import ContactList from './ContactList';
 
 // Navigation Configuration
 const NAVIGATION = [
@@ -57,6 +58,11 @@ const NAVIGATION = [
         icon: <DescriptionIcon />,
       },
     ],
+  },
+  {
+    segment: 'contactList',
+    title: 'Contact List',
+    icon: <ContactsIcon />,
   },
   {
     kind: 'divider',
@@ -153,6 +159,7 @@ function EmployeeNavigation() {
           default:
             return <div>Select a schedule to view</div>;
         }
+        
       case 'employeeManagement':
         switch (subSegment) {
           case 'employeeList':
@@ -182,6 +189,10 @@ function EmployeeNavigation() {
           default:
             return <div>Select an employee management option</div>;
         }
+
+        case 'contactList':
+        return <ContactList />;
+
       case 'profile':
         switch (subSegment) {
           case 'myProfile':
