@@ -1,4 +1,5 @@
-// EditContact.js
+// Resources 
+// CHATGPT
 import React, { useState, useEffect } from "react";
 import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
 import { useLocation, useNavigate } from "react-router-dom";

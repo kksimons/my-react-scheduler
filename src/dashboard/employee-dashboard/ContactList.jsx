@@ -1,4 +1,5 @@
-// Updated ContactList with Navigate on Edit Click
+// Resources 
+// CHATGPT
 import React, { useState, useEffect } from "react";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { CssBaseline, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, ThemeProvider, Tooltip, Typography } from "@mui/material";
