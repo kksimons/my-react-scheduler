@@ -1,31 +1,46 @@
-import dotenv from 'dotenv';
-import express from 'express';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import admin from 'firebase-admin';
-import fs from 'fs';
 
-// Load environment variables
-dotenv.config();
 
-// Initialize Firebase Admin SDK
-const serviceAccount = JSON.parse(fs.readFileSync(process.env.FIREBASE_ADMIN_SDK_PATH));
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-});
-
-// Create Firestore database instance
-const db = admin.firestore();
+const express = require('express');
+const moment = require('moment');
+const cors = require('cors');
 
 const app = express();
+const port = 3000;
+
+
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
-// Import the scheduler routes
-import schedulerRoutes from './routes/scheduler.js'; // Ensure correct path and file extension
-app.use('/api/v1/scheduler', schedulerRoutes);
+let employees = [];
+let schedules = [];
 
-const PORT = process.env.PORT || 80;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+// Helper functions 
+const getMaxHours = (employeeType) => {
+    employeeType === "Full-Time" ? 40 : 24;
+}
+
+const hasOverlappingSchedule = (employeeId, start, end) => {
+    return schedules.some(schedule => 
+      schedule.employeeId === employeeId &&
+      ((moment(start).isBetween(schedule.start, schedule.end, null, '[]')) ||
+       (moment(end).isBetween(schedule.start, schedule.end, null, '[]')) ||
+       (moment(schedule.start).isBetween(start, end, null, '[]')))
+    );
+  };
+
+  // API Endpoints
+  app.post('/api/employees', (req, res) => {
+    const newEmployee = req.body();
+    employees.push(newEmployee);
+    res.status(201).json(newEmployee);
+  })
+
+  app.get('/api/generate-schedule', (req, res) => {
+    const { numberOfWeeks, employeePerDay, isKitchen } = req.body;
+    const positions = isKitchen ? ["Cook"] : ["Server", "Busser", "Host"];
+    const scheduleStartDate = moment().startOf("week").add(1, "weeks");
+    const scheduleEndDate = moment(scheduleStartDate).add(numberOfWeeks, "weeks");
+    const newEvents = [];
+
+    
+  })

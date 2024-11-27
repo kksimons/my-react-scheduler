@@ -800,3 +800,16 @@ nav {
   /* display: none; */
   background-color: Red;
 }
+
+.rbc-label .rbc-time-header-gutter {
+  display: none;
+}
+
+/* Hide time slots in week view */
+.rbc-time-slot {
+  display: none; 
+}
+
+.rbc-label {
+  display: none;
+}
