@@ -100,7 +100,7 @@ const ClassesPage: React.FC = () => {
       Th: 4,
       F: 5,
     };
-    const referenceDate = new Date("2024-11-18T00:00:00");
+    const referenceDate = new Date("2024-11-25T00:00:00");
 
     return data.schedules
       .flatMap((schedule, index) => {
