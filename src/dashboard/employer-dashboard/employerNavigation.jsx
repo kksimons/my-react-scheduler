@@ -5,6 +5,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import MessageIcon from '@mui/icons-material/Message';
 import EmployeeScheduler from './EmployeeScheduler';
 import AddEmployee from './AddEmployee';
 import EmployeeList from './AllEmployeeList';
@@ -19,6 +20,7 @@ import { navigate } from 'react-big-calendar/lib/utils/constants';
 import UserProfile from '@dashboard/components/UserProfile';
 import { useNavigate } from 'react-router-dom';
 import ContactList from './ContactList';
+import GeneralChat from '../general-chat/GeneralChat';
 
 
 //This is only for navigation side bar title and icons, it does not have any functionality 
@@ -79,6 +81,11 @@ const NAVIGATION = [
     title: 'Contact List',
     icon: <ContactsIcon />,
   },
+  {
+    segment: 'generalChat',
+    title: 'General Chat',
+    icon: <MessageIcon />,
+  }
 ];
 
 function useDemoRouter(initialPath) {
@@ -191,7 +198,10 @@ function EmployerNavigation() {
         }
         case 'contactList':
           return <ContactList />
-        default:
+        
+          case 'generalChat': 
+          return <GeneralChat />
+          default: 
           return <EmployeeManagement employees={employees} setEmployees={setEmployees} defaultView="list" />;
       }
   };

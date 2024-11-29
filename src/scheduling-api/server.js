@@ -40,7 +40,5 @@ const hasOverlappingSchedule = (employeeId, start, end) => {
     const positions = isKitchen ? ["Cook"] : ["Server", "Busser", "Host"];
     const scheduleStartDate = moment().startOf("week").add(1, "weeks");
     const scheduleEndDate = moment(scheduleStartDate).add(numberOfWeeks, "weeks");
-    const newEvents = [];
-
-    
+    const newEvents = [];   
   })

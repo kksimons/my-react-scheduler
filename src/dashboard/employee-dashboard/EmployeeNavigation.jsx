@@ -5,6 +5,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import MessageIcon from '@mui/icons-material/Message';
 import EmployeeScheduler from './EmployeeScheduler';
 import EmployeeManagement from './EmployeeManagement';
 import { collection, getDocs } from 'firebase/firestore';
@@ -16,6 +17,7 @@ import logo from "@assets/logo.png";
 import UserProfile from '@dashboard/components/UserProfile';
 import { useAuth } from '@userAuth/contexts/AuthContext'; 
 import ContactList from './ContactList';
+import GeneralChat from '../general-chat/GeneralChat';
 
 // Navigation Configuration
 const NAVIGATION = [
@@ -63,6 +65,11 @@ const NAVIGATION = [
     segment: 'contactList',
     title: 'Contact List',
     icon: <ContactsIcon />,
+  },
+  {
+    segment: 'generalChat',
+    title: 'General Chat',
+    icon: <MessageIcon />,
   },
   {
     kind: 'divider',
@@ -192,6 +199,9 @@ function EmployeeNavigation() {
 
         case 'contactList':
         return <ContactList />;
+        
+          case 'generalChat': 
+          return <GeneralChat />
 
       case 'profile':
         switch (subSegment) {
