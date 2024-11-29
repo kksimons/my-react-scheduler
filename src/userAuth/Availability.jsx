@@ -159,7 +159,7 @@ const Availability = () => {
       container
       justifyContent="center"
       alignItems="center"
-      sx={{ minHeight: "100vh", backgroundColor: "#f5f5f5", padding: 2, backgroundColor: "#c4c4ff" }}
+      sx={{ minHeight: "100vh", padding: 2, backgroundColor: "#c4c4ff" }}
     >
       <Grid2 item xs={12} sm={10} md={8} lg={6}>
         <Box
