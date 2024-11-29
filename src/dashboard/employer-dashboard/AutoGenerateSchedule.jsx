@@ -206,24 +206,20 @@ console.log("Generated events: ", newEvents);
       <Button
         onClick={handleGenerateClick}
         variant="contained"
-        color="primary"
-        size="small"
-        sx={{
-          marginTop: '57px',
-          marginBottom: '16px',
-          marginLeft: '16px',
-          marginRight: '16px',
-          height: '30px',
-          width: '250px',
-          border: '1px solid #000000',
-          borderRadius: '8px',
-          padding: '10px 20px',
-          backgroundColor: 'primary',
-          '&:hover': {
-            backgroundColor: '#4b00c7',
-            borderColor: '#4b00c7',
-          },
-        }}
+        // color="primary"
+
+        // sx={{
+        //   height: '30px',
+        //   width: '250px',
+        //   border: '1px solid #000000',
+        //   borderRadius: '8px',
+        //   padding: '10px 20px',
+        //   backgroundColor: 'primary',
+        //   '&:hover': {
+        //     backgroundColor: '#4b00c7',
+        //     borderColor: '#4b00c7',
+        //   },
+        // }}
       >
         Generate Auto Schedule
       </Button>
