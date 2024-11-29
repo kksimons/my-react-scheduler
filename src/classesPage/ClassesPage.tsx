@@ -3,7 +3,7 @@ import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
 import courseData from "./data/courseDefaultsAll.json";
 import "./ClassesPage.css";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Modal, Box } from "@mui/material"; // Import Modal from Material UI
 import { ApiResponse, Course, Event } from "./utils/types";
 import Schedule from "./Components/Schedule";
 import Toolbar from "./Components/Toolbar";
@@ -40,6 +40,7 @@ const ClassesPage: React.FC = () => {
   const [selectedClasses, setSelectedClasses] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [events, setEvents] = useState<Event[]>([]);
+  const [openModal, setOpenModal] = useState(false); // State to manage modal visibility
 
   const handleClassSelection = (course: string) => {
     setSelectedClasses((prev) =>
@@ -49,13 +50,16 @@ const ClassesPage: React.FC = () => {
     );
   };
 
-  const selectedSections = selectedClasses.reduce((acc, className) => {
-    const course = courseData.find((c: Course) => c.course === className);
-    if (course) {
-      acc[className] = course.sections;
-    }
-    return acc;
-  }, {} as { [courseName: string]: Course["sections"] });
+  const selectedSections = selectedClasses.reduce(
+    (acc, className) => {
+      const course = courseData.find((c: Course) => c.course === className);
+      if (course) {
+        acc[className] = course.sections;
+      }
+      return acc;
+    },
+    {} as { [courseName: string]: Course["sections"] }
+  );
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -81,6 +85,7 @@ const ClassesPage: React.FC = () => {
       if (response.ok) {
         const data: ApiResponse = await response.json();
         setEvents(parseApiResponse(data));
+        setOpenModal(true); // Open the modal when the schedule is returned
       } else {
         alert("Failed to submit schedule.");
       }
@@ -100,7 +105,7 @@ const ClassesPage: React.FC = () => {
       Th: 4,
       F: 5,
     };
-    const referenceDate = new Date("2024-11-18T00:00:00");
+    const referenceDate = new Date("2024-11-25T00:00:00");
 
     return data.schedules
       .flatMap((schedule, index) => {
@@ -139,7 +144,6 @@ const ClassesPage: React.FC = () => {
     initParticlesEngine(loadSlim).then(() => setInit(true));
   }, []);
 
-  // seems to load quickly, the example had it so I kept just in case I guess, not that it's pretty to look at if it's loading I imagine
   if (!init)
     return (
       <div style={{ color: "#fff", textAlign: "center", marginTop: "50px" }}>
@@ -147,7 +151,7 @@ const ClassesPage: React.FC = () => {
       </div>
     );
 
-  // using html2cavas like Mitchell had set up before to send just the scheduler component (point it at class)
+  // Handle download
   const handleDownload = async () => {
     const scheduleElement = document.querySelector(
       ".schedule-container"
@@ -161,7 +165,7 @@ const ClassesPage: React.FC = () => {
     }
   };
 
-  // mailto doesn't let us attach the file, but we can remind them to I guess?
+  // Handle email
   const handleEmail = async () => {
     const email = prompt("Enter the email address:");
     if (email) {
@@ -177,9 +181,8 @@ const ClassesPage: React.FC = () => {
     <div
       style={{
         position: "relative",
-        height: "100vh",
         width: "100vw",
-        overflow: "hidden",
+        minHeight: "100vh",
       }}
     >
       <Particles
@@ -229,34 +232,56 @@ const ClassesPage: React.FC = () => {
           </div>
         ) : events.length > 0 ? (
           <>
-            <div className="schedule-container">
-              <Schedule
-                events={events}
-                onEventClick={(event) =>
-                  alert(`Clicked on event: ${event.title}`)
-                }
-              />
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                marginTop: "20px",
-              }}
+            {/* Modal to display the schedule */}
+            <Modal
+              open={openModal}
+              onClose={() => setOpenModal(false)}
+              aria-labelledby="schedule-modal-title"
+              aria-describedby="schedule-modal-description"
             >
-              <button
-                onClick={() => window.location.reload()}
-                className="action-button"
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  backgroundColor: "white",
+                  padding: "20px",
+                  boxShadow: 24,
+                  width: "80vw",
+                  maxHeight: "80vh",
+                  overflowY: "auto",
+                }}
               >
-                <FiRefreshCw size={20} />
-              </button>
-              <button onClick={handleDownload} className="action-button">
-                <FiDownload size={20} />
-              </button>
-              <button onClick={handleEmail} className="action-button">
-                <FiMail size={20} />
-              </button>
-            </div>
+                <h2 id="schedule-modal-title">Your Schedule</h2>
+                <Schedule
+                  events={events}
+                  onEventClick={(event) =>
+                    alert(`Clicked on event: ${event.title}`)
+                  }
+                />
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginTop: "20px",
+                  }}
+                >
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="action-button"
+                  >
+                    <FiRefreshCw size={20} />
+                  </button>
+                  <button onClick={handleDownload} className="action-button">
+                    <FiDownload size={20} />
+                  </button>
+                  <button onClick={handleEmail} className="action-button">
+                    <FiMail size={20} />
+                  </button>
+                </div>
+              </Box>
+            </Modal>
           </>
         ) : (
           <>
@@ -265,7 +290,7 @@ const ClassesPage: React.FC = () => {
               setTool={setTool}
               selectedClasses={selectedClasses}
               handleClassSelection={handleClassSelection}
-              handleSubmit={handleSubmit} // Pass handleSubmit as a prop now so we can get the animation
+              handleSubmit={handleSubmit}
             />
             {tool === "section" && selectedClasses.length > 0 && (
               <SectionDisplay sections={selectedSections} />
