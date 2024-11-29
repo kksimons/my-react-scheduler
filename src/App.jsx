@@ -39,7 +39,7 @@ const App = () => {
   return (
       <AuthProvider>
         <Router>
-                    {/* Global ToastContainer */}
+          {/* Global ToastContainer */}
           {/* I implement the toast component here to make sure it is accessibile in all other pages without import the it over again */}
           <ToastContainer
             position="top-center"
@@ -59,7 +59,8 @@ const App = () => {
             <Route path="/ForgotPassword" element={<ForgotPassword />} />
             <Route path="/PricingPage" element={<PricingPage />} />
 
-
+            {/* Route for ClassesPage */}
+            <Route path="/classes" element={<ClassesPage />} />
 
             {/* {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
@@ -83,10 +84,6 @@ const App = () => {
               <Route path="/AllEmployeeList" element={<AllEmployeeList />} />
               <Route path="/AutoGenerateSchedule" element={<AutoGenerateSchedule />} />
               <Route path="/employerNavigation" element={<EmployerNavigation />} />
-            
-              {/* Route for ClassesPage */}
-              <Route path="/classes" element={<ClassesPage />} />
-              
             </Route>
             
             {/* {/* 404 Not Found Route */}
