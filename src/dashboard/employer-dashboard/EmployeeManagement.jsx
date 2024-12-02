@@ -55,28 +55,6 @@ const EmployeeManagement = ({ employees, setEmployees, defaultView = 'list', nav
   };
 
   return (
-    // <Box
-    //   className="employee-management-container"
-    //   sx={{ padding: "10px", position: "relative", minHeight: "100vh" }}
-    // >
-    //   {defaultView === 'addEmployee' || editEmployee ? (
-    //     <AddEmployee
-    //       onEmployeeAdded={handleAddEmployee}
-    //       initialData={editEmployee}
-    //       onEmployeeUpdated={handleEmployeeUpdated}
-    //     />
-    //   ) 
-    //   : defaultView === 'scheduler' ? (
-    //     <EmployeeScheduler employees={employees} />
-    //   ) 
-    //   : (
-    //     <AllEmployeeList
-    //       employees={employees}
-    //       onDelete={handleDelete}
-    //       onUpdate={handleUpdateEmployee}
-    //     />
-    //   )}
-    // </Box>
     <Box
     className="employee-management-container"
     sx={{ padding: "10px", position: "relative", minHeight: "100vh" }}

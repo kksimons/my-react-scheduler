@@ -613,6 +613,51 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
       {/* Dialog for Event Actions */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>{`Assign Shift for ${selectedEmployeeName}`}</DialogTitle>
+
+              />
+            </ListItem>
+          ))}
+        </List>
+      </Paper>
+
+      <DnDCalendar
+        localizer={localizer}
+        events={events}
+        eventPropGetter={eventStyleGetter}
+        components={{
+          event: (props) => <CustomEvent {...props} employees={employees} />,
+        }}
+        onEventDrop={handleEventDrop}
+        onSelectSlot={handleSelectSlot}
+        onSelectEvent={(event) => {
+          setSelectedSlot({ start: event.start, end: event.end });
+          setStartTime(moment(event.start).format("HH:mm"));
+          setEndTime(moment(event.end).format("HH:mm"));
+          setSelectedEventId(event.id);
+          setEventDescription(event.description || "");
+          setOpenDialog(true);
+        }}
+        selectable
+        resizable={false}
+        defaultView="week"
+        views={["day", "week"]}
+        step={60}
+        timeslots={1}
+        min={moment().startOf("day").add(7, "hours").toDate()}
+        max={moment().startOf("day").add(23, "hours").toDate()}
+        style={{ flexGrow: 1 }}
+        defaultDate={new Date()}
+        formats={{
+          timeGutterFormat: (date) => moment(date).format("HH:mm"),
+          dayFormat: (date) => moment(date).format("ddd DD/MM"),
+        }}
+      />
+      <Dialog open={openDialog} onClose={handleDialogClose}>
+        <DialogTitle>
+          {selectedEventId
+            ? "Update Working Hours"
+            : `Set Working Hours for ${selectedEmployeeName}`}
+        </DialogTitle>
         <DialogContent>
           <TextField
             label="Start Time (HH:mm)"
