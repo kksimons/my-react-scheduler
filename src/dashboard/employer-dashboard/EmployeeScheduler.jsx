@@ -24,9 +24,13 @@ import {
   TextField,
 } from "@mui/material";
 
-import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, getDoc, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { db } from "@userAuth/firebase";
 import AutoGenerateSchedule from "./AutoGenerateSchedule";
+
+//import pdf 
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
@@ -84,7 +88,7 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
     for (const employee of employees) {
       try {
         const employeeDoc = doc(db, "employees", employee.id);
-        const employeeSnapshot = await getDocs(employeeDoc);
+        const employeeSnapshot = await getDoc(employeeDoc);
   
         if (employeeSnapshot.exists()) {
           const employeeData = employeeSnapshot.data();
@@ -92,11 +96,15 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
             employeeData.remainingHours !== undefined
               ? employeeData.remainingHours
               : getMaxHours(employee.employee_type); // Use saved or default max hours
+              console.log("Fetched employee data:", employeeSnapshot.data());
+
         } else {
+          console.warn(`No data found for employee ID: ${employee.id}`);
           initialHours[employee.id] = getMaxHours(employee.employee_type);
         }
       } catch (error) {
         console.error(`Failed to fetch data for employee ID: ${employee.id}`, error);
+        
         initialHours[employee.id] = getMaxHours(employee.employee_type); // Fallback
       }
     }
@@ -425,18 +433,81 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
     setSelectedEventId(null); // Clear selected event
   };
   
-  // const eventStyleGetter = (event) => {
-  //   const style = {
-  //     display: "flex",
-  //     flexDirection: "row",  
-  //     padding: '5px',
-  //     margin: '2px 0', // Add spacing between stacked events
-  //     zIndex: 1,
-  //     width: '100%',
-  //   };
-  //   return { style };
-  // };
+ 
+  // handle export to PDF function to generate a PDF of the weekly employee schedule
+  const handleExportToPDF = () => {
+    const doc = new jsPDF();
+  
+    // Add Title
+    doc.setFontSize(14);
+    doc.text("Weekly Employee Schedule", 30, 20); // (text, x, y)
+  
+  
+    // Prepare Table Columns
+    const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const tableColumns = ["Employee", ...daysOfWeek.map((day, index) => `${day} (${moment().startOf("week").add(index + 1, "days").format("D/MM")})`)];
+  
+  // Prepare Table Data
+  const tableRows = employees.map((employee) => {
+    const row = [employee.employee_fname + " " + employee.employee_lname]; // Employee Name
+    daysOfWeek.forEach((day, index) => {
+      // Get the start date of the week for reference
+      const currentDate = moment()
+        .startOf("week")
+        .add(index + 1, "days")
+        .format("YYYY-MM-DD"); // Format to match event date
 
+      // Filter events for this employee and day
+      const dayEvents = events.filter(
+        (event) =>
+          event.employeeId === employee.id &&
+          moment(event.start).format("YYYY-MM-DD") === currentDate
+      );
+
+      if (dayEvents.length > 0) {
+        // Combine all shifts into one cell
+        const shiftDetails = dayEvents
+          .map(
+            (event) =>
+              `${event.description} (${moment(event.start).format("h:mm A")} to ${moment(event.end).format("h:mm A")})`
+          )
+          .join("\n");
+        row.push(shiftDetails);
+      } else {
+        row.push(""); // Empty cell for no shifts
+      }
+    });
+    return row;
+    });
+  
+    // Render Table in PDF
+    doc.autoTable({
+      head: [tableColumns],
+      body: tableRows,
+      startY: 20,
+      theme: "grid",
+      styles: {
+        halign: "center", // Center align text
+        valign: "middle", // Vertically align text
+      },
+      columnStyles: {
+        0: { halign: "left" }, // Align employee names to the left
+      },
+      didDrawCell: (data) => {
+        // Check if the cell contains "No shift"
+        if (data.cell.raw === "No shift") {
+          doc.setFillColor(200); // Set gray background color
+          doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height, "F"); // Fill the cell
+        }
+      },
+    });
+  
+    // Save PDF
+    doc.save("Employee_Schedule.pdf");
+  };
+  
+  
+  
 
   return (
     <Box display="flex" flexDirection="column" height="100vh" padding={""}>
@@ -445,9 +516,11 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
       <Box
         display="flex"
         justifyContent="flex-start"
+        gap={5}
         sx={{ padding: "1.5rem"}}
       >
         <AutoGenerateSchedule
+        
           employees={employees}
           addSchedule={addSchedule}
           hasOverlappingSchedule={hasOverlappingSchedule}
@@ -455,6 +528,13 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
           updateEmployeeHours={updateRemainingHours}
           isKitchen={isKitchen}
         />
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleExportToPDF}
+        >
+          Export to PDF
+        </Button>
       </Box>
   
       {/* Calendar Section */}
