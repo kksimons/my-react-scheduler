@@ -1,12 +1,13 @@
-
-//Resource: 
-//ChatGPT
+//  Resources: 
+//    - ChatGPt
 
 import React, { useState, useEffect, useCallback } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+
+import jsPDF from "jspdf";
 
 import {
   Box,
@@ -15,7 +16,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  Avatar,
   Dialog,
   DialogActions,
   DialogContent,
@@ -23,30 +23,34 @@ import {
   Button,
   TextField,
 } from "@mui/material";
-
-import { collection, addDoc, getDocs, getDoc, doc, deleteDoc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
 import { db } from "@userAuth/firebase";
+import CustomEvent from "./CustomEvent";
 import AutoGenerateSchedule from "./AutoGenerateSchedule";
-
-//import pdf 
-import jsPDF from "jspdf";
-import "jspdf-autotable";
 
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
 
 const EmployeeScheduler = ({ employees, isKitchen }) => {
+  // const [employees, setEmployees] = useState(initialEmployees);
   const [events, setEvents] = useState([]);
-  const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
-  const [selectedEventId, setSelectedEventId] = useState(null);
-  const [selectedEmployeeName, setSelectedEmployeeName] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState(null);
   const [selectedSlot, setSelectedSlot] = useState({
     start: new Date(),
     end: new Date(),
   });
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+  const [selectedEmployeeName, setSelectedEmployeeName] = useState("");
   const [eventDescription, setEventDescription] = useState("");
   const [employeeRemainingHours, setEmployeeRemainingHours] = useState({});
 
@@ -60,131 +64,69 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
     const scheduleSnapshot = await getDocs(scheduleCollection);
     const scheduleList = scheduleSnapshot.docs.map((doc) => {
       const data = doc.data();
+      const employee = employees.find((emp) => emp.id === data.employeeId);
+
       return {
         id: doc.id,
-        ...data,
-        start: data.start.toDate(),
-        end: data.end.toDate(),
+        ...doc.data(),
+        start: doc.data().start.toDate(),
+        end: doc.data().end.toDate(),
+        position: employee?.employee_position || "Unknown",
       };
     });
 
-    // Filter events based on the schedule type
+    // Filter events based on schedule type
     const filteredEvents = scheduleList.filter(
-      (event) =>
-        event.scheduleType === (isKitchen ? "Kitchen Side" : "Dining Side")
+      (event) => event.scheduleType === (isKitchen ? "Kitchen Side" : "Dining Side")
     );
     setEvents(filteredEvents);
   };
 
-  // const initializeEmployeeHours = () => {
-  //   const initialHours = employees.reduce((acc, employee) => {
-  //     acc[employee.id] = getMaxHours(employee.employee_type); // Set max hours initially
-  //     return acc;
-  //   }, {});
-  //   setEmployeeRemainingHours(initialHours);
-  // };
-  const initializeEmployeeHours = async () => {
-    const initialHours = {};
-    for (const employee of employees) {
-      try {
-        const employeeDoc = doc(db, "employees", employee.id);
-        const employeeSnapshot = await getDoc(employeeDoc);
-  
-        if (employeeSnapshot.exists()) {
-          const employeeData = employeeSnapshot.data();
-          initialHours[employee.id] =
-            employeeData.remainingHours !== undefined
-              ? employeeData.remainingHours
-              : getMaxHours(employee.employee_type); // Use saved or default max hours
-              console.log("Fetched employee data:", employeeSnapshot.data());
-
-        } else {
-          console.warn(`No data found for employee ID: ${employee.id}`);
-          initialHours[employee.id] = getMaxHours(employee.employee_type);
-        }
-      } catch (error) {
-        console.error(`Failed to fetch data for employee ID: ${employee.id}`, error);
-        
-        initialHours[employee.id] = getMaxHours(employee.employee_type); // Fallback
-      }
-    }
+  const initializeEmployeeHours = () => {
+    const initialHours = employees.reduce((acc, employee) => {
+      acc[employee.id] = getMaxHours(employee.employee_type);
+      return acc;
+    }, {});
     setEmployeeRemainingHours(initialHours);
   };
-  
-  
 
-  //Check employee maximum hours based on employee type, if exactly like the data type 
   const getMaxHours = (employeeType) => {
     return employeeType === "Full-Time" ? 40 : 24;
   };
 
-  //Add schedule function with (title, start, end, employeeId, description, isKitchen), if yes, use find to get the first emp with the id 
-  //matches the employeeId, if not, alert the user that only cooks can be scheduled in the kitchen 
-  // const addSchedule = async (
-  //   title,
-  //   start,
-  //   end,
-  //   employeeId,
-  //   description,
-  //   isKitchen
-  // ) => {
-  //   try {
-  //     const employee = employees.find((emp) => emp.id === employeeId);
+  const eventStyleGetter = (event) => {
+    let backgroundColor;
+    let textColor = '#262626'; 
 
-  //     if (isKitchen && employee?.employee_system !== "Kitchen Side") {
-  //       alert("Only cooks can be scheduled in the kitchen.");
-  //       return;
-  //     } else if (
-  //       !isKitchen &&
-  //       employee?.employee_system !== "Dining Side"
-  //     ) {
-  //       alert(
-  //         "Only Hosts, Servers, and Bussers can be scheduled in the dining area."
-  //       );
-  //       return;
-  //     }
+    switch (event.position) {
+      case 'Server':
+          backgroundColor = '#AC9AFF'; // light purple color for Server
+          break;
+      case 'Busser':
+          backgroundColor = '#EE9D8F'; // light tomato color for Busser
+          break;
+      case 'Cook':
+          backgroundColor = '#E9B5D6'; //  light pink color for Cook
+          break;
+      case 'Host':
+          backgroundColor = '#A4AFE'; // light blue for host 
+          break;
+      default:
+          backgroundColor = 'gray'; // Fallback color
+  }
 
-  //     const docRef = await addDoc(collection(db, "schedules"), {
-  //       title,
-  //       start,
-  //       end,
-  //       employeeId,
-  //       description,
-  //       scheduleType: isKitchen ? "Kitchen Side" : "Dining Side",
-  //     });
+  return {
+      style: {
+          backgroundColor,
+          color: textColor, // Optional text color for better contrast
+      },
+  };
+  }
 
-  //     const newEvent = {
-  //       id: docRef.id,
-  //       title,
-  //       start,
-  //       end,
-  //       employeeId,
-  //       description,
-  //       position: employee?.employee_position || "Unknown",
-  //       scheduleType: isKitchen ? "Kitchen Side" : "Dining Side",
-  //     };
-
-  //     setEvents((prev) => [...prev, newEvent]);
-  //   //   updateRemainingHours(employeeId, start, end);
-  //   // } catch (e) {
-  //   //   console.error("Error adding schedule:", e);
-  //   //   alert("Failed to add schedule. Please try again.");
-  //   // }
-  //       updateRemainingHours(employeeId, start, end); // Update hours here
-  //     } catch (e) {
-  //       console.error("Error adding schedule:", e);
-  //       alert("Failed to add schedule. Please try again.");
-  //     }
-  // };
-
-  // const updateRemainingHours = (employeeId, start, end) => {
-  //   const shiftHours = (end - start) / (1000 * 60 * 60); // Calculate shift duration in hours
-  
-  //   setEmployeeRemainingHours((prev) => ({
-  //     ...prev,
-  //     [employeeId]: Math.max(0, (prev[employeeId] || getMaxHours("Part-Time")) - shiftHours),
-  //   }));
-  // };
+  // function for worked hour
+  const getEmployeeHours = (employeeType) => {
+    return employeeType === "Full-Time" ? "40hr" : "24hr";
+  };
 
   const addSchedule = async (
     title,
@@ -192,24 +134,24 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
     end,
     employeeId,
     description,
-    isKitchen
+    isKitchen,
+    // batchId
   ) => {
     try {
+      // Check if the employee is eligible for scheduling based on the type of schedule
       const employee = employees.find((emp) => emp.id === employeeId);
-  
+
       if (isKitchen && employee?.employee_system !== "Kitchen Side") {
         alert("Only cooks can be scheduled in the kitchen.");
         return;
-      } else if (
-        !isKitchen &&
-        employee?.employee_system !== "Dining Side"
-      ) {
+      } else if (!isKitchen && employee?.employee_system !== "Dining Side") {
         alert(
           "Only Hosts, Servers, and Bussers can be scheduled in the dining area."
         );
         return;
       }
-  
+
+      // Proceed to add the schedule to firestore if validation passes
       const docRef = await addDoc(collection(db, "schedules"), {
         title,
         start,
@@ -217,64 +159,50 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
         employeeId,
         description,
         scheduleType: isKitchen ? "Kitchen Side" : "Dining Side",
+        // batchId,
       });
-  
-      const newEvent = {
+
+      console.log("Document written with ID:", docRef.id);
+
+      // Return the newly created event object
+      return {
         id: docRef.id,
         title,
         start,
         end,
         employeeId,
         description,
-        position: employee?.employee_position || "Unknown",
+        position: employee?.employee_position,
         scheduleType: isKitchen ? "Kitchen Side" : "Dining Side",
+        // batchId,
       };
-  
-      setEvents((prev) => [...prev, newEvent]);
-      updateRemainingHours(employeeId, start, end); // Update remaining hours here
     } catch (e) {
-      console.error("Error adding schedule:", e);
+      console.error("Error adding document:", e);
       alert("Failed to add schedule. Please try again.");
     }
   };
+
   
-  const updateRemainingHours = (employeeId, start, end) => {
-    const shiftHours = (end - start) / (1000 * 60 * 60); // Calculate shift duration in hours
-  
-    setEmployeeRemainingHours((prev) => {
-      const newHours = Math.max(
-        0,
-        (prev[employeeId] || getMaxHours("Part-Time")) - shiftHours
-      );
-  
-      // Save the updated remaining hours to Firestore
-      updateEmployeeHoursToDatabase(employeeId, newHours);
-  
-      return {
-        ...prev,
-        [employeeId]: newHours,
-      };
-    });
-  };
-  
-  const updateEmployeeHoursToDatabase = async (employeeId, remainingHours) => {
+  const updateSchedule = async (eventId, updatedEvent) => {
     try {
-      const employeeDoc = doc(db, "employees", employeeId);
-      await updateDoc(employeeDoc, { remainingHours });
-      console.log(`Updated remaining hours for employee ID: ${employeeId}`);
-    } catch (error) {
-      console.error(`Failed to update remaining hours for employee ID: ${employeeId}`, error);
+      await updateDoc(doc(db, "schedules", eventId), {
+        ...updatedEvent,
+        scheduleType: isKitchen ? "Kitchen" : "Dining",
+      });
+      console.log("Document updated with ID:", eventId);
+    } catch (e) {
+      console.error("Error updating document:", e);
     }
   };
-  
-  
 
-  const hasOverlappingSchedule = (
-    employeeId,
-    start,
-    end,
-    excludeEventId
-  ) => {
+  const updateEmployeeHours = useCallback((employeeId, hoursWorked) => {
+    setEmployeeRemainingHours((prevHours) => ({
+      ...prevHours,
+      [employeeId]: Math.max(0, (prevHours[employeeId] || 0) - hoursWorked),
+    }));
+  }, []);
+
+  const hasOverlappingSchedule = (employeeId, start, end, excludeEventId) => {
     return events.some(
       (event) =>
         event.employeeId === employeeId &&
@@ -285,10 +213,31 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
     );
   };
 
+  const handleEventDrop = useCallback(
+    async ({ event, start, end }) => {
+      const newStart = new Date(start);
+      const newEnd = new Date(end);
+      newStart.setHours(event.start.getHours(), event.start.getMinutes());
+      newEnd.setHours(event.end.getHours(), event.end.getMinutes());
+      const updatedEvent = { ...event, start: newStart, end: newEnd };
+      await updateSchedule(event.id, updatedEvent);
+      setEvents((prev) =>
+        prev.map((ev) => (ev.id === event.id ? updatedEvent : ev))
+      );
+    },
+    [setEvents]
+  );
+
   const handleSelectSlot = useCallback(
     ({ start, end }) => {
       if (!selectedEmployeeId) {
         alert("Please select an employee first.");
+        return;
+      }
+      if (hasOverlappingSchedule(selectedEmployeeId, start, end, null)) {
+        alert(
+          "This schedule overlaps with an existing schedule for this employee."
+        );
         return;
       }
       setSelectedSlot({ start, end });
@@ -299,19 +248,14 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
     [selectedEmployeeId]
   );
 
-  //functoin to handle dialog close, to close the dialog and clear the selected event ID,
-  // selected slot, start time, end time, and event description
   const handleDialogClose = () => {
     setOpenDialog(false);
-    setSelectedEventId(null); // Clear selected event ID
-    setSelectedSlot({ start: new Date(), end: new Date() });
     setStartTime("");
     setEndTime("");
+    setSelectedEventId(null);
     setEventDescription("");
   };
 
-
-  // handle schedule set function to set the schedule for the selected employee
   const handleScheduleSet = async () => {
     const [startHour, startMinute] = startTime.split(":").map(Number);
     const [endHour, endMinute] = endTime.split(":").map(Number);
@@ -320,8 +264,25 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
     const newEventEnd = new Date(selectedSlot.start);
     newEventEnd.setHours(endHour, endMinute);
 
+    if (newEventEnd <= newEventStart) {
+      alert("End time must be after start time.");
+      return;
+    }
     if (!selectedEmployeeId) {
       alert("No employee selected.");
+      return;
+    }
+    if (
+      hasOverlappingSchedule(
+        selectedEmployeeId,
+        newEventStart,
+        newEventEnd,
+        selectedEventId
+      )
+    ) {
+      alert(
+        "This schedule overlaps with an existing schedule for this employee."
+      );
       return;
     }
 
@@ -332,293 +293,252 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
     }
 
     const title = `${employee.employee_fname} ${employee.employee_lname}`;
-    const shiftDuration =
-      (newEventEnd.getTime() - newEventStart.getTime()) / (1000 * 60 * 60);
 
-    if ((employeeRemainingHours[selectedEmployeeId] || 0) < shiftDuration) {
-      alert("Not enough remaining hours for this employee.");
-      return;
-    }
+    // Create a new event including position
+    const newEvent = {
+      id: "", // This will be set after adding to Firestore
+      title,
+      start: newEventStart,
+      end: newEventEnd,
+      employeeId: employee.id,
+      description: eventDescription,
+      position: employee.employee_position, // Include position here
+    };
 
     if (selectedEventId) {
-      // Update existing event
-      try {
-        await updateDoc(doc(db, "schedules", selectedEventId), {
-          title,
-          start: newEventStart,
-          end: newEventEnd,
-          description: eventDescription,
-        });
-  
-        setEvents((prev) =>
-          prev.map((ev) =>
-            ev.id === selectedEventId
-              ? { ...ev, title, start: newEventStart, end: newEventEnd }
-              : ev
-          )
-        );
-  
-        console.log("Event updated:", selectedEventId);
-      } catch (error) {
-        console.error("Error updating event:", error);
-        alert("Failed to update event.");
-      }
-    } else {
-      // Create new event
-      await addSchedule(
-        title,
-        newEventStart,
-        newEventEnd,
-        selectedEmployeeId,
-        eventDescription,
-        isKitchen
-      );
-    }
-
-    setOpenDialog(false);
-    setStartTime("");
-    setEndTime("");
-    setEventDescription("");
-
-    handleDialogClose(); // Clear selected event ID
-  };
-
-
-  // handle event drop function to update the event start and end times in the database
-  const handleEventDrop = async ({ event, start, end }) => {
-    const updatedEvent = { ...event, start, end };
-  
-    try {
-      await updateDoc(doc(db, "schedules", event.id), {
-        start,
-        end,
+      // Update an existing schedule
+      await updateSchedule(selectedEventId, {
+        ...newEvent,
+        id: selectedEventId,
+        scheduleType: isKitchen ? 'Kitchen Side' : 'Dining Side',
       });
       setEvents((prev) =>
-        prev.map((ev) => (ev.id === event.id ? updatedEvent : ev))
+        prev.map((ev) =>
+          ev.id === selectedEventId ? { ...newEvent, id: selectedEventId } : ev
+        )
       );
-  
-      console.log(`Shift updated for event ID: ${event.id}`);
-    } catch (error) {
-      console.error("Error updating event:", error);
-      alert("Failed to update event.");
+    } else {
+      // Adding a new schedule
+      const addedEvent = await addSchedule(
+        newEvent.title,
+        newEvent.start,
+        newEvent.end,
+        newEvent.employeeId,
+        newEvent.description,
+        isKitchen
+      );
+
+      // Add the event with its position to state
+      if (addedEvent) {
+        setEvents((prev) => [...prev, addedEvent]);
+      }
     }
+
+    handleDialogClose();
   };
-
-  // handle select event function to set the selected slot, employee ID, and open the dialog
-  const handleSelectEvent = (event) => {
-    setSelectedSlot({ start: event.start, end: event.end });
-    setSelectedEmployeeId(event.employeeId);
-    setSelectedEmployeeName(event.title);
-    setEventDescription(event.description || "");
-    setSelectedEventId(event.id);
-    setOpenDialog(true);
-  };
-
-
-  
 
   const handleDeleteSchedule = async () => {
     if (!selectedEventId) return;
-  
-    try {
-      await deleteDoc(doc(db, "schedules", selectedEventId));
-      setEvents((prev) => prev.filter((event) => event.id !== selectedEventId));
-      console.log("Event deleted:", selectedEventId);
-    } catch (error) {
-      console.error("Error deleting event:", error);
-      alert("Failed to delete event.");
-    }
-  
-    setOpenDialog(false);
-    setSelectedEventId(null); // Clear selected event
+    await deleteDoc(doc(db, "schedules", selectedEventId));
+    setEvents((prev) => prev.filter((ev) => ev.id !== selectedEventId));
+    handleDialogClose();
   };
-  
- 
-  // handle export to PDF function to generate a PDF of the weekly employee schedule
-  const handleExportToPDF = () => {
-    const doc = new jsPDF();
-  
-    // Add Title
-    doc.setFontSize(14);
-    doc.text("Weekly Employee Schedule", 30, 20); // (text, x, y)
-  
-  
-    // Prepare Table Columns
-    const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    const tableColumns = ["Employee", ...daysOfWeek.map((day, index) => `${day} (${moment().startOf("week").add(index + 1, "days").format("D/MM")})`)];
-  
-  // Prepare Table Data
-  const tableRows = employees.map((employee) => {
-    const row = [employee.employee_fname + " " + employee.employee_lname]; // Employee Name
-    daysOfWeek.forEach((day, index) => {
-      // Get the start date of the week for reference
-      const currentDate = moment()
-        .startOf("week")
-        .add(index + 1, "days")
-        .format("YYYY-MM-DD"); // Format to match event date
+  // useEffect(() => {
+  //   console.log("Events to be displayed:", events);
+  // }, [events]); // This will log whenever events change
 
-      // Filter events for this employee and day
-      const dayEvents = events.filter(
-        (event) =>
-          event.employeeId === employee.id &&
-          moment(event.start).format("YYYY-MM-DD") === currentDate
-      );
 
-      if (dayEvents.length > 0) {
-        // Combine all shifts into one cell
-        const shiftDetails = dayEvents
-          .map(
-            (event) =>
-              `${event.description} (${moment(event.start).format("h:mm A")} to ${moment(event.end).format("h:mm A")})`
-          )
-          .join("\n");
-        row.push(shiftDetails);
-      } else {
-        row.push(""); // Empty cell for no shifts
+  // Export to pdf function 
+  const exportToPDF = () => {
+    // Identify the start and end of the week (starting from Monday).
+    // Moment.js's startOf('week') gets the start of the week (Sunday), so we add 1 day to make it Monday.
+    const startOfWeek = moment().startOf('week').add(1, 'days'); 
+    // End of the week is determined by adding 1 day to the end of the week (Sunday), to get the actual end date.
+    const endOfWeek = moment().endOf('week').add(1, 'days'); 
+    
+    // Format the week range as a string, e.g., "Week of October 1, 2024 - October 7, 2024".
+    const weekRange = `Week of ${startOfWeek.format("MMMM D, YYYY")} - ${endOfWeek.format("MMMM D, YYYY")}`;
+    
+    // Filter the events to get only those that fall within the current week
+    const filteredEvents = events.filter((event) => {
+      // Convert event's start time to a moment object for comparison.
+      const eventStart = moment(event.start);
+      // Check if the event start time falls within the start and end of the current week.
+      return eventStart.isBetween(startOfWeek, endOfWeek, 'days', '[]');
+    });
+    
+    // Define the days of the week to loop through later.
+    const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    // Create an object to store events grouped by day of the week.
+    // The 'reduce' function initializes the object and adds empty arrays for each day.
+    const eventsByDay = daysOfWeek.reduce((acc, day) => {
+      acc[day] = [];
+       return acc;
+    }, {});
+    
+    // Loop through the filtered events to group them by day of the week.
+    filteredEvents.forEach((event) => {
+      // Get the name of the day for the event (e.g., "Monday").
+      const dayOfWeek = moment(event.start).format("dddd"); // Get day name (e.g., "Monday")
+      // If the event's day matches one of the days in our 'eventsByDay' object, add the event to that day.
+      if (eventsByDay[dayOfWeek]) {
+        eventsByDay[dayOfWeek].push(event);
       }
     });
-    return row;
-    });
-  
-    // Render Table in PDF
-    doc.autoTable({
-      head: [tableColumns],
-      body: tableRows,
-      startY: 20,
-      theme: "grid",
-      styles: {
-        halign: "center", // Center align text
-        valign: "middle", // Vertically align text
-      },
-      columnStyles: {
-        0: { halign: "left" }, // Align employee names to the left
-      },
-      didDrawCell: (data) => {
-        // Check if the cell contains "No shift"
-        if (data.cell.raw === "No shift") {
-          doc.setFillColor(200); // Set gray background color
-          doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height, "F"); // Fill the cell
+    
+    // Create the PDF document
+    const doc = new jsPDF();
+    // Set the font size for the document text to 12 (standard size).
+    doc.setFontSize(12);
+    // Add the formatted week range (e.g., "Week of October 1, 2024 - October 7, 2024") to the PDF at position (14, 10).
+    doc.text(weekRange, 14, 10);
+    
+    doc.line(14, 15, 200, 15);
+    
+    let yPosition = 20; // Start adding text at y = 20
+    
+    // Loop over the days of the week 
+    daysOfWeek.forEach((day) => {
+      // Add the day of the week as a header, with a larger font size (14) 
+      doc.setFontSize(14); 
+      doc.text(day, 14, yPosition);
+      // Draw a line under the day header
+      doc.line(14, yPosition + 5, 200, yPosition + 5); 
+      
+      yPosition += 10; // Move y position down for the events
+    
+      // Add events for the current day
+      eventsByDay[day].forEach((event, index) => {
+        // Find the employee associated with the event by matching the employee ID
+        const employee = employees.find((emp) => emp.id === event.employeeId);
+        // Format the event's start and end times using moment.js
+        const startTime = moment(event.start).format("HH:mm");
+        const endTime = moment(event.end).format("HH:mm");
+        // Default the event description to "No description" if it's not provided
+        const eventDescription = event.description || "No description";
+    
+        // Create the event text that combines the employee's name, time, and description
+        const text = `${employee.employee_fname} ${employee.employee_lname} - ${startTime} - ${endTime} (${eventDescription})`;
+    
+        // Set the font size back to 12 for the event details and add the event text to the PDF
+        doc.setFontSize(12);
+        doc.text(text, 14, yPosition + (index * 10)); // Adjust the position for each event
+        yPosition += 10; // Increment position for the next event
+    
+        // If the yPosition exceeds the bottom of the page (270), add a new page
+        if (yPosition > 270) {
+          doc.addPage();
+          yPosition = 10; // Reset y position after a page break
         }
-      },
+      });
+    
+      // Add some space after each day
+      yPosition += 10;
     });
-  
-    // Save PDF
-    doc.save("Employee_Schedule.pdf");
+    
+    // Save the generated PDF document as a file named "employee_schedule.pdf"
+    doc.save("employee_schedule.pdf");
   };
-  
-  
-  
 
   return (
-    <Box display="flex" flexDirection="column" height="100vh" padding={""}>
-
-      {/* Auto Generate Button Section */}
-      <Box
-        display="flex"
-        justifyContent="flex-start"
-        gap={5}
-        sx={{ padding: "1.5rem"}}
+    <Box sx={{ display: "flex", height: "100%" }}>
+      <Paper
+        elevation={3}
+        sx={{
+          backgroundColor: "LightSlateGrey",
+          width: 200,
+          padding: 1,
+          marginTop: "5px",
+          marginRight: "5px",
+        }}
       >
-        <AutoGenerateSchedule
-        
-          employees={employees}
-          addSchedule={addSchedule}
-          hasOverlappingSchedule={hasOverlappingSchedule}
-          setEvents={setEvents}
-          updateEmployeeHours={updateRemainingHours}
-          isKitchen={isKitchen}
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleExportToPDF}
-        >
-          Export to PDF
-        </Button>
-      </Box>
-  
-      {/* Calendar Section */}
-      <Box display="flex" flexGrow={1} overflow="hidden"> 
-        
-        {/* Employee List */}
-        <Paper
-          style={{
-            width: "250px",
-            overflowY: "auto",
-            padding: "8px",
-            height: "100%",
-          }}
-        >
-          <Typography variant="h6" align="center">
-            Employee List
-          </Typography>
-          <List>
-            {employees.map((employee) => (
-              <ListItem
-                key={employee.id}
-                onClick={() => {
-                  setSelectedEmployeeId(employee.id);
-                  setSelectedEmployeeName(
-                    `${employee.employee_fname} ${employee.employee_lname}`
-                  );
+        <Typography variant="h6" textAlign="center">
+          Employees
+        </Typography>
+        <List sx={{ display: "flex", flexDirection: "column" }}>
+          {employees.map((employee) => (
+            <ListItem
+              key={employee.id}
+              onClick={() => {
+                setSelectedEmployeeId(employee.id);
+                setSelectedEmployeeName(
+                  `${employee.employee_fname} ${employee.employee_lname}`
+                );
+              }}
+              style={{
+                cursor: "pointer",
+                padding: "1px",
+                border:
+                  selectedEmployeeId === employee.id
+                    ? "2px solid black"
+                    : "none",
+                borderRadius: "5px",
+                backgroundColor:
+                  selectedEmployeeId === employee.id
+                    ? "#8a2be2"
+                    : "transparent",
+                height: "72px",
+              }}
+            >
+              <ListItemText
+                primary={`${employee.employee_fname} ${employee.employee_lname}`}
+                secondary={
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      {employee.employee_position}
+                    </Typography>
+                    <Typography component="span" variant="body2">
+                      {employee.remainingHours
+                        ? `${employee.remainingHours}hr left`
+                        : getEmployeeHours(employee.employee_type)}
+                    </Typography>
+                  </Box>
+                }
+                secondaryTypographyProps={{ component: "div" }} 
+                sx={{
+                  backgroundColor: "#B0C4DE",
+                  padding: "9px",
+                  borderRadius: "2px",
                 }}
-                style={{
-                  cursor: "pointer",
-                  backgroundColor:
-                    selectedEmployeeId === employee.id ? "#d3d3d3" : "white",
-                  margin: "1rem 0",
-                  borderRadius: "4px",
-                }}
-              >
-                <Avatar src={employee.photoURL} alt={employee.employee_fname} />
-                <ListItemText
-                  primary={`${employee.employee_fname} ${employee.employee_lname}`}
-                  secondary={
-                    <>
-                      <Typography variant="body2">
-                        {employee.employee_position}
-                      </Typography>
-                      <Typography variant="body2">
-                        Remaining Hours:{" "}
-                        {employeeRemainingHours[employee.id] !== undefined
-                          ? employeeRemainingHours[employee.id].toFixed(1) // Format to 1 decimal place
-                          : getMaxHours(employee.employee_type)}{" "}
-                        hrs
-                      </Typography>
-                    </>
-                  }
-                />
-              </ListItem>
-            ))}
-          </List>
-        </Paper>
-  
-        {/* Calendar */}
-        <Box flexGrow={1} overflow="hidden">
-          <DnDCalendar
-            localizer={localizer}
-            events={events}
-            selectable
-            resizable
-            onEventDrop={handleEventDrop}
-            onSelectEvent={handleSelectEvent}
-            onSelectSlot={handleSelectSlot}
-            dayLayoutAlgorithm="overlap"
-            defaultView="week"
-            style={{ height: "100%", width: "100%" }}
-          />
-        </Box>
-      </Box>
-  
-      {/* Dialog for Event Actions */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>{`Assign Shift for ${selectedEmployeeName}`}</DialogTitle>
-
               />
             </ListItem>
           ))}
         </List>
       </Paper>
+
+        {/* Button to create a pdf schedule */}
+      <Button 
+      variant="contained"  
+      size="small" 
+      onClick={exportToPDF}
+      sx={{
+        position: 'absolute',         
+        bottom: '500px',               
+        right: '16px',                              
+        borderRadius: '8px',          
+        padding: '10px 20px',              
+        height: '50px',
+        width: '250px',
+        border: '1px solid #000000',
+        backgroundColor: 'primary',
+          '&:hover': {
+            backgroundColor: '#4b00c7',
+            borderColor: '#4b00c7',
+          },
+      }}
+      >
+        Export Schedule to PDF
+      </Button>
 
       <DnDCalendar
         localizer={localizer}
@@ -660,49 +580,59 @@ const EmployeeScheduler = ({ employees, isKitchen }) => {
         </DialogTitle>
         <DialogContent>
           <TextField
+            autoFocus
+            margin="dense"
             label="Start Time (HH:mm)"
             type="time"
             fullWidth
+            variant="outlined"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
           />
           <TextField
+            margin="dense"
             label="End Time (HH:mm)"
             type="time"
             fullWidth
+            variant="outlined"
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
           />
           <TextField
+            margin="dense"
             label="Description"
             type="text"
             fullWidth
+            variant="outlined"
             value={eventDescription}
             onChange={(e) => setEventDescription(e.target.value)}
           />
         </DialogContent>
         <DialogActions>
-          {selectedEventId ? (
-            // When updating an existing event
-            <>
-              <Button color="error" onClick={handleDeleteSchedule}>
-                Delete
-              </Button>
-              <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-              <Button onClick={handleScheduleSet}>Update</Button>
-            </>
-          ) : (
-            // When creating a new event
-            <>
-              <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-              <Button onClick={handleScheduleSet}>Set Schedule</Button>
-            </>
+          {selectedEventId && (
+            <Button color="error" onClick={handleDeleteSchedule}>
+              Delete
+            </Button>
           )}
+          <Button onClick={handleDialogClose}>Cancel</Button>
+          <Button onClick={handleScheduleSet}>
+            {selectedEventId ? "Update Schedule" : "Set Schedule"}
+          </Button>
         </DialogActions>
       </Dialog>
+      <Box>
+        <AutoGenerateSchedule
+          employees={employees}
+          addSchedule={addSchedule}
+          hasOverlappingSchedule={hasOverlappingSchedule}
+          setEvents={setEvents}
+          updateEmployeeHours={updateEmployeeHours}
+          // employeeRemainingHours={employeeRemainingHours}
+          isKitchen={isKitchen}
+        />
+      </Box>
     </Box>
   );
-  
 };
 
 export default EmployeeScheduler;
